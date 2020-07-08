@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const validator = require('validator');
+const UserController = require('./controllers/UserController');
 const port = 3000;
 
 const app = express();
@@ -23,26 +24,7 @@ app.get('/membresias', (req, res) => {
 
 /*Funcion POST para la creación de un nuevo usuario*/
 app.post('/users/nuevo', async (req, res) => {
-    let validacion = await validacionNuevoUsuario(req);
-    if (!validacion.error) {
-        const user = {
-            nombre_usuario: req.body.nombre_usuario,
-            email: req.body.email,
-            numero_celular: req.body.numero_celular,
-            password: req.body.password,
-            rol_id_rol: 2
-        }
-        await UserModel.create(user).then(usuario => {
-             Membresia.update({ user_id_user: usuario.id_user }, {
-                 where: {
-                   id_membresia: validacion.id_membresia
-                 }
-               });
-        });
-        res.json({succcess:'Usuario registrado correctamente'})
-    } else {
-        res.json(validacion)
-    }
+    res.json(await UserController.crearUsuario(req));
 });
 
 app.get('/users/:id', (req, res) => {
