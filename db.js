@@ -1,9 +1,10 @@
 const Sequelize = require('sequelize');
+require('dotenv').config();
 const { UsuarioModel } = require('./models/user')
 const User = require('./models/user')
 const MembresiaModel = require('./models/membresia')
 
-const URL = 'mysql://root:Tuv267mato@localhost:3306/cpg'
+const URL = process.env.URL_DB
 const sequelize = new Sequelize(URL);
 
 
