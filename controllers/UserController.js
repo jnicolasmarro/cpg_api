@@ -1,30 +1,7 @@
 /*Controlador de Usuario*/
 const validator = require('validator');
-const { UserModel,Membresia } = require('../db');
+const { UserModel, Membresia } = require('../db');
 const bcrypt = require('bcryptjs');
-
-const crearUsuario = async (req) => {
-    let validacion = await validacionNuevoUsuario(req);
-    if (!validacion.error) {
-        const user = {
-            nombre_usuario: req.body.nombre_usuario,
-            email: req.body.email,
-            numero_celular: req.body.numero_celular,
-            password: req.body.password,
-            rol_id_rol: 2
-        }
-        await UserModel.create(user).then(usuario => {
-             Membresia.update({ user_id_user: usuario.id_user }, {
-                 where: {
-                   id_membresia: validacion.id_membresia
-                 }
-               });
-        });
-       return {succcess:'Usuario registrado correctamente'}
-    } else {
-       return validacion
-    }
-}
 
 /* 
 Función para la validación de los datos de registro de un nuevo usuario
@@ -34,6 +11,7 @@ Función para la validación de los datos de registro de un nuevo usuario
 - Si la membresía es válida se retorna el id de la membresía
 - Se valida que el correo ingresado no se encuentre registrado
 - Se valida que la contraseña contenga mínimo 8 caracteres
+@req 
 */
 async function validacionNuevoUsuario(req) {
     let error = [];
@@ -71,40 +49,50 @@ async function validacionNuevoUsuario(req) {
     }
     if (validator.isEmpty(req.body.numero_celular, { ignore_whitespace: true })) {
         error.push('No ha ingresado un número celular')
-    } else if (!validator.isMobilePhone(req.body.numero_celular, "es-CO" )) {
+    } else if (!validator.isMobilePhone(req.body.numero_celular, "es-CO")) {
         error.push('El número celular no es válido')
     }
     if (validator.isEmpty(req.body.nombre_usuario, { ignore_whitespace: true })) {
         error.push('No ha ingresado el nombre')
     }
-    if (error.length == 0){
+    if (error.length == 0) {
         error = null;
     }
     return { error, id_membresia };
 };
 
-module.exports ={
+module.exports = {
     async crearUsuario(req, res) {
         let validacion = await validacionNuevoUsuario(req);
-    if (!validacion.error) {
-        const user = {
-            nombre_usuario: req.body.nombre_usuario,
-            email: req.body.email,
-            numero_celular: req.body.numero_celular,
-            password: req.body.password,
-            rol_id_rol: 2
+        if (!validacion.error) {
+            let salt = bcrypt.genSaltSync(10);
+            const user = {
+                nombre_usuario: req.body.nombre_usuario,
+                email: req.body.email,
+                numero_celular: req.body.numero_celular,
+                password: bcrypt.hashSync(req.body.password, salt),
+                rol_id_rol: 2
+            }
+            await UserModel.create(user).then(usuario => {
+                Membresia.update({ user_id_user: usuario.id_user }, {
+                    where: {
+                        id_membresia: validacion.id_membresia
+                    }
+                });
+            });
+            return res.json({ succcess: 'Usuario registrado correctamente' })
+        } else {
+            return res.json(validacion)
         }
-        await UserModel.create(user).then(usuario => {
-             Membresia.update({ user_id_user: usuario.id_user }, {
-                 where: {
-                   id_membresia: validacion.id_membresia
-                 }
-               });
-        });
-       return res.json({succcess:'Usuario registrado correctamente'})
-    } else {
-       return res.json(validacion)
+
+    },
+    obtenerUsuario(req, res) {
+        UserModel.findOne({ where: { id_user: req.params.id } })
+            .then(user => {
+                if (user)
+                    res.json(user)
+                else
+                    res.json({ error: 'Usuario no existe' });
+            })
     }
-        
-    }
-};
+}

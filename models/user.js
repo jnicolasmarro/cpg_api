@@ -26,14 +26,6 @@ const UsuarioModel = (sequelize, type) => {
         }
     }
         , {
-            hooks: {
-                beforeCreate: function (user) {
-                    var salt = bcrypt.genSaltSync(10);
-                    var hash = bcrypt.hashSync(user.password, salt);
-                    user.password = hash;
-                    
-                }
-            },
             tableName: 'user',
             timestamps: true
             

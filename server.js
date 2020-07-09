@@ -1,11 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const validator = require('validator');
-const UserController = require('./controllers/UserController');
-const port = 3000;
 const usersRouter = require('./routes/users')
-
 const app = express();
+require('dotenv').config();
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -28,17 +25,6 @@ app.post('/users/nuevo', async (req, res) => {
     res.json(await UserController.crearUsuario(req));
 });
 
-app.get('/users/:id', (req, res) => {
-    let id = req.params.id;
-    UserModel.findOne({ where: { id_user: id } })
-        .then(user => {
-            if (user)
-                res.json(user)
-            else
-                res.json({ error: 'Usuario no existe' });
-        })
-
-});
 
 app.get('/login', async (req, res) => {
     res.json(await validacionLogin(req));
@@ -52,10 +38,8 @@ app.delete('/users/:id', (req, res) => {
     res.send('DELETE /users/:id')
 });*/
 
-app.listen(port, () => {
-
+app.listen(process.env.PORT, () => {
     console.log('Servidor arrancado!');
-
 });
 
 async function validacionLogin(req) {

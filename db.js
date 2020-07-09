@@ -13,6 +13,5 @@ const Membresia = MembresiaModel(sequelize, Sequelize)
 
 module.exports = {
     UserModel,
-    Membresia,
-    User
+    Membresia
 }
