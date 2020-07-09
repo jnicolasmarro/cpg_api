@@ -84,7 +84,27 @@ async function validacionNuevoUsuario(req) {
 };
 
 module.exports ={
-    crearUsuario(req,res) {
+    async crearUsuario(req, res) {
+        let validacion = await validacionNuevoUsuario(req);
+    if (!validacion.error) {
+        const user = {
+            nombre_usuario: req.body.nombre_usuario,
+            email: req.body.email,
+            numero_celular: req.body.numero_celular,
+            password: req.body.password,
+            rol_id_rol: 2
+        }
+        await UserModel.create(user).then(usuario => {
+             Membresia.update({ user_id_user: usuario.id_user }, {
+                 where: {
+                   id_membresia: validacion.id_membresia
+                 }
+               });
+        });
+       return res.json({succcess:'Usuario registrado correctamente'})
+    } else {
+       return res.json(validacion)
+    }
         
     }
 };

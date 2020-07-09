@@ -3,16 +3,17 @@ const bodyParser = require('body-parser');
 const validator = require('validator');
 const UserController = require('./controllers/UserController');
 const port = 3000;
+const usersRouter = require('./routes/users')
 
 const app = express();
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+/*
+const { UserModel,Membresia,User } = require('./db')*/
 
-const { UserModel,Membresia,User } = require('./db')
-
-
-app.get('/users', (req, res) => {
+app.use('/api/user',usersRouter)
+/*app.get('/users', (req, res) => {
     UserModel.findAll()
         .then(users => { res.json(users); })
 });
@@ -22,7 +23,7 @@ app.get('/membresias', (req, res) => {
         .then(membresias => { res.json(membresias); })
 });
 
-/*Funcion POST para la creación de un nuevo usuario*/
+/*Funcion POST para la creación de un nuevo usuario*//*
 app.post('/users/nuevo', async (req, res) => {
     res.json(await UserController.crearUsuario(req));
 });
@@ -49,7 +50,7 @@ app.put('/users/:id', (req, res) => {
 
 app.delete('/users/:id', (req, res) => {
     res.send('DELETE /users/:id')
-});
+});*/
 
 app.listen(port, () => {
 
@@ -85,7 +86,7 @@ Función para la validación de los datos de registro de un nuevo usuario
 - Si la membresía es válida se retorna el id de la membresía
 - Se valida que el correo ingresado no se encuentre registrado
 - Se valida que la contraseña contenga mínimo 8 caracteres
-*/
+*//*
 async function validacionNuevoUsuario(req) {
     let error=[];
     let id_membresia;
@@ -122,7 +123,7 @@ async function validacionNuevoUsuario(req) {
     }else if (!validator.isByteLength(req.body.password, { min: 8 })) {
         error.push('La contraseña debe tener mínimo 8 caracteres')
     }
-/*NUMEROS*/
+/*NUMEROS*//*
     if (validator.isEmpty(req.body.numero_celular, { ignore_whitespace: true })) {
         error.push('No ha ingresado un número celular')
     }
@@ -133,4 +134,4 @@ async function validacionNuevoUsuario(req) {
         error = null;
     }
     return { error, id_membresia };
-}
+}*/
