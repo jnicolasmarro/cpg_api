@@ -36,7 +36,7 @@ Función para la validación de los datos de registro de un nuevo usuario
 - Se valida que la contraseña contenga mínimo 8 caracteres
 */
 async function validacionNuevoUsuario(req) {
-    let error=[];
+    let error = [];
     let id_membresia;
     if (validator.isEmpty(req.body.codigo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el código de la membresía')
@@ -45,7 +45,7 @@ async function validacionNuevoUsuario(req) {
             .then(membresia => {
                 if (!membresia) {
                     error.push('La membresía ingresada no es válida')
-                } else if(!membresia.user_id_user) {
+                } else if (!membresia.user_id_user) {
                     id_membresia = membresia.id_membresia;
                 } else {
                     error.push('La membresía se encuentra asignada a un usuario');
@@ -66,12 +66,12 @@ async function validacionNuevoUsuario(req) {
     }
     if (validator.isEmpty(req.body.password, { ignore_whitespace: true })) {
         error.push('No ha ingresado la contraseña')
-    }else if (!validator.isByteLength(req.body.password, { min: 8 })) {
+    } else if (!validator.isByteLength(req.body.password, { min: 8 })) {
         error.push('La contraseña debe tener mínimo 8 caracteres')
     }
     if (validator.isEmpty(req.body.numero_celular, { ignore_whitespace: true })) {
         error.push('No ha ingresado un número celular')
-    } else if (!validator.isMobilePhone(req.body.numero_celular, {locale:"es-CO"})) {
+    } else if (!validator.isMobilePhone(req.body.numero_celular, "es-CO" )) {
         error.push('El número celular no es válido')
     }
     if (validator.isEmpty(req.body.nombre_usuario, { ignore_whitespace: true })) {
@@ -84,5 +84,7 @@ async function validacionNuevoUsuario(req) {
 };
 
 module.exports ={
-    crearUsuario
+    crearUsuario(req,res) {
+        
+    }
 };
