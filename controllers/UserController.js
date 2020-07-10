@@ -60,13 +60,40 @@ async function validacionNuevoUsuario(req) {
     }
     return { error, id_membresia };
 };
+async function validacionActualizarUsuario(req) {
+    let error = [];
+    if (validator.isEmpty(req.body.email, { ignore_whitespace: true })) {
+        error.push('No ha ingresado el correo')
+    } else if (!validator.isEmail(req.body.email)) {
+        error.push('No ha ingresado un correo válido')
+    } else {
+        await UserModel.findOne({ where: { email: req.body.email } }).
+            then(user => {
+                if (user && user.id_user != req.params.id) {
+                    error.push('El correo electrónico ya se encuentra en uso')
+                }
+            })
+    }
+    if (validator.isEmpty(req.body.numero_celular, { ignore_whitespace: true })) {
+        error.push('No ha ingresado un número celular')
+    } else if (!validator.isMobilePhone(req.body.numero_celular, "es-CO")) {
+        error.push('El número celular no es válido')
+    }
+    if (validator.isEmpty(req.body.nombre_usuario, { ignore_whitespace: true })) {
+        error.push('No ha ingresado el nombre')
+    }
+    if (error.length == 0) {
+        error = null;
+    }
+    return error
+}
 
 module.exports = {
     async crearUsuario(req, res) {
         let validacion = await validacionNuevoUsuario(req);
         if (!validacion.error) {
             let salt = bcrypt.genSaltSync(10);
-            const user = {
+            let user = {
                 nombre_usuario: req.body.nombre_usuario,
                 email: req.body.email,
                 numero_celular: req.body.numero_celular,
@@ -93,6 +120,36 @@ module.exports = {
                     res.json(user)
                 else
                     res.json({ error: 'Usuario no existe' });
+            })
+    },
+    async actualizarUsuario(req, res) {
+        let user = {
+            nombre_usuario: req.body.nombre_usuario,
+            email: req.body.email,
+            numero_celular: req.body.numero_celular,
+        }
+        let error = await validacionActualizarUsuario(req)
+        if (error) {
+           res.json(error) 
+        } else {
+            await UserModel.update(user, {
+                where: {
+                    id_user: req.params.id
+                }
+            }).then(res.json("Usuario actualizado con exito"))
+                .catch(error => {
+                console.log(error)
+            });
+        }
+        
+    },
+    async obtenerUsuarios(req, res) {
+        await UserModel.findAll({ where: { rol_id_rol: 2 } })
+            .then(users => {
+                if (users.length > 0)
+                    res.json(users)
+                else
+                    res.json("No existen usuarios")
             })
     }
 }
