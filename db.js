@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 require('dotenv').config();
-const { UsuarioModel } = require('./models/user')
-const User = require('./models/user')
+const UsuarioModel  = require('./models/user')
 const MembresiaModel = require('./models/membresia')
 
 const URL = process.env.URL_DB

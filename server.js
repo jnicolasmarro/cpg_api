@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users')
+const establecimientosRouter = require('./routes/establecimientos')
 const app = express();
 require('dotenv').config();
 
@@ -9,7 +10,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 /*
 const { UserModel,Membresia,User } = require('./db')*/
 
-app.use('/api/user',usersRouter)
+app.use('/api/user', usersRouter)
+
+app.use('/api/establecimiento',establecimientosRouter)
 /*app.get('/users', (req, res) => {
     UserModel.findAll()
         .then(users => { res.json(users); })
