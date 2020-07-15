@@ -1,6 +1,6 @@
 /*Controlador de Usuario*/
 const validator = require('validator');
-const { UserModel, Membresia } = require('../db');
+const { User, Membresia } = require('../db');
 const bcrypt = require('bcryptjs');
 
 /* 
@@ -35,7 +35,7 @@ async function validacionNuevoUsuario(req) {
     } else if (!validator.isEmail(req.body.email)) {
         error.push('No ha ingresado un correo válido')
     } else {
-        await UserModel.findOne({ where: { email: req.body.email } })
+        await User.findOne({ where: { email: req.body.email } })
             .then(user => {
                 if (user) {
                     error.push('El correo ingresado ya se encuentra registrado')
@@ -67,7 +67,7 @@ async function validacionActualizarUsuario(req) {
     } else if (!validator.isEmail(req.body.email)) {
         error.push('No ha ingresado un correo válido')
     } else {
-        await UserModel.findOne({ where: { email: req.body.email } }).
+        await User.findOne({ where: { email: req.body.email } }).
             then(user => {
                 if (user && user.id_user != req.params.id) {
                     error.push('El correo electrónico ya se encuentra en uso')
@@ -100,8 +100,8 @@ module.exports = {
                 password: bcrypt.hashSync(req.body.password, salt),
                 rol_id_rol: 2
             }
-            await UserModel.create(user).then(usuario => {
-                Membresia.update({ user_id_user: usuario.id_user }, {
+            await User.create(user).then(usuario => {
+             Membresia.update({ user_id_user: usuario.id_user }, {
                     where: {
                         id_membresia: validacion.id_membresia
                     }
@@ -114,7 +114,7 @@ module.exports = {
 
     },
     obtenerUsuario(req, res) {
-        UserModel.findOne({ where: { id_user: req.params.id } })
+        User.findOne({ where: { id_user: req.params.id } })
             .then(user => {
                 if (user)
                     res.json(user)
@@ -132,7 +132,7 @@ module.exports = {
         if (error) {
            res.json(error) 
         } else {
-            await UserModel.update(user, {
+            await User.update(user, {
                 where: {
                     id_user: req.params.id
                 }
@@ -144,12 +144,25 @@ module.exports = {
         
     },
     async obtenerUsuarios(req, res) {
-        await UserModel.findAll({ where: { rol_id_rol: 2 } })
+        await User.findAll({ where: { rol_id_rol: 2 } })
             .then(users => {
                 if (users.length > 0)
                     res.json(users)
                 else
                     res.json("No existen usuarios")
             })
+    },
+    async inactivarUsuario(req, res) {
+        let user = {
+            estado_user: 0
+        }
+        await User.update(user, {
+            where: {
+                id_user: req.params.id
+            }
+        }).then(res.json("Usuario inactivado"))
+            .catch(error => {
+            console.log(error)
+        });
     }
 }

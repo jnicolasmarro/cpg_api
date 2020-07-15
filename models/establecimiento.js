@@ -1,32 +1,43 @@
 module.exports= (sequelize, type) => {
     const Establecimiento = sequelize.define('establecimiento',{
-        id_user: {
-            type: type.INTEGER,
+        nit: {
+            type: type.BIGINT(11),
             primaryKey: true,
             unique: true,
-            autoIncrement: true
+            autoIncrement: false
         },
-        nombre_usuario: {
+        nombre_empresa: {
             type: type.STRING
         },
-        email: {
+        establecimiento_comercial: {
+            type: type.STRING
+        },
+        correo_establecimiento: {
             type: type.STRING,
-            unique: true
+            unique:true
         },
-        numero_celular: {
+        celular_establecimiento: {
             type: type.STRING
         },
-        password: {
+        direccion_establecimiento: {
             type: type.STRING
         },
-        rol_id_rol: {
-            type: type.INTEGER
+        autorizacion_datos: {
+            type: type.BOOLEAN
+        },
+        autorizacion_debito: {
+            type: type.BOOLEAN
+        },
+        logo_establecimiento: {
+            type: type.STRING
+        },
+        estado_establecimiento: {
+            type: type.BOOLEAN
         }
     }
         , {
-            tableName: 'user',
-            timestamps: true
-            
+            tableName: 'establecimiento',
+            timestamps: true    
       });
     return Establecimiento;
 }

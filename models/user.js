@@ -19,6 +19,9 @@ module.exports= (sequelize, type) => {
         password: {
             type: type.STRING
         },
+        estado_user: {
+            type: type.BOOLEAN
+        },
         rol_id_rol: {
             type: type.INTEGER
         }

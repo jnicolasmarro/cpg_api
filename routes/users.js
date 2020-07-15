@@ -12,6 +12,9 @@ router.get('/', UserController.obtenerUsuarios)
 router.post('/singup', UserController.crearUsuario)
 
 /*Actualizar Usuario*/
-router.put('/:id',UserController.actualizarUsuario)
+router.put('/:id', UserController.actualizarUsuario)
+
+/*Inactivar usuario*/
+router.delete('/:id',UserController.inactivarUsuario)
 
 module.exports = router
