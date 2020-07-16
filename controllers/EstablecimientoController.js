@@ -4,16 +4,15 @@ const validator = require('validator');
 
 
 
-var SquareConnect = require('square-connect');
-var defaultClient = SquareConnect.ApiClient.instance;
+const SquareConnect = require('square-connect');
+const defaultClient = SquareConnect.ApiClient.instance;
 // Set sandbox url
 defaultClient.basePath = 'https://connect.squareupsandbox.com';
 // Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
+const oauth2 = defaultClient.authentications['oauth2'];
 // Set sandbox access token
 oauth2.accessToken = process.env.SANDBOX_TOKEN;
-// Pass client to API
-var api = new SquareConnect.LocationsApi();
+
 
 async function validacionDatosEstablecimiento(establecimiento) {
   let error = [];
@@ -29,11 +28,9 @@ async function validacionDatosEstablecimiento(establecimiento) {
           error.push('Ya existe un establecimiento con el NIT ingresado')
       })
   }
-
   if (validator.isEmpty(establecimiento.nombre_empresa, { ignore_whitespace: true })) {
     error.push('No ha ingresado el nombre del establecimiento')
   }
-
   if (validator.isEmpty(establecimiento.establecimiento_comercial, { ignore_whitespace: true })) {
     error.push('No ha ingresado la descripción del establecimiento')
   }
@@ -49,18 +46,16 @@ async function validacionDatosEstablecimiento(establecimiento) {
           error.push('El correo ingresado ya se encuentra registrado')
         }
       })
-  }
+  } 
 
   if (validator.isEmpty(establecimiento.celular_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado un número celular del establecimiento')
   } else if (!validator.isMobilePhone(establecimiento.celular_establecimiento, "es-CO")) {
     error.push('El número celular del establecimiento no es válido')
   }
-
   if (validator.isEmpty(establecimiento.direccion_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado la dirección del establecimiento')
   }
-
   if (error.length == 0)
     error = null
   return error
@@ -115,6 +110,27 @@ function validacionHD(hd) {
   return error
 }
 
+async function añadirEstablecimiento(establecimiento, hd,admin) {
+  let apiInstance = new SquareConnect.CustomersApi();
+
+  await Establecimiento.create(Object.assign(establecimiento, hd))
+
+  let body = {
+    given_name: admin.nombre_usuario,
+    company_name: establecimiento.nombre_empresa,
+    email_address: establecimiento.correo_establecimiento,
+    phone_number: establecimiento.celular_establecimiento,
+    reference_id: establecimiento.nit
+  }
+
+  apiInstance.createCustomer(JSON.stringify(body)).then(function(data) {
+    console.log(data.customer)
+  }, function(error) {
+    console.error(error);
+  });
+
+}
+
 module.exports = {
   async creaEstablecimiento(req, res) {
 
@@ -159,54 +175,13 @@ module.exports = {
 
     if (errores) {
       res.json(errores)
+    } else {
+      await añadirEstablecimiento(establecimiento, hd, admin);
+      
     }
 
-
-    var apiInstance = new SquareConnect.CustomersApi();
-
-    /*var body = new SquareConnect.CreateCustomerRequest(); // CreateCustomerRequest | An object containing the fields to POST for the request.  See the corresponding object definition for field details.
-    *//*
-    apiInstance.createCustomer(req.body).then(function(data) {
-      console.log('API called successfully. Returned data: ' + data);
-    }, function(error) {
-      console.error(error);
-    });
-        */
   },
   async vincularTarjeta(req, res) {
-    let tok;
-
-    await stripe.tokens.create(
-      {
-        card: {
-          number: 5406910101410537,
-          exp_month: 10,
-          exp_year: 2024,
-          cvc: 361,
-        },
-      },
-      async function (err, token) {
-
-
-
-        stripe.customers.createSource(
-          'cus_HclfLlGlyAV3p4',
-          { source: token.id },
-          function (err, card) {
-            res.json(err)
-          }
-        )
-
-      }
-    );
-
-
-    /*await stripe.customers.createSource(
-        'cus_HclfLlGlyAV3p4',
-        {source: tok},
-        function(err, card) {
-          res.json(err)
-        }
-      )*/
+    
   }
 }
