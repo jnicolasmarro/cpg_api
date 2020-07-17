@@ -1,7 +1,7 @@
 module.exports= (sequelize, type) => {
     const Establecimiento = sequelize.define('establecimiento',{
         nit: {
-            type: type.BIGINT(11),
+            type: type.BIGINT(20),
             primaryKey: true,
             unique: true,
             autoIncrement: false
