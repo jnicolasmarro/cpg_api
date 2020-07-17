@@ -1,4 +1,4 @@
-const { Establecimiento,User } = require('../db');
+const { Establecimiento,User,Custormer_sq } = require('../db');
 const validator = require('validator');
 
 
@@ -123,8 +123,12 @@ async function añadirEstablecimiento(establecimiento, hd,admin) {
     reference_id: establecimiento.nit
   }
 
-  apiInstance.createCustomer(JSON.stringify(body)).then(function(data) {
-    console.log(data.customer)
+  apiInstance.createCustomer(JSON.stringify(body)).then(async function (data) {
+    let customer_sq = {
+      customer_id: data.customer.id,
+      establecimiento_nit:establecimiento.nit
+    }
+    await Custormer_sq.create(customer_sq)
   }, function(error) {
     console.error(error);
   });
@@ -177,7 +181,7 @@ module.exports = {
       res.json(errores)
     } else {
       await añadirEstablecimiento(establecimiento, hd, admin);
-      
+      res.json('Se ha agregado el establecimiento')
     }
 
   },
