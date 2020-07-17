@@ -1,5 +1,6 @@
-const { Establecimiento,User,Custormer_sq } = require('../db');
+const { Establecimiento, User, Custormer_sq, User_Establecimiento } = require('../db');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 
 
@@ -46,7 +47,7 @@ async function validacionDatosEstablecimiento(establecimiento) {
           error.push('El correo ingresado ya se encuentra registrado')
         }
       })
-  } 
+  }
 
   if (validator.isEmpty(establecimiento.celular_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado un número celular del establecimiento')
@@ -110,7 +111,7 @@ function validacionHD(hd) {
   return error
 }
 
-async function añadirEstablecimiento(establecimiento, hd,admin) {
+async function añadirEstablecimiento(establecimiento, hd, admin) {
   let apiInstance = new SquareConnect.CustomersApi();
 
   await Establecimiento.create(Object.assign(establecimiento, hd))
@@ -126,12 +127,33 @@ async function añadirEstablecimiento(establecimiento, hd,admin) {
   apiInstance.createCustomer(JSON.stringify(body)).then(async function (data) {
     let customer_sq = {
       customer_id: data.customer.id,
-      establecimiento_nit:establecimiento.nit
+      establecimiento_nit: establecimiento.nit
     }
-    await Custormer_sq.create(customer_sq)
-  }, function(error) {
+    await Custormer_sq.create(customer_sq).
+    then(await añadirAdminEstablecimiento(admin,establecimiento.nit))
+  }, function (error) {
     console.error(error);
   });
+
+}
+
+async function añadirAdminEstablecimiento(admin,nit) {
+  let salt = bcrypt.genSaltSync(10);
+  let user = {
+    nombre_usuario: admin.nombre_usuario,
+    email: admin.email,
+    numero_celular: admin.numero_celular,
+    password: bcrypt.hashSync(admin.password, salt),
+    rol_id_rol: 3
+  }
+  await User.create(user).
+    then(async usuario => {
+      let userEstablecimiento = {
+        user_id_user: usuario.id_user,
+        establecimiento_nit: nit
+      }
+      await User_Establecimiento.create(userEstablecimiento)
+    })
 
 }
 
@@ -172,7 +194,7 @@ module.exports = {
       errores = errores.concat(errorAdmin);
     if (errorHD != null)
       errores = errores.concat(errorHD);
-    
+
     if (errores.length == 0) {
       errores = null
     }
@@ -181,11 +203,11 @@ module.exports = {
       res.json(errores)
     } else {
       await añadirEstablecimiento(establecimiento, hd, admin);
-      res.json('Se ha agregado el establecimiento')
+      res.json('Establecimiento y Admin agregados')
     }
 
   },
   async vincularTarjeta(req, res) {
-    
+
   }
 }
