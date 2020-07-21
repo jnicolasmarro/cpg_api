@@ -1,14 +1,15 @@
 module.exports = (sequelize, type) => {
     const Membresia = sequelize.define('membresia',{
-        id_membresia: {
-            type: type.INTEGER,
-            primaryKey: true,
-            unique: true,
-            autoIncrement: true
-        },
-        codigo: {
+        codigo_membresia: {
             type: type.STRING,
+            primaryKey: true,
             unique: true
+        },
+        fecha_uso: {
+            type: type.DATE
+        },
+        fecha_vencimiento: {
+            type: type.DATE
         },
         user_id_user: {
             type: type.INTEGER,
