@@ -1,19 +1,20 @@
 const validator = require('validator');
 const { User, Membresia } = require('../../db');
 const bcrypt = require('bcryptjs');
+const { DisputedPayment } = require('square-connect');
 
 async function validacionNuevoUsuario(req) {
     let error = [];
-    let id_membresia;
+    let codigo_membresia;
     if (validator.isEmpty(req.body.codigo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el código de la membresía')
     } else {
-        await Membresia.findOne({ where: { codigo: req.body.codigo } })
+        await Membresia.findOne({ where: { codigo_membresia: req.body.codigo } })
             .then(membresia => {
                 if (!membresia) {
                     error.push('La membresía ingresada no es válida')
                 } else if (!membresia.user_id_user) {
-                    id_membresia = membresia.id_membresia;
+                    codigo_membresia = membresia.codigo_membresia;
                 } else {
                     error.push('La membresía se encuentra asignada a un usuario');
                 }
@@ -47,7 +48,7 @@ async function validacionNuevoUsuario(req) {
     if (error.length == 0) {
         error = null;
     }
-    return { error, id_membresia };
+    return { error, codigo_membresia };
 };
 
 module.exports = async (req, res) => {
@@ -62,9 +63,18 @@ module.exports = async (req, res) => {
                 rol_id_rol: 2
             }
             await User.create(user).then(usuario => {
-             Membresia.update({ user_id_user: usuario.id_user }, {
+                let hoy = new Date();
+                let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+                let fecha_vencimiento = new Date();
+                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + 182);
+                let membresia = {
+                    user_id_user: usuario.id_user,
+                    fecha_uso: fecha_hoy,
+                    fecha_vencimiento: fecha_vencimiento
+                }
+             Membresia.update(membresia, {
                     where: {
-                        id_membresia: validacion.id_membresia
+                        codigo_membresia: validacion.codigo_membresia
                     }
                 });
             });
