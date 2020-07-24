@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
                     }
                 });
             });
-            return res.json({ succcess: 'Usuario registrado correctamente' })
+            return res.json({ success: 'Usuario registrado correctamente' })
         } else {
             return res.json(validacion)
         }
