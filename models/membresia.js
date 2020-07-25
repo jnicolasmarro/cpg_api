@@ -12,8 +12,7 @@ module.exports = (sequelize, type) => {
             type: type.DATE
         },
         user_id_user: {
-            type: type.INTEGER,
-            unique: true
+            type: type.INTEGER
         }
     }
         , {
