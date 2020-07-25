@@ -124,20 +124,21 @@ async function añadirEstablecimiento(establecimiento, hd, admin) {
     reference_id: establecimiento.nit
   }
 
-  apiInstance.createCustomer(JSON.stringify(body)).then(async function (data) {
-    let customer_sq = {
-      customer_id: data.customer.id,
-      establecimiento_nit: establecimiento.nit
-    }
-    await Custormer_sq.create(customer_sq).
-    then(await añadirAdminEstablecimiento(admin,establecimiento.nit))
-  }, function (error) {
-    console.error(error);
-  });
+  apiInstance.createCustomer(JSON.stringify(body)).
+    then(async function (data) {
+      let customer_sq = {
+        customer_id: data.customer.id,
+        establecimiento_nit: establecimiento.nit
+      }
+      await Custormer_sq.create(customer_sq).
+        then(await añadirAdminEstablecimiento(admin, establecimiento.nit))
+    }, function (error) {
+      console.error(error);
+    });
 
 }
 
-async function añadirAdminEstablecimiento(admin,nit) {
+async function añadirAdminEstablecimiento(admin, nit) {
   let salt = bcrypt.genSaltSync(10);
   let user = {
     nombre_usuario: admin.nombre_usuario,
@@ -203,7 +204,7 @@ module.exports = {
       res.json(errores)
     } else {
       await añadirEstablecimiento(establecimiento, hd, admin);
-      res.json('Establecimiento y Admin agregados')
+      res.json({ success: 'Establecimiento y Admin agregados' })
     }
 
   },

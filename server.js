@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users')
 const establecimientosRouter = require('./routes/establecimientos')
+const adminEstablecimientoRouter = require('./routes/adminEstablecimiento')
 const authRouter = require('./routes/AuthRoutes/auth')
 const authMiddleware = require('./middleware/auth')
 const app = express();
@@ -14,7 +15,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use('/api/user',authMiddleware, usersRouter)
 
-app.use('/api/establecimiento',authMiddleware, establecimientosRouter)
+app.use('/api/establecimiento', establecimientosRouter)
+
+app.use('/api/adminEstablecimiento', adminEstablecimientoRouter)
 
 app.use('/api/auth',authRouter)
 
