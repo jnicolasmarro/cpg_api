@@ -16,6 +16,9 @@ Función para la validación de los datos de registro de un nuevo usuario
 async function validacionNuevoUsuario(req) {
     let error = [];
     let id_membresia;
+    if(!req.body.datos){
+        error.push('No ha aceptado el tratamiento de datos')
+    }
     if (validator.isEmpty(req.body.codigo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el código de la membresía')
     } else {
