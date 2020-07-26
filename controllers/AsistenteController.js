@@ -82,7 +82,8 @@ async function listarAsistentes(establecimiento) {
       model: User,
       as: 'users',
       where: {
-        rol_id_rol: 4
+        rol_id_rol: 4,
+        estado_user:1
       }
     }
   });
