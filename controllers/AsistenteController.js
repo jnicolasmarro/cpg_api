@@ -1,4 +1,4 @@
-const { User, User_Establecimiento } = require('../db');
+const { User, User_Establecimiento, Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
@@ -6,14 +6,14 @@ async function traeEstablecimiento(admin) {
 
   let nit;
 
-   await User_Establecimiento.findOne({ where: { user_id_user: admin } }).
+  await User_Establecimiento.findOne({ where: { user_id_user: admin } }).
     then(establecimiento => {
       if (establecimiento) {
-        nit= establecimiento.establecimiento_nit;
+        nit = establecimiento.establecimiento_nit;
       }
     })
 
-    return nit;
+  return nit;
 
 }
 
@@ -54,7 +54,7 @@ async function validacionDatosAsistente(asistente) {
 async function añadirAsistente(asistente, establecimiento) {
 
   let salt = bcrypt.genSaltSync(10);
-  
+
   let user = {
     nombre_usuario: asistente.nombre_usuario,
     email: asistente.email,
@@ -71,6 +71,28 @@ async function añadirAsistente(asistente, establecimiento) {
       }
       await User_Establecimiento.create(userEstablecimiento)
     })
+
+}
+
+async function listarAsistentes(establecimiento) {
+  User.belongsToMany(Establecimiento, { through: User_Establecimiento, foreignKey: 'user_id_user' });
+  Establecimiento.belongsToMany(User, { through: User_Establecimiento, foreignKey: 'establecimiento_nit' });
+  let establecimientos = await Establecimiento.findOne({
+    where: { nit: establecimiento }, include: {
+      model: User,
+      as: 'users',
+      where: {
+        rol_id_rol: 4
+      }
+    }
+  });
+
+  if (establecimientos == null) {
+    return null
+  } else {
+    return establecimientos.users
+  }
+
 
 }
 
@@ -100,6 +122,20 @@ module.exports = {
       res.json({ error: 'Error administrador de establecimiento!' })
     }
 
+  },
+  async listarAsistentesActivos(req, res) {
+    let admin = req.body.admin;
+    let establecimiento = await traeEstablecimiento(admin);
+    if (establecimiento) {
+      let asistentes = await listarAsistentes(establecimiento);
+      if (asistentes==null) {
+        res.json({ error: 'El establecimiento no tiene asistentes!' })
+      } else {
+        res.json({ asistentesEstablecimiento: asistentes })
+      }
+    } else {
+      res.json({ error: 'Error administrador de establecimiento!' })
+    }
   }
 
 }
