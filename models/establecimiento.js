@@ -33,6 +33,9 @@ module.exports= (sequelize, type) => {
         },
         estado_establecimiento: {
             type: type.BOOLEAN
+        },
+        ciudad_id_ciudad:{
+            type: type.INTEGER
         }
     }
         , {

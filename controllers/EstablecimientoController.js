@@ -168,7 +168,8 @@ module.exports = {
       establecimiento_comercial: req.body.establecimiento_comercial,
       correo_establecimiento: req.body.correo_establecimiento,
       celular_establecimiento: req.body.celular_establecimiento,
-      direccion_establecimiento: req.body.direccion_establecimiento
+      direccion_establecimiento: req.body.direccion_establecimiento,
+      ciudad_id_ciudad: req.body.ciudad
     }
 
     let admin = {
