@@ -26,6 +26,16 @@ INSERT INTO `ciudad` VALUES (4,'Barranquilla'),(1,'Bogotá'),(3,'Cali'),(2,'Mede
 UNLOCK TABLES;
 
 --
+-- Dumping data for table `experiencia_tipo`
+--
+
+LOCK TABLES `experiencia_tipo` WRITE;
+/*!40000 ALTER TABLE `experiencia_tipo` DISABLE KEYS */;
+INSERT INTO `experiencia_tipo` VALUES (1,'Gastronómica'),(2,'Entretenimiento');
+/*!40000 ALTER TABLE `experiencia_tipo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Dumping data for table `membresia`
 --
 
@@ -54,4 +64,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-27 18:43:47
+-- Dump completed on 2020-07-27 21:38:17
