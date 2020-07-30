@@ -14,9 +14,8 @@ module.exports = async (req, res) => {
 
                 if (validacionPassword) {
                     const token = jwt.sign(
-                        { userId: user._id },
-                        process.env.JWT_TOKEN,
-                        { expiresIn: '24h' });
+                        { userId: user.id_user },
+                        process.env.JWT_TOKEN);
                     return res.status(200).json({
                         userId: user.id_user,
                         token: token
