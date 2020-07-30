@@ -22,7 +22,7 @@ module.exports= (sequelize, type) => {
             type: type.BOOLEAN
         },
         comision:{
-            type: type.INTEGER
+            type: type.DECIMAL(5, 2)
         },
         imagen_experiencia: {
             type: type.STRING
