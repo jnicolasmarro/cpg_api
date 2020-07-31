@@ -11,4 +11,7 @@ router.get('/gastronomicas', ExperienciaController.obtenerGastronomicas)
 /*Obtener todas las experiencias de entretenimiento*/
 router.get('/entretenimiento', ExperienciaController.obtenerEntretenimiento)
 
+/*Obtener todas las experiencias de entretenimiento*/
+router.put('/activacion', ExperienciaController.activacionExperiencia)
+
 module.exports = router
