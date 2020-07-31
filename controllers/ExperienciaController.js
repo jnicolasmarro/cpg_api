@@ -1,4 +1,4 @@
-const { Experiencia, Establecimiento } = require('../db');
+const { Experiencia, Establecimiento,Item } = require('../db');
 const validator = require('validator');
 
 
@@ -60,6 +60,27 @@ async function validacionExperiencia(experiencia) {
 
 }
 
+async function validacionActivacionExperiencia(experiencia){
+    let error = [];
+    if (validator.isEmpty(experiencia.id_experiencia, { ignore_whitespace: true })) {
+        error.push('No ha ingresado el ID de la experiencia!')
+    }else{
+        await Experiencia.findOne({where:{id_experiencia:experiencia.id_experiencia}}).
+        then(exp=>{
+            if(!exp){
+                error.push('La experiencia no existe!')
+            }else{
+                if(exp.estado_experiencia==1){
+                    error.push('La experiencia ya se encuentra activa!')
+                }
+            }
+        })
+    }
+    if (error.length == 0)
+        error = null
+    return error
+}
+
 module.exports = {
     async crearExperiencia(req, res) {
         let experiencia = {
@@ -87,7 +108,11 @@ module.exports = {
         }
     },
     async obtenerGastronomicas(req, res) {
-        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 1,estado_experiencia:1 } }).
+        Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia' });
+        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 1,estado_experiencia:1 }, include: {
+            model: Item,
+            as: 'items'
+          } }).
         then(experienciasGastronomicas=>{
             if(experienciasGastronomicas.length>0){
                 res.json(experienciasGastronomicas)
@@ -105,6 +130,22 @@ module.exports = {
                 res.json({error:'No existen experiencias de entretenimiento aún!'})
             }
         })
+    },
+    async activacionExperiencia(req,res){
+        let experiencia = {
+            id_experiencia:req.body.id_experiencia
+        }
+
+        let errores = await validacionActivacionExperiencia(experiencia)
+
+        if(errores){
+            res.json({errores})
+        }else{
+            await Experiencia.update({estado_experiencia:1},
+                {where:{id_experiencia:req.body.id_experiencia}}).
+                then(res.json({success:'Experiencia activada!'}))
+        }
+        
     }
 
 
