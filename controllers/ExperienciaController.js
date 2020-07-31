@@ -1,6 +1,6 @@
 const { Experiencia, Establecimiento } = require('../db');
 const validator = require('validator');
-const experiencia = require('../models/experiencia');
+
 
 async function validacionExperiencia(experiencia) {
     let error = [];
@@ -85,7 +85,28 @@ module.exports = {
                 }
             })
         }
+    },
+    async obtenerGastronomicas(req, res) {
+        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 1,estado_experiencia:1 } }).
+        then(experienciasGastronomicas=>{
+            if(experienciasGastronomicas.length>0){
+                res.json(experienciasGastronomicas)
+            }else{
+                res.json({error:'No existen experiencias gastronómicas aún!'})
+            }
+        })
+    },
+    async obtenerEntretenimiento(req, res) {
+        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 2,estado_experiencia:1 } }).
+        then(experienciasEntretenimiento=>{
+            if(experienciasEntretenimiento.length>0){
+                res.json(experienciasEntretenimiento)
+            }else{
+                res.json({error:'No existen experiencias de entretenimiento aún!'})
+            }
+        })
     }
+
 
     
 }
