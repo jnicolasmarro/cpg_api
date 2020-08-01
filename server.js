@@ -10,10 +10,11 @@ const authMiddleware = require('./middleware/auth')
 const app = express();
 require('dotenv').config();
 
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.static('publico'));
 
 app.use('/api/user',authMiddleware, usersRouter)
 

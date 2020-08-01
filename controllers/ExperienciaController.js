@@ -1,5 +1,6 @@
 const { Experiencia, Establecimiento,Item } = require('../db');
 const validator = require('validator');
+const fs = require('fs')
 
 
 async function validacionExperiencia(experiencia) {
@@ -81,6 +82,42 @@ async function validacionActivacionExperiencia(experiencia){
     return error
 }
 
+async function validacionInactivacionExperiencia(experiencia){
+    let error = [];
+    if (validator.isEmpty(experiencia.id_experiencia, { ignore_whitespace: true })) {
+        error.push('No ha ingresado el ID de la experiencia!')
+    }else{
+        await Experiencia.findOne({where:{id_experiencia:experiencia.id_experiencia}}).
+        then(exp=>{
+            if(!exp){
+                error.push('La experiencia no existe!')
+            }else{
+                if(exp.estado_experiencia==0){
+                    error.push('La experiencia ya se encuentra inactiva!')
+                }
+            }
+        })
+    }
+    if (error.length == 0)
+        error = null
+    return error
+}
+
+async function validaImagenExperiencia(id_experiencia){
+    let error = [];
+  
+    await Experiencia.findOne({where:{id_experiencia:id_experiencia}}).
+    then(experiencia=>{
+      if(!experiencia){
+        error.push("No existe la experiencia!")
+      }
+    })
+    if (error.length == 0) {
+      error = null;
+    }
+    return error
+  }
+
 module.exports = {
     async crearExperiencia(req, res) {
         let experiencia = {
@@ -146,7 +183,46 @@ module.exports = {
                 then(res.json({success:'Experiencia activada!'}))
         }
         
-    }
+    },
+    async inactivacionExperiencia(req,res){
+        let experiencia = {
+            id_experiencia:req.body.id_experiencia
+        }
+
+        let errores = await validacionInactivacionExperiencia(experiencia)
+
+        if(errores){
+            res.json({errores})
+        }else{
+            await Experiencia.update({estado_experiencia:0},
+                {where:{id_experiencia:req.body.id_experiencia}}).
+                then(res.json({success:'Experiencia inactivada!'}))
+        }
+        
+    },
+    async añadirImagen(req,res){
+        if(req.file==undefined){
+          res.json({error:'Error al subir imagen!'})
+        }else{
+          let errores = await validaImagenExperiencia(req.body.id_imagen)
+          if(errores){
+            let path = req.file.path
+            fs.unlink(path, (err) => {
+              if (err) {
+                console.error(err)
+                return
+              }
+            
+            })
+            res.json({errores})
+          }else{
+            await Experiencia.update({imagen_experiencia:'/experiencias/'+''},
+              {where:{id_experiencia:req.body.id_imagen}})
+            res.json({success:'Imagen de experiencia subida con éxito!'})
+          }
+          
+        }
+      }
 
 
     

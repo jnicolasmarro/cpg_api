@@ -1,6 +1,7 @@
 const { Establecimiento, User, Custormer_sq, User_Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const fs = require('fs')
 
 
 
@@ -154,8 +155,23 @@ async function añadirAdminEstablecimiento(admin, nit) {
         establecimiento_nit: nit
       }
       await User_Establecimiento.create(userEstablecimiento)
-    })
+  })
 
+}
+
+async function validaNitLogo(nitEstablecimiento){
+  let error = [];
+
+  await Establecimiento.findOne({where:{nit:nitEstablecimiento}}).
+  then(establecimiento=>{
+    if(!establecimiento){
+      error.push("No existe el establecimiento!")
+    }
+  })
+  if (error.length == 0) {
+    error = null;
+  }
+  return error
 }
 
 module.exports = {
@@ -209,7 +225,27 @@ module.exports = {
     }
 
   },
-  async vincularTarjeta(req, res) {
-
+  async añadirLogo(req,res){
+    if(req.file==undefined){
+      res.json({error:'Error al subir imagen!'})
+    }else{
+      let errores = await validaNitLogo(req.body.id_imagen)
+      if(errores){
+        let path = req.file.path
+        fs.unlink(path, (err) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+        
+        })
+        res.json({errores})
+      }else{
+        await Establecimiento.update({logo_establecimiento:'/establecimiento/'+''},
+          {where:{nit:req.body.id_imagen}})
+        res.json({success:'Logo de establecimiento subido con éxito!'})
+      }
+      
+    }
   }
 }

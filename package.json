@@ -13,8 +13,11 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
     "mysql2": "^2.1.0",
+    "path": "^0.12.7",
     "sequelize": "^6.2.4",
     "square-connect": "^4.20200625.0",
     "validator": "^13.1.1"
