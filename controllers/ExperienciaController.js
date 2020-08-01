@@ -216,7 +216,7 @@ module.exports = {
             })
             res.json({errores})
           }else{
-            await Experiencia.update({imagen_experiencia:'/experiencias/'+''},
+            await Experiencia.update({imagen_experiencia:'/experiencias/'+req.file.filename},
               {where:{id_experiencia:req.body.id_imagen}})
             res.json({success:'Imagen de experiencia subida con éxito!'})
           }

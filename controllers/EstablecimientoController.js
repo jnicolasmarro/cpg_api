@@ -241,7 +241,8 @@ module.exports = {
         })
         res.json({errores})
       }else{
-        await Establecimiento.update({logo_establecimiento:'/establecimiento/'+''},
+        console.log(req.file.filename);
+        await Establecimiento.update({logo_establecimiento:'/establecimiento/'+req.file.filename},
           {where:{nit:req.body.id_imagen}})
         res.json({success:'Logo de establecimiento subido con éxito!'})
       }
