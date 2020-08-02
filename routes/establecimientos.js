@@ -7,6 +7,12 @@ const {upload} = require('../middleware/upload');
 router.post('/creacion', EstablecimientoController.creaEstablecimiento)
 
 /*Subir logo de establecimiento*/
-router.post('/subirLogo',upload.single('file'),EstablecimientoController.añadirLogo)
+router.put('/subirLogo',upload.single('file'),EstablecimientoController.añadirLogo)
+
+/*Vincular tarjeta a establecimiento*/
+router.post('/vincularTarjeta',EstablecimientoController.vincularTarjeta)
+
+/*Realizar un pago por nit del establecimiento*/
+router.get('/searchCustomer',EstablecimientoController.realizarPago)
 
 module.exports = router

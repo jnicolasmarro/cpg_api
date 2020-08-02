@@ -16,6 +16,8 @@ app.use(bodyParser.json())
 
 app.use(express.static('publico'));
 
+app.use(express.static(__dirname));
+
 app.use('/api/user',authMiddleware, usersRouter)
 
 app.use('/api/establecimiento', establecimientosRouter)

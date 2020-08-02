@@ -1,7 +1,8 @@
 const { Establecimiento, User, Custormer_sq, User_Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const fs = require('fs')
+const fs = require('fs');
+const crypto = require('crypto');
 
 
 
@@ -159,7 +160,7 @@ async function añadirAdminEstablecimiento(admin, nit) {
 
 }
 
-async function validaNitLogo(nitEstablecimiento){
+async function validaNit(nitEstablecimiento){
   let error = [];
 
   await Establecimiento.findOne({where:{nit:nitEstablecimiento}}).
@@ -172,6 +173,22 @@ async function validaNitLogo(nitEstablecimiento){
     error = null;
   }
   return error
+}
+
+
+async function registroTarjeta(nonce,id_customer){
+
+  let apiInstance = new SquareConnect.CustomersApi();
+  let data_result=null;
+  let error_result=null;
+
+  await apiInstance.createCustomerCard(id_customer, {card_nonce:nonce}).then(function(data) {
+    data_result=data;
+  }, function(error) {
+    error_result=error;
+  });
+  
+  return {data_result,error_result};
 }
 
 module.exports = {
@@ -229,7 +246,7 @@ module.exports = {
     if(req.file==undefined){
       res.json({error:'Error al subir imagen!'})
     }else{
-      let errores = await validaNitLogo(req.body.id_imagen)
+      let errores = await validaNit(req.body.id_imagen)
       if(errores){
         let path = req.file.path
         fs.unlink(path, (err) => {
@@ -241,12 +258,94 @@ module.exports = {
         })
         res.json({errores})
       }else{
-        console.log(req.file.filename);
         await Establecimiento.update({logo_establecimiento:'/establecimiento/'+req.file.filename},
           {where:{nit:req.body.id_imagen}})
         res.json({success:'Logo de establecimiento subido con éxito!'})
       }
       
     }
+  },
+  async vincularTarjeta(req, res){
+    let nit_establecimiento=req.body.nit_establecimiento;
+    let errores=await validaNit(nit_establecimiento);
+    console.log(req.body.nonce);
+    if(errores){
+      res.json({errores})
+    }else{
+      await Custormer_sq.findOne({where:{establecimiento_nit:nit_establecimiento}}).
+      then(async customer_sq=>{
+        if(customer_sq){
+          let vinculacion= await registroTarjeta(req.body.nonce,customer_sq.customer_id)
+
+          if(vinculacion.data_result){
+            res.json(vinculacion.data_result)
+            
+          }else{
+            if(vinculacion.error_result){
+              res.json(vinculacion.error_result)
+            }
+          }
+        }else{
+          res.json({error:'No se encuentra id de establecimiento en SquareUp'})
+        }
+      })
+    }
+
+
+  },
+  async realizarPago(req,res){
+
+    const idempotency_key = crypto.randomBytes(22).toString('hex');
+
+    let body={
+      query:
+      {
+        filter:{
+          reference_id:{
+            exact:req.body.nit_establecimiento
+          }
+        }
+      }
+    }
+
+    let apiInstance = new SquareConnect.CustomersApi();
+
+    let card;
+    let customer_id;
+    await apiInstance.searchCustomers(body).then(function(data) {
+      card=data.customers[0].cards[0];
+      customer_id=data.customers[0].id;
+    }, function(error) {
+      console.error(error);
+    });
+
+  
+   
+  
+
+  const payments_api = new SquareConnect.PaymentsApi();
+  const request_body = {
+    source_id: card.id,
+    amount_money: {
+      amount: 100000, // $1.00 charge
+      currency: 'COP'
+    },
+    idempotency_key: idempotency_key,
+    customer_id:customer_id
+  };
+
+  try {
+    const response = await payments_api.createPayment(request_body);
+    res.status(200).json({
+      'title': 'Payment Successful',
+      'result': response
+    });
+  } catch(error) {
+    res.status(500).json({
+      'title': 'Payment Failure',
+      'result': error.response.text
+    });
+  }
+
   }
 }
