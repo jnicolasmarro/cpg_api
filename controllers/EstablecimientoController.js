@@ -1,25 +1,17 @@
-const { Establecimiento, User, Custormer_sq, User_Establecimiento } = require('../db');
+const { Establecimiento, User, Custormer_ePayco, Ciudad, User_Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const crypto = require('crypto');
-
-
-
-
-const SquareConnect = require('square-connect');
-const defaultClient = SquareConnect.ApiClient.instance;
-// Set sandbox url
-defaultClient.basePath = 'https://connect.squareupsandbox.com';
-// Configure OAuth2 access token for authorization: oauth2
-const oauth2 = defaultClient.authentications['oauth2'];
-// Set sandbox access token
-oauth2.accessToken = process.env.SANDBOX_TOKEN;
+const epayco = require('epayco-sdk-node')({
+  apiKey: process.env.PUBLIC_KEY,
+  privateKey: process.env.PRIVATE_KEY,
+  lang: 'ES',
+  test: (process.env.EPAYCO_TEST == 'true')
+})
 
 
 async function validacionDatosEstablecimiento(establecimiento) {
   let error = [];
-
   if (validator.isEmpty(establecimiento.nit, { ignore_whitespace: true })) {
     error.push('No ha ingresado el NIT del establecimiento')
   } else if (!validator.isInt(establecimiento.nit)) {
@@ -114,30 +106,8 @@ function validacionHD(hd) {
 }
 
 async function añadirEstablecimiento(establecimiento, hd, admin) {
-  let apiInstance = new SquareConnect.CustomersApi();
-
-  await Establecimiento.create(Object.assign(establecimiento, hd))
-
-  let body = {
-    given_name: admin.nombre_usuario,
-    company_name: establecimiento.nombre_empresa,
-    email_address: establecimiento.correo_establecimiento,
-    phone_number: establecimiento.celular_establecimiento,
-    reference_id: establecimiento.nit
-  }
-
-  apiInstance.createCustomer(JSON.stringify(body)).
-    then(async function (data) {
-      let customer_sq = {
-        customer_id: data.customer.id,
-        establecimiento_nit: establecimiento.nit
-      }
-      await Custormer_sq.create(customer_sq).
-        then(await añadirAdminEstablecimiento(admin, establecimiento.nit))
-    }, function (error) {
-      console.error(error);
-    });
-
+  await Establecimiento.create(Object.assign(establecimiento, hd)).
+    then(await añadirAdminEstablecimiento(admin, establecimiento.nit))
 }
 
 async function añadirAdminEstablecimiento(admin, nit) {
@@ -156,19 +126,19 @@ async function añadirAdminEstablecimiento(admin, nit) {
         establecimiento_nit: nit
       }
       await User_Establecimiento.create(userEstablecimiento)
-  })
+    })
 
 }
 
-async function validaNit(nitEstablecimiento){
+async function validaNit(nitEstablecimiento) {
   let error = [];
 
-  await Establecimiento.findOne({where:{nit:nitEstablecimiento}}).
-  then(establecimiento=>{
-    if(!establecimiento){
-      error.push("No existe el establecimiento!")
-    }
-  })
+  await Establecimiento.findOne({ where: { nit: nitEstablecimiento } }).
+    then(establecimiento => {
+      if (!establecimiento) {
+        error.push("No existe el establecimiento!")
+      }
+    })
   if (error.length == 0) {
     error = null;
   }
@@ -176,19 +146,19 @@ async function validaNit(nitEstablecimiento){
 }
 
 
-async function registroTarjeta(nonce,id_customer){
+async function registroTarjeta(nonce, id_customer) {
 
   let apiInstance = new SquareConnect.CustomersApi();
-  let data_result=null;
-  let error_result=null;
+  let data_result = null;
+  let error_result = null;
 
-  await apiInstance.createCustomerCard(id_customer, {card_nonce:nonce}).then(function(data) {
-    data_result=data;
-  }, function(error) {
-    error_result=error;
+  await apiInstance.createCustomerCard(id_customer, { card_nonce: nonce }).then(function (data) {
+    data_result = data;
+  }, function (error) {
+    error_result = error;
   });
-  
-  return {data_result,error_result};
+
+  return { data_result, error_result };
 }
 
 module.exports = {
@@ -242,110 +212,148 @@ module.exports = {
     }
 
   },
-  async añadirLogo(req,res){
-    if(req.file==undefined){
-      res.json({error:'Error al subir imagen!'})
-    }else{
+  async añadirLogo(req, res) {
+    if (req.file == undefined) {
+      res.json({ error: 'Error al subir imagen!' })
+    } else {
       let errores = await validaNit(req.body.id_imagen)
-      if(errores){
+      if (errores) {
         let path = req.file.path
         fs.unlink(path, (err) => {
           if (err) {
             console.error(err)
             return
           }
-        
+
         })
-        res.json({errores})
-      }else{
-        await Establecimiento.update({logo_establecimiento:'/establecimiento/'+req.file.filename},
-          {where:{nit:req.body.id_imagen}})
-        res.json({success:'Logo de establecimiento subido con éxito!'})
+        res.json({ errores })
+      } else {
+        await Establecimiento.update({ logo_establecimiento: '/establecimiento/' + req.file.filename },
+          { where: { nit: req.body.id_imagen } })
+        res.json({ success: 'Logo de establecimiento subido con éxito!' })
       }
-      
+
     }
   },
-  async vincularTarjeta(req, res){
-    let nit_establecimiento=req.body.nit_establecimiento;
-    let errores=await validaNit(nit_establecimiento);
-    console.log(req.body.nonce);
-    if(errores){
-      res.json({errores})
-    }else{
-      await Custormer_sq.findOne({where:{establecimiento_nit:nit_establecimiento}}).
-      then(async customer_sq=>{
-        if(customer_sq){
-          let vinculacion= await registroTarjeta(req.body.nonce,customer_sq.customer_id)
+  async vincularTarjeta(req, res) {
+    let nit_establecimiento = req.body.nit;
+    let errores = await validaNit(nit_establecimiento);
 
-          if(vinculacion.data_result){
-            res.json(vinculacion.data_result)
-            
-          }else{
-            if(vinculacion.error_result){
-              res.json(vinculacion.error_result)
-            }
-          }
-        }else{
-          res.json({error:'No se encuentra id de establecimiento en SquareUp'})
+    if (errores) {
+      res.json({ errores })
+    } else {
+      let establecimiento;
+      let token_card;
+
+      Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
+      await Establecimiento.findOne({
+        where: { nit: nit_establecimiento },
+        include: {
+          model: Ciudad,
+          as: 'ciudad'
         }
+      }).
+        then(e => {
+          establecimiento = e;
+        })
+
+      let credit_info = {
+        "card[number]": req.body.number,
+        "card[exp_year]": req.body.exp_year,
+        "card[exp_month]": req.body.exp_month,
+        "card[cvc]": req.body.cvc
+      }
+
+      await epayco.token.create(credit_info)
+        .then(function (token) {
+          token_card = token;
+        })
+        .catch(function (err) {
+          console.log("err: " + err);
+        });
+
+      let customer_info = {
+        token_card: token_card.id,
+        name: establecimiento.nombre_empresa,
+        email: establecimiento.correo_establecimiento,
+        default: true,
+        //Optional parameters: These parameters are important when validating the credit card transaction
+        city: establecimiento.ciudad.nombre_ciudad,
+        address: establecimiento.direccion_establecimiento,
+        phone: establecimiento.celular_establecimiento,
+        cell_phone: establecimiento.celular_establecimiento
+      }
+
+      await epayco.customers.create(customer_info)
+        .then(function (customer) {
+          res.json(customer)
+        })
+        .catch(function (err) {
+          console.log("err: " + err);
+        });
+    }
+  },
+  async realizarPago(req, res) {
+
+    let token_card_p;
+
+    await epayco.customers.get("ewmfsybmXuoq7ySCo")
+      .then(function (customer) {
+        token_card_p = customer.data.cards[0].token;
       })
-    }
+      .catch(function (err) {
+        console.log("err: " + err);
+      });
 
+    console.log(token_card_p)
+    let payment_info = {
+      token_card: "GX2XusxefAX3juXZr",
+      customer_id: "EaA7Z5ZatzzuQ39dm",
+      doc_type: "CC",
+      doc_number: "1035851980",
+      name: "John",
+      last_name: "Doe",
+      email: "example@email.com",
+      bill: "OR-1234",
+      description: "Test Payment",
+      value: "456",
+      tax: "16000",
+      tax_base: "100000",
+      currency: "COP",
+      dues: "12",
+      ip: "190.000.000.000", /*This is the client's IP, it is required */
+      url_response: "https://ejemplo.com/respuesta.html",
+      url_confirmation: "https://ejemplo.com/confirmacion",
+      method_confirmation: "GET"
+    }
+    await epayco.charge.create(payment_info)
+      .then(function (charge) {
+        console.log(charge.data);
+      })
+      .catch(function (err) {
+
+        console.log(err.data.errors)
+      });
 
   },
-  async realizarPago(req,res){
+  async pruebamercadopago(req, res) {
 
-    const idempotency_key = crypto.randomBytes(22).toString('hex');
+    var customer_data = { "email": "test@test.com" }
 
-    let body={
-      query:
-      {
-        filter:{
-          reference_id:{
-            exact:req.body.nit_establecimiento
-          }
-        }
+    mercadopago.customers.create(customer_data).then(function (customer) {
+
+      var card_data = {
+        "token": "9b2d63e00d66a8c721607214cedaecda",
+        "customer": customer.id
       }
-    }
 
-    let apiInstance = new SquareConnect.CustomersApi();
+      mercadopago.cards.create(card_data).then(function (card) {
+        console.log(card);
+      });
 
-    let card;
-    let customer_id;
-    await apiInstance.searchCustomers(body).then(function(data) {
-      card=data.customers[0].cards[0];
-      customer_id=data.customers[0].id;
-    }, function(error) {
-      console.error(error);
     });
 
-  
-   
-  
 
-  const payments_api = new SquareConnect.PaymentsApi();
-  const request_body = {
-    source_id: card.id,
-    amount_money: {
-      amount: 100000, // $1.00 charge
-      currency: 'COP'
-    },
-    idempotency_key: idempotency_key,
-    customer_id:customer_id
-  };
-
-  try {
-    const response = await payments_api.createPayment(request_body);
-    res.status(200).json({
-      'title': 'Payment Successful',
-      'result': response
-    });
-  } catch(error) {
-    res.status(500).json({
-      'title': 'Payment Failure',
-      'result': error.response.text
-    });
-  }
 
   }
 }
