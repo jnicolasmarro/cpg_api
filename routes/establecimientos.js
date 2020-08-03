@@ -13,6 +13,6 @@ router.put('/subirLogo',upload.single('file'),EstablecimientoController.añadirL
 router.post('/vincularTarjeta',EstablecimientoController.vincularTarjeta)
 
 /*Realizar un pago por nit del establecimiento*/
-router.get('/searchCustomer',EstablecimientoController.realizarPago)
+router.post('/realizarPago',EstablecimientoController.realizarPago)
 
 module.exports = router

@@ -146,19 +146,73 @@ async function validaNit(nitEstablecimiento) {
 }
 
 
-async function registroTarjeta(nonce, id_customer) {
+async function registroTarjeta(req, res) {
 
-  let apiInstance = new SquareConnect.CustomersApi();
-  let data_result = null;
-  let error_result = null;
+      let establecimiento;
+      let token_card_epayco;
+      let customer_id;
 
-  await apiInstance.createCustomerCard(id_customer, { card_nonce: nonce }).then(function (data) {
-    data_result = data;
-  }, function (error) {
-    error_result = error;
-  });
+      Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
+      await Establecimiento.findOne({
+        where: { nit: req.body.nit },
+        include: {
+          model: Ciudad,
+          as: 'ciudad'
+        }
+      }).
+        then(e => {
+          establecimiento = e;
+        })
 
-  return { data_result, error_result };
+      let credit_info = {
+        "card[number]": req.body.number,
+        "card[exp_year]": req.body.exp_year,
+        "card[exp_month]": req.body.exp_month,
+        "card[cvc]": req.body.cvc
+      }
+
+      await epayco.token.create(credit_info)
+        .then(function (token) {
+          token_card_epayco = token.id;
+        })
+        .catch(function (err) {
+          console.log("err: " + err);
+        });
+        console.log(token_card_epayco)
+      let customer_info = {
+        token_card: token_card_epayco,
+        name: establecimiento.nombre_empresa,
+        email: establecimiento.correo_establecimiento,
+        default: true,
+        //Optional parameters: These parameters are important when validating the credit card transaction
+        city: establecimiento.ciudad.nombre_ciudad,
+        address: establecimiento.direccion_establecimiento,
+        phone: establecimiento.celular_establecimiento,
+        cell_phone: establecimiento.celular_establecimiento
+      }
+
+      await epayco.customers.create(customer_info)
+        .then(function (customer) {
+          customer_id = customer.data.customerId
+        })
+        .catch(function (err) {
+          console.log("err: " + err);
+        });
+
+      
+      await Custormer_ePayco.create({
+        establecimiento_nit: req.body.nit,
+        customer_id: customer_id,
+        token_card: token_card_epayco
+      }).
+        then(customer_epayco=>{
+          if(customer_epayco){
+            res.json({success:'Tarjeta vinculada al establecimiento'})
+          }else{
+            res.json({error:'Falló al agregar el establecimiento con la pasarela!'})
+          }
+        }
+          )
 }
 
 module.exports = {
@@ -242,98 +296,133 @@ module.exports = {
     if (errores) {
       res.json({ errores })
     } else {
-      let establecimiento;
-      let token_card;
-
-      Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
-      await Establecimiento.findOne({
-        where: { nit: nit_establecimiento },
-        include: {
-          model: Ciudad,
-          as: 'ciudad'
-        }
-      }).
-        then(e => {
-          establecimiento = e;
-        })
-
-      let credit_info = {
-        "card[number]": req.body.number,
-        "card[exp_year]": req.body.exp_year,
-        "card[exp_month]": req.body.exp_month,
-        "card[cvc]": req.body.cvc
-      }
-
-      await epayco.token.create(credit_info)
-        .then(function (token) {
-          token_card = token;
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
-
-      let customer_info = {
-        token_card: token_card.id,
-        name: establecimiento.nombre_empresa,
-        email: establecimiento.correo_establecimiento,
-        default: true,
-        //Optional parameters: These parameters are important when validating the credit card transaction
-        city: establecimiento.ciudad.nombre_ciudad,
-        address: establecimiento.direccion_establecimiento,
-        phone: establecimiento.celular_establecimiento,
-        cell_phone: establecimiento.celular_establecimiento
-      }
-
-      await epayco.customers.create(customer_info)
-        .then(function (customer) {
-          res.json(customer)
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
+      await registroTarjeta(req,res)
     }
   },
   async realizarPago(req, res) {
+    let nit_establecimiento = req.body.nit;
+    let errores = await validaNit(req.body.nit);
 
-    let token_card_p;
+    if (errores) {
+      res.json({ errores })
+    } else {
 
-    await epayco.customers.get("ewmfsybmXuoq7ySCo")
-      .then(function (customer) {
-        token_card_p = customer.data.cards[0].token;
-      })
-      .catch(function (err) {
-        console.log("err: " + err);
-      });
+      
 
-    console.log(token_card_p)
-    let payment_info = {
-      token_card: "GX2XusxefAX3juXZr",
-      customer_id: "EaA7Z5ZatzzuQ39dm",
-      doc_type: "CC",
-      doc_number: "1035851980",
-      name: "John",
-      last_name: "Doe",
-      email: "example@email.com",
-      bill: "OR-1234",
-      description: "Test Payment",
-      value: "456",
-      tax: "16000",
-      tax_base: "100000",
-      currency: "COP",
-      dues: "12",
-      ip: "190.000.000.000", /*This is the client's IP, it is required */
-      url_response: "https://ejemplo.com/respuesta.html",
-      url_confirmation: "https://ejemplo.com/confirmacion",
-      method_confirmation: "GET"
+      var payment_info = {
+        token_card: "token_id",
+        customer_id: "customer_id",
+        doc_type: "CC",
+        doc_number: "1035851980",
+        name: "John",
+        last_name: "Doe",
+        email: "example@email.com",
+        bill: "OR-1234",
+        description: "Test Payment",
+        value: "116000",
+        tax: "16000",
+        tax_base: "100000",
+        currency: "COP",
+        dues: "12",
+        ip:"190.000.000.000", /*This is the client's IP, it is required */
+        url_response: "https://ejemplo.com/respuesta.html",
+        url_confirmation: "https://ejemplo.com/confirmacion",
+        method_confirmation: "GET",
+    
+        //Extra params: These params are optional and can be used by the commerce
+    
+        use_default_card_customer: true,/*if the user wants to be charged with the card that the customer currently has as default = true*/
+       
+       extras: {
+            extra1: "",
+            extra2: "",
+            extra3: "",
+            extra4: "",
+            extra5: "",
+            extra6: ""
+        }
     }
-    await epayco.charge.create(payment_info)
-      .then(function (charge) {
-        console.log(charge.data);
-      })
-      .catch(function (err) {
+    epayco.charge.create(payment_info)
+        .then(function(charge) {
+            console.log(charge);
+        })
+        .catch(function(err) {
+            console.log("err: " + err);
+        });
 
-        console.log(err.data.errors)
-      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      await epayco.customers.get("ewmfsybmXuoq7ySCo")
+        .then(function (customer) {
+          /*console.log(customer)*/
+        })
+        .catch(function (err) {
+          console.log("err: " + err);
+        });
+    }
+    console.log(epayco.customers)
+    /*  epayco.customers.delete("ewmfsybmXuoq7ySCo")
+       .then(function(customer) {
+               console.log(customer);
+       })
+       .catch(function(err) {
+               console.log('err: ' + err);
+       })
+      /* let token_card_p;
+   
+       await epayco.customers.get("ewmfsybmXuoq7ySCo")
+         .then(function (customer) {
+           token_card_p = customer.data.cards[0].token;
+         })
+         .catch(function (err) {
+           console.log("err: " + err);
+         });
+   
+       console.log(token_card_p)
+       let payment_info = {
+         token_card: "GX2XusxefAX3juXZr",
+         customer_id: "EaA7Z5ZatzzuQ39dm",
+         doc_type: "CC",
+         doc_number: "1035851980",
+         name: "John",
+         last_name: "Doe",
+         email: "example@email.com",
+         bill: "OR-1234",
+         description: "Test Payment",
+         value: "456",
+         tax: "16000",
+         tax_base: "100000",
+         currency: "COP",
+         dues: "12",
+         ip: "190.000.000.000", /*This is the client's IP, it is required */
+    /* url_response: "https://ejemplo.com/respuesta.html",
+     url_confirmation: "https://ejemplo.com/confirmacion",
+     method_confirmation: "GET"
+   }
+   await epayco.charge.create(payment_info)
+     .then(function (charge) {
+       console.log(charge.data);
+     })
+     .catch(function (err) {
+
+       console.log(err.data.errors)
+     });*/
 
   },
   async pruebamercadopago(req, res) {

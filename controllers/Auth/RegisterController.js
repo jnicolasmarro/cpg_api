@@ -1,7 +1,7 @@
 const validator = require('validator');
 const { User, Membresia } = require('../../db');
 const bcrypt = require('bcryptjs');
-const { DisputedPayment } = require('square-connect');
+
 
 async function validacionNuevoUsuario(req) {
     let error = [];
