@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { User, Membresia } = require('../../db');
+const { User, Membresia, Util} = require('../../db');
 const bcrypt = require('bcryptjs');
 
 
@@ -13,7 +13,7 @@ async function validacionNuevoUsuario(req) {
             .then(membresia => {
                 if (!membresia) {
                     error.push('La membresía ingresada no es válida')
-                } else if (!membresia.user_id_user) {
+                } else if (!membresia.user_id_user && membresia.asignada==1) {
                     codigo_membresia = membresia.codigo_membresia;
                 } else {
                     error.push('La membresía se encuentra asignada a un usuario');
@@ -54,6 +54,9 @@ async function validacionNuevoUsuario(req) {
 module.exports = async (req, res) => {
     let validacion = await validacionNuevoUsuario(req);
         if (!validacion.error) {
+            let dias_vencimiento;
+            await Util.findOne({where:{id_param:1}}).
+            then(util=>{dias_vencimiento=util.valor_param})
             let salt = bcrypt.genSaltSync(10);
             let user = {
                 nombre_usuario: req.body.nombre_usuario,
@@ -66,7 +69,7 @@ module.exports = async (req, res) => {
                 let hoy = new Date();
                 let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
                 let fecha_vencimiento = new Date();
-                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + 182);
+                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + dias_vencimiento);
                 let membresia = {
                     user_id_user: usuario.id_user,
                     fecha_uso: fecha_hoy,
