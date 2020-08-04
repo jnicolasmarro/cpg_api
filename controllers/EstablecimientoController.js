@@ -307,12 +307,12 @@ module.exports = {
       res.json({ errores })
     } else {
 
-      
+
 
       var payment_info = {
         token_card: "token_id",
         customer_id: "customer_id",
-        doc_type: "CC",
+        doc_type: "NIT",
         doc_number: "1035851980",
         name: "John",
         last_name: "Doe",
@@ -323,24 +323,7 @@ module.exports = {
         tax: "16000",
         tax_base: "100000",
         currency: "COP",
-        dues: "12",
-        ip:"190.000.000.000", /*This is the client's IP, it is required */
-        url_response: "https://ejemplo.com/respuesta.html",
-        url_confirmation: "https://ejemplo.com/confirmacion",
-        method_confirmation: "GET",
-    
-        //Extra params: These params are optional and can be used by the commerce
-    
-        use_default_card_customer: true,/*if the user wants to be charged with the card that the customer currently has as default = true*/
-       
-       extras: {
-            extra1: "",
-            extra2: "",
-            extra3: "",
-            extra4: "",
-            extra5: "",
-            extra6: ""
-        }
+        dues: "12"
     }
     epayco.charge.create(payment_info)
         .then(function(charge) {
