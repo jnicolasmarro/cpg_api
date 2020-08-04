@@ -28,6 +28,7 @@ async function validacionMembresia(p_membresia){
 
 module.exports={
     async asignarMembresia(req,res){
+        
         let error = await validacionMembresia(req.body.membresia)
 
         if(error){
