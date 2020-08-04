@@ -9,6 +9,7 @@ const ExperienciaModel = require('./models/experiencia')
 const ItemModel = require('./models/item')
 const CiudadModel = require('./models/ciudad')
 const UtilModel = require('./models/util')
+const Experiencia_Usada_Model = require('./models/experiencia_usada')
 
 const URL = process.env.URL_DB
 const sequelize = new Sequelize(URL);
@@ -23,6 +24,7 @@ const Experiencia = ExperienciaModel(sequelize, Sequelize)
 const Item = ItemModel(sequelize, Sequelize)
 const Ciudad = CiudadModel(sequelize, Sequelize)
 const Util = UtilModel(sequelize, Sequelize)
+const Experiencia_Usada = Experiencia_Usada_Model(sequelize, Sequelize)
 
 module.exports = {
     User,
@@ -33,5 +35,6 @@ module.exports = {
     Experiencia,
     Item,
     Ciudad,
-    Util
+    Util,
+    Experiencia_Usada
 }

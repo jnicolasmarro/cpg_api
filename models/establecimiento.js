@@ -22,6 +22,9 @@ module.exports= (sequelize, type) => {
         direccion_establecimiento: {
             type: type.STRING
         },
+        cantidad_lote:{
+            type: type.INTEGER
+        },
         autorizacion_datos: {
             type: type.BOOLEAN
         },

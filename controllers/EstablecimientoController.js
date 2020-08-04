@@ -51,6 +51,15 @@ async function validacionDatosEstablecimiento(establecimiento) {
   if (validator.isEmpty(establecimiento.direccion_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado la dirección del establecimiento')
   }
+
+  if (validator.isEmpty(establecimiento.cantidad_lote, { ignore_whitespace: true })) {
+    error.push('No ha ingresado la cantidad del lote de experiencias!')
+  } else if (!validator.isInt(establecimiento.cantidad_lote)) {
+    error.push('La cantidad del lote de experiencias debe de ser un número entero!')
+  } else if (parseInt(establecimiento.cantidad_lote) <= 0) {
+    error.push('La cantidad del lote de experiencias debe de ser mayor a cero!')
+  }
+
   if (error.length == 0)
     error = null
   return error
@@ -148,71 +157,71 @@ async function validaNit(nitEstablecimiento) {
 
 async function registroTarjeta(req, res) {
 
-      let establecimiento;
-      let token_card_epayco;
-      let customer_id;
+  let establecimiento;
+  let token_card_epayco;
+  let customer_id;
 
-      Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
-      await Establecimiento.findOne({
-        where: { nit: req.body.nit },
-        include: {
-          model: Ciudad,
-          as: 'ciudad'
-        }
-      }).
-        then(e => {
-          establecimiento = e;
-        })
+  Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
+  await Establecimiento.findOne({
+    where: { nit: req.body.nit },
+    include: {
+      model: Ciudad,
+      as: 'ciudad'
+    }
+  }).
+    then(e => {
+      establecimiento = e;
+    })
 
-      let credit_info = {
-        "card[number]": req.body.number,
-        "card[exp_year]": req.body.exp_year,
-        "card[exp_month]": req.body.exp_month,
-        "card[cvc]": req.body.cvc
+  let credit_info = {
+    "card[number]": req.body.number,
+    "card[exp_year]": req.body.exp_year,
+    "card[exp_month]": req.body.exp_month,
+    "card[cvc]": req.body.cvc
+  }
+
+  await epayco.token.create(credit_info)
+    .then(function (token) {
+      token_card_epayco = token.id;
+    })
+    .catch(function (err) {
+      console.log("err: " + err);
+    });
+  console.log(token_card_epayco)
+  let customer_info = {
+    token_card: token_card_epayco,
+    name: establecimiento.nombre_empresa,
+    email: establecimiento.correo_establecimiento,
+    default: true,
+    //Optional parameters: These parameters are important when validating the credit card transaction
+    city: establecimiento.ciudad.nombre_ciudad,
+    address: establecimiento.direccion_establecimiento,
+    phone: establecimiento.celular_establecimiento,
+    cell_phone: establecimiento.celular_establecimiento
+  }
+
+  await epayco.customers.create(customer_info)
+    .then(function (customer) {
+      customer_id = customer.data.customerId
+    })
+    .catch(function (err) {
+      console.log("err: " + err);
+    });
+
+
+  await Custormer_ePayco.create({
+    establecimiento_nit: req.body.nit,
+    customer_id: customer_id,
+    token_card: token_card_epayco
+  }).
+    then(customer_epayco => {
+      if (customer_epayco) {
+        res.json({ success: 'Tarjeta vinculada al establecimiento' })
+      } else {
+        res.json({ error: 'Falló al agregar el establecimiento con la pasarela!' })
       }
-
-      await epayco.token.create(credit_info)
-        .then(function (token) {
-          token_card_epayco = token.id;
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
-        console.log(token_card_epayco)
-      let customer_info = {
-        token_card: token_card_epayco,
-        name: establecimiento.nombre_empresa,
-        email: establecimiento.correo_establecimiento,
-        default: true,
-        //Optional parameters: These parameters are important when validating the credit card transaction
-        city: establecimiento.ciudad.nombre_ciudad,
-        address: establecimiento.direccion_establecimiento,
-        phone: establecimiento.celular_establecimiento,
-        cell_phone: establecimiento.celular_establecimiento
-      }
-
-      await epayco.customers.create(customer_info)
-        .then(function (customer) {
-          customer_id = customer.data.customerId
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
-
-      
-      await Custormer_ePayco.create({
-        establecimiento_nit: req.body.nit,
-        customer_id: customer_id,
-        token_card: token_card_epayco
-      }).
-        then(customer_epayco=>{
-          if(customer_epayco){
-            res.json({success:'Tarjeta vinculada al establecimiento'})
-          }else{
-            res.json({error:'Falló al agregar el establecimiento con la pasarela!'})
-          }
-        }
-          )
+    }
+    )
 }
 
 module.exports = {
@@ -226,6 +235,7 @@ module.exports = {
       correo_establecimiento: req.body.correo_establecimiento,
       celular_establecimiento: req.body.celular_establecimiento,
       direccion_establecimiento: req.body.direccion_establecimiento,
+      cantidad_lote: req.body.cantidad_lote,
       ciudad_id_ciudad: req.body.ciudad
     }
 
@@ -296,7 +306,7 @@ module.exports = {
     if (errores) {
       res.json({ errores })
     } else {
-      await registroTarjeta(req,res)
+      await registroTarjeta(req, res)
     }
   },
   async realizarPago(req, res) {
@@ -324,13 +334,13 @@ module.exports = {
         tax_base: "100000",
         currency: "COP",
         dues: "12"
-    }
-    epayco.charge.create(payment_info)
-        .then(function(charge) {
-            console.log(charge);
+      }
+      epayco.charge.create(payment_info)
+        .then(function (charge) {
+          console.log(charge);
         })
-        .catch(function(err) {
-            console.log("err: " + err);
+        .catch(function (err) {
+          console.log("err: " + err);
         });
 
 

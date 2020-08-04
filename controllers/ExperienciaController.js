@@ -1,4 +1,4 @@
-const { Experiencia, Establecimiento,Item } = require('../db');
+const { Experiencia, Establecimiento, Item } = require('../db');
 const validator = require('validator');
 const fs = require('fs')
 
@@ -31,11 +31,8 @@ async function validacionExperiencia(experiencia) {
         error.push('El porcentaje de comisión puede tener máximo 2 decimales!')
     } else if (parseFloat(experiencia.comision) <= 0) {
         error.push('El porcentaje de comisión debe de ser mayor a cero!')
-    }else if(parseFloat(experiencia.comision) > 100){
+    } else if (parseFloat(experiencia.comision) > 100) {
         error.push('El porcentaje de comisión debe de ser máximo 100!')
-    }
-    if (validator.isEmpty(experiencia.imagen_experiencia, { ignore_whitespace: true })) {
-        error.push('No ha cargado una imagen de experiencia!')
     }
     if (validator.isEmpty(experiencia.experiencia_tipo_id_tipo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el tipo de experiencia!')
@@ -61,62 +58,62 @@ async function validacionExperiencia(experiencia) {
 
 }
 
-async function validacionActivacionExperiencia(experiencia){
+async function validacionActivacionExperiencia(experiencia) {
     let error = [];
     if (validator.isEmpty(experiencia.id_experiencia, { ignore_whitespace: true })) {
         error.push('No ha ingresado el ID de la experiencia!')
-    }else{
-        await Experiencia.findOne({where:{id_experiencia:experiencia.id_experiencia}}).
-        then(exp=>{
-            if(!exp){
-                error.push('La experiencia no existe!')
-            }else{
-                if(exp.estado_experiencia==1){
-                    error.push('La experiencia ya se encuentra activa!')
+    } else {
+        await Experiencia.findOne({ where: { id_experiencia: experiencia.id_experiencia } }).
+            then(exp => {
+                if (!exp) {
+                    error.push('La experiencia no existe!')
+                } else {
+                    if (exp.estado_experiencia == 1) {
+                        error.push('La experiencia ya se encuentra activa!')
+                    }
                 }
-            }
-        })
+            })
     }
     if (error.length == 0)
         error = null
     return error
 }
 
-async function validacionInactivacionExperiencia(experiencia){
+async function validacionInactivacionExperiencia(experiencia) {
     let error = [];
     if (validator.isEmpty(experiencia.id_experiencia, { ignore_whitespace: true })) {
         error.push('No ha ingresado el ID de la experiencia!')
-    }else{
-        await Experiencia.findOne({where:{id_experiencia:experiencia.id_experiencia}}).
-        then(exp=>{
-            if(!exp){
-                error.push('La experiencia no existe!')
-            }else{
-                if(exp.estado_experiencia==0){
-                    error.push('La experiencia ya se encuentra inactiva!')
+    } else {
+        await Experiencia.findOne({ where: { id_experiencia: experiencia.id_experiencia } }).
+            then(exp => {
+                if (!exp) {
+                    error.push('La experiencia no existe!')
+                } else {
+                    if (exp.estado_experiencia == 0) {
+                        error.push('La experiencia ya se encuentra inactiva!')
+                    }
                 }
-            }
-        })
+            })
     }
     if (error.length == 0)
         error = null
     return error
 }
 
-async function validaImagenExperiencia(id_experiencia){
+async function validaImagenExperiencia(id_experiencia) {
     let error = [];
-  
-    await Experiencia.findOne({where:{id_experiencia:id_experiencia}}).
-    then(experiencia=>{
-      if(!experiencia){
-        error.push("No existe la experiencia!")
-      }
-    })
+
+    await Experiencia.findOne({ where: { id_experiencia: id_experiencia } }).
+        then(experiencia => {
+            if (!experiencia) {
+                error.push("No existe la experiencia!")
+            }
+        })
     if (error.length == 0) {
-      error = null;
+        error = null;
     }
     return error
-  }
+}
 
 module.exports = {
     async crearExperiencia(req, res) {
@@ -126,104 +123,105 @@ module.exports = {
             precio_experiencia: req.body.precio_experiencia,
             precio_publico: req.body.precio_publico,
             comision: req.body.comision,
-            imagen_experiencia: req.body.imagen_experiencia,
             experiencia_tipo_id_tipo: req.body.tipo_experiencia,
             establecimiento_nit: req.body.establecimiento_nit
         }
 
         let errores = await validacionExperiencia(experiencia);
 
-        if(errores){
+        if (errores) {
             res.json(errores)
-        }else{
+        } else {
             await Experiencia.create(experiencia).
-            then(exp =>{
-                if(exp){
-                    res.json({success:'Experiencia creada!'})
-                }
-            })
+                then(exp => {
+                    if (exp) {
+                        res.json({ success: 'Experiencia creada!' })
+                    }
+                })
         }
     },
     async obtenerGastronomicas(req, res) {
         Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia' });
-        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 1,estado_experiencia:1 }, include: {
-            model: Item,
-            as: 'items'
-          } }).
-        then(experienciasGastronomicas=>{
-            if(experienciasGastronomicas.length>0){
-                res.json(experienciasGastronomicas)
-            }else{
-                res.json({error:'No existen experiencias gastronómicas aún!'})
+        await Experiencia.findAll({
+            where: { experiencia_tipo_id_tipo: 1, estado_experiencia: 1 }, include: {
+                model: Item,
+                as: 'items'
             }
-        })
+        }).
+            then(experienciasGastronomicas => {
+                if (experienciasGastronomicas.length > 0) {
+                    res.json(experienciasGastronomicas)
+                } else {
+                    res.json({ error: 'No existen experiencias gastronómicas aún!' })
+                }
+            })
     },
     async obtenerEntretenimiento(req, res) {
-        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 2,estado_experiencia:1 } }).
-        then(experienciasEntretenimiento=>{
-            if(experienciasEntretenimiento.length>0){
-                res.json(experienciasEntretenimiento)
-            }else{
-                res.json({error:'No existen experiencias de entretenimiento aún!'})
-            }
-        })
+        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 2, estado_experiencia: 1 } }).
+            then(experienciasEntretenimiento => {
+                if (experienciasEntretenimiento.length > 0) {
+                    res.json(experienciasEntretenimiento)
+                } else {
+                    res.json({ error: 'No existen experiencias de entretenimiento aún!' })
+                }
+            })
     },
-    async activacionExperiencia(req,res){
+    async activacionExperiencia(req, res) {
         let experiencia = {
-            id_experiencia:req.body.id_experiencia
+            id_experiencia: req.body.id_experiencia
         }
 
         let errores = await validacionActivacionExperiencia(experiencia)
 
-        if(errores){
-            res.json({errores})
-        }else{
-            await Experiencia.update({estado_experiencia:1},
-                {where:{id_experiencia:req.body.id_experiencia}}).
-                then(res.json({success:'Experiencia activada!'}))
+        if (errores) {
+            res.json({ errores })
+        } else {
+            await Experiencia.update({ estado_experiencia: 1 },
+                { where: { id_experiencia: req.body.id_experiencia } }).
+                then(res.json({ success: 'Experiencia activada!' }))
         }
-        
+
     },
-    async inactivacionExperiencia(req,res){
+    async inactivacionExperiencia(req, res) {
         let experiencia = {
-            id_experiencia:req.body.id_experiencia
+            id_experiencia: req.body.id_experiencia
         }
 
         let errores = await validacionInactivacionExperiencia(experiencia)
 
-        if(errores){
-            res.json({errores})
-        }else{
-            await Experiencia.update({estado_experiencia:0},
-                {where:{id_experiencia:req.body.id_experiencia}}).
-                then(res.json({success:'Experiencia inactivada!'}))
+        if (errores) {
+            res.json({ errores })
+        } else {
+            await Experiencia.update({ estado_experiencia: 0 },
+                { where: { id_experiencia: req.body.id_experiencia } }).
+                then(res.json({ success: 'Experiencia inactivada!' }))
         }
-        
+
     },
-    async añadirImagen(req,res){
-        if(req.file==undefined){
-          res.json({error:'Error al subir imagen!'})
-        }else{
-          let errores = await validaImagenExperiencia(req.body.id_imagen)
-          if(errores){
-            let path = req.file.path
-            fs.unlink(path, (err) => {
-              if (err) {
-                console.error(err)
-                return
-              }
-            
-            })
-            res.json({errores})
-          }else{
-            await Experiencia.update({imagen_experiencia:'/experiencias/'+req.file.filename},
-              {where:{id_experiencia:req.body.id_imagen}})
-            res.json({success:'Imagen de experiencia subida con éxito!'})
-          }
-          
+    async añadirImagen(req, res) {
+        if (req.file == undefined) {
+            res.json({ error: 'Error al subir imagen!' })
+        } else {
+            let errores = await validaImagenExperiencia(req.body.id_imagen)
+            if (errores) {
+                let path = req.file.path
+                fs.unlink(path, (err) => {
+                    if (err) {
+                        console.error(err)
+                        return
+                    }
+
+                })
+                res.json({ errores })
+            } else {
+                await Experiencia.update({ imagen_experiencia: '/experiencias/' + req.file.filename },
+                    { where: { id_experiencia: req.body.id_imagen } })
+                res.json({ success: 'Imagen de experiencia subida con éxito!' })
+            }
+
         }
-      }
+    }
 
 
-    
+
 }

@@ -69,7 +69,7 @@ module.exports = async (req, res) => {
                 let hoy = new Date();
                 let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
                 let fecha_vencimiento = new Date();
-                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + dias_vencimiento);
+                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + parseInt(dias_vencimiento));
                 let membresia = {
                     user_id_user: usuario.id_user,
                     fecha_uso: fecha_hoy,
