@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { User,Membresia } = require('../../db');
+const { User,Membresia,Util } = require('../../db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
@@ -27,7 +27,14 @@ module.exports = async (req, res) => {
                             }
                         })
                         if(membresia_vencida){
-                            return res.json({error:"Membresía vencida"})
+                            let whatsapp="";
+                            await Util.findOne({where:{id_param:2}}).
+                            then(r_whatsapp=>{
+                                if(r_whatsapp){
+                                    whatsapp=r_whatsapp.valor_param;
+                                }
+                            })
+                            return res.json({error:"Tu afiliación se ha vencido, por favor comunícate a nuestra línea de WhatsApp: "+whatsapp+" para reactivarla"})
                         }
                         
                     }

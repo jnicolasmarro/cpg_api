@@ -8,7 +8,7 @@ module.exports = (sequelize, type) => {
             type: type.STRING
         },
         valor_param: {
-            type: type.INTEGER
+            type: type.STRING
         }
     }
         , {
