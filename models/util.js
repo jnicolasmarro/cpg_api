@@ -5,10 +5,10 @@ module.exports = (sequelize, type) => {
             primaryKey: true
         },
         nombre_param:{
-            type: type.STRING
+            type: type.STRING(45)
         },
         valor_param: {
-            type: type.STRING
+            type: type.STRING(45)
         }
     }
         , {
