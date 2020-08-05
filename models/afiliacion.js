@@ -1,7 +1,7 @@
 module.exports = (sequelize, type) => {
-    const Membresia = sequelize.define('membresia',{
-        codigo_membresia: {
-            type: type.STRING,
+    const Afiliacion = sequelize.define('afiliacion',{
+        codigo_afiliacion: {
+            type: type.STRING(8),
             primaryKey: true,
             unique: true
         },
@@ -15,16 +15,16 @@ module.exports = (sequelize, type) => {
             type: type.DATE
         },
         fecha_vencimiento: {
-            type: type.DATE
+            type: type.DATEONLY
         },
         periodo_afiliacion:{
             type: type.INTEGER
         }
     }
         , {
-            tableName: 'membresia',
+            tableName: 'afiliacion',
             timestamps: true
             
       });
-    return Membresia;
+    return Afiliacion;
  }
