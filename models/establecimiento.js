@@ -12,7 +12,8 @@ module.exports= (sequelize, type) => {
             type: type.STRING(60)
         },
         correo_establecimiento: {
-            type: type.STRING(60)
+            type: type.STRING(60),
+            unique:true
         },
         celular_establecimiento: {
             type: type.STRING(10)
