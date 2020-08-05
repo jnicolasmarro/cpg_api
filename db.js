@@ -36,5 +36,6 @@ module.exports = {
     Item,
     Ciudad,
     Util,
-    Experiencia_Usada
+    Experiencia_Usada,
+    sequelize
 }

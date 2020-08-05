@@ -1,6 +1,8 @@
-const { Experiencia, Establecimiento, Item } = require('../db');
+const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, sequelize } = require('../db');
 const validator = require('validator');
-const fs = require('fs')
+const fs = require('fs');
+const CryptoJS = require("crypto-js");
+const Sequelize = require('sequelize');
 
 
 async function validacionExperiencia(experiencia) {
@@ -141,20 +143,25 @@ module.exports = {
         }
     },
     async obtenerGastronomicas(req, res) {
-        Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia' });
+
+        let usados = [];
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia'], where: { user_id_user: req.body.id_user } }).
+            then(usado => {
+                usado.forEach(e => {
+                    usados.push(e.experiencia_id_experiencia)
+                });
+            })
+        
         await Experiencia.findAll({
-            where: { experiencia_tipo_id_tipo: 1, estado_experiencia: 1 }, include: {
-                model: Item,
-                as: 'items'
+            where: {
+                id_experiencia: {
+                    [Sequelize.Op.notIn]: usados
+                },
+                estado_experiencia:1
             }
         }).
-            then(experienciasGastronomicas => {
-                if (experienciasGastronomicas.length > 0) {
-                    res.json(experienciasGastronomicas)
-                } else {
-                    res.json({ error: 'No existen experiencias gastronómicas aún!' })
-                }
-            })
+            then(result => { res.json(result) })
+
     },
     async obtenerEntretenimiento(req, res) {
         await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 2, estado_experiencia: 1 } }).
@@ -220,8 +227,18 @@ module.exports = {
             }
 
         }
+    },
+    async encriptaDatos(req, res) {
+        let id_usuario = CryptoJS.AES.encrypt(req.body.id_usuario, 'secret key 123').toString();
+        let id_experiencia = CryptoJS.AES.encrypt(req.body.id_experiencia, 'secret key 123').toString();
+        return res.json({ id_usuario, id_experiencia })
+    },
+    async desencriptaDatos(req, res) {
+        let bytes_id_usuario = CryptoJS.AES.decrypt(req.body.id_usuario, 'secret key 123');
+        let originalText_id_usuario = bytes_id_usuario.toString(CryptoJS.enc.Utf8);
+        let bytes_id_experiencia = CryptoJS.AES.decrypt(req.body.id_experiencia, 'secret key 123');
+        let originalText_id_experiencia = bytes_id_experiencia.toString(CryptoJS.enc.Utf8);
+        return res.json({ originalText_id_usuario, originalText_id_experiencia })
     }
-
-
 
 }

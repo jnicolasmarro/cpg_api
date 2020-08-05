@@ -19,6 +19,12 @@ router.put('/activacion', ExperienciaController.activacionExperiencia)
 router.put('/inactivacion', ExperienciaController.inactivacionExperiencia)
 
 /*Subir logo de establecimiento*/
-router.post('/subirImagenExp',upload.single('file'),ExperienciaController.añadirImagen)
+router.put('/subirImagenExp',upload.single('file'),ExperienciaController.añadirImagen)
+
+/*Encripta datos*/
+router.get('/encriptar',ExperienciaController.encriptaDatos)
+
+/*Desencripta datos*/
+router.get('/desencriptar',ExperienciaController.desencriptaDatos)
 
 module.exports = router
