@@ -3,27 +3,29 @@ module.exports= (sequelize, type) => {
         id_user: {
             type: type.INTEGER,
             primaryKey: true,
-            unique: true,
             autoIncrement: true
         },
         nombre_usuario: {
-            type: type.STRING
+            type: type.STRING(100)
         },
         email: {
-            type: type.STRING,
+            type: type.STRING(50),
             unique: true
         },
         numero_celular: {
-            type: type.STRING
+            type: type.STRING(10)
         },
         password: {
-            type: type.STRING
+            type: type.STRING(1000)
         },
         estado_user: {
             type: type.BOOLEAN
         },
         rol_id_rol: {
             type: type.INTEGER
+        },
+        establecimiento_nit_user: {
+            type: type.BIGINT(20)
         }
     }
         , {
