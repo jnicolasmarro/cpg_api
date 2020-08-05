@@ -3,12 +3,10 @@ module.exports= (sequelize, type) => {
         id_ciudad: {
             type: type.INTEGER,
             primaryKey: true,
-            unique: true,
             autoIncrement: true
         },
         nombre_ciudad: {
-            type: type.STRING,
-            primaryKey: false,
+            type: type.STRING(20),
             unique: true
         }
     }

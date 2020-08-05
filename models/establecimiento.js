@@ -2,25 +2,23 @@ module.exports= (sequelize, type) => {
     const Establecimiento = sequelize.define('establecimiento',{
         nit: {
             type: type.BIGINT(20),
-            primaryKey: true,
-            unique: true,
-            autoIncrement: false
+            primaryKey: true
         },
         nombre_empresa: {
-            type: type.STRING
-        },
-        establecimiento_comercial: {
-            type: type.STRING
-        },
-        correo_establecimiento: {
-            type: type.STRING,
+            type: type.STRING(50),
             unique:true
         },
+        establecimiento_comercial: {
+            type: type.STRING(60)
+        },
+        correo_establecimiento: {
+            type: type.STRING(60)
+        },
         celular_establecimiento: {
-            type: type.STRING
+            type: type.STRING(10)
         },
         direccion_establecimiento: {
-            type: type.STRING
+            type: type.STRING(100)
         },
         cantidad_lote:{
             type: type.INTEGER
@@ -32,7 +30,8 @@ module.exports= (sequelize, type) => {
             type: type.BOOLEAN
         },
         logo_establecimiento: {
-            type: type.STRING
+            type: type.STRING(150),
+            unique:true
         },
         estado_establecimiento: {
             type: type.BOOLEAN
