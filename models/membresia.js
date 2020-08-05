@@ -16,6 +16,9 @@ module.exports = (sequelize, type) => {
         },
         fecha_vencimiento: {
             type: type.DATE
+        },
+        periodo_afiliacion:{
+            type: type.INTEGER
         }
     }
         , {

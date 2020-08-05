@@ -1,14 +1,14 @@
 module.exports= (sequelize, type) => {
     const Experiencia_Usada = sequelize.define('experiencia_usada',{
-        user_id_user: {
+        user_id_user_usada: {
             type: type.INTEGER,
             primaryKey: true
         },
-        experiencia_id_experiencia: {
+        experiencia_id_experiencia_usada: {
             type: type.INTEGER,
             primaryKey: true
         },
-        fecha_uso_experiencia: {
+        fecha_uso_experiencia_usada: {
             type: type.DATE
         }
     }

@@ -27,4 +27,7 @@ router.get('/encriptar',ExperienciaController.encriptaDatos)
 /*Desencripta datos*/
 router.get('/desencriptar',ExperienciaController.desencriptaDatos)
 
+/*Obtiene la información de una experiencia*/
+router.get('/obtener',ExperienciaController.obtenerInfoExperiencia)
+
 module.exports = router

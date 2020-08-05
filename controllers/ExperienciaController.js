@@ -148,7 +148,7 @@ module.exports = {
         await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia'], where: { user_id_user: req.body.id_user } }).
             then(usado => {
                 usado.forEach(e => {
-                    usados.push(e.experiencia_id_experiencia)
+                    usados.push(e.experiencia_id_experiencia_usada)
                 });
             })
         
@@ -229,16 +229,29 @@ module.exports = {
         }
     },
     async encriptaDatos(req, res) {
-        let id_usuario = CryptoJS.AES.encrypt(req.body.id_usuario, 'secret key 123').toString();
-        let id_experiencia = CryptoJS.AES.encrypt(req.body.id_experiencia, 'secret key 123').toString();
+        let id_usuario = CryptoJS.AES.encrypt(req.body.id_usuario, process.env.KEY_AES).toString();
+        let id_experiencia = CryptoJS.AES.encrypt(req.body.id_experiencia, process.env.KEY_AES).toString();
         return res.json({ id_usuario, id_experiencia })
     },
     async desencriptaDatos(req, res) {
-        let bytes_id_usuario = CryptoJS.AES.decrypt(req.body.id_usuario, 'secret key 123');
+        let bytes_id_usuario = CryptoJS.AES.decrypt(req.body.id_usuario, process.env.KEY_AES);
         let originalText_id_usuario = bytes_id_usuario.toString(CryptoJS.enc.Utf8);
-        let bytes_id_experiencia = CryptoJS.AES.decrypt(req.body.id_experiencia, 'secret key 123');
+        let bytes_id_experiencia = CryptoJS.AES.decrypt(req.body.id_experiencia, process.env.KEY_AES);
         let originalText_id_experiencia = bytes_id_experiencia.toString(CryptoJS.enc.Utf8);
         return res.json({ originalText_id_usuario, originalText_id_experiencia })
+    },
+    async obtenerInfoExperiencia(req,res){
+
+        Experiencia.hasMany(Item,{foreignKey: 'experiencia_id_experiencia_item' })
+
+        await Experiencia.findOne({where:{id_experiencia:req.body.id_experiencia},
+            include: [{
+            model: Item
+          }]}).
+          then(experiencia=>{
+              res.json(experiencia)
+          })
+
     }
 
 }

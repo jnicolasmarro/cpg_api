@@ -12,7 +12,7 @@ module.exports = (sequelize, type) => {
         descripcion_item: {
             type: type.STRING
         },
-        experiencia_id_experiencia: {
+        experiencia_id_experiencia_item: {
             type: type.INTEGER
         }
     }
