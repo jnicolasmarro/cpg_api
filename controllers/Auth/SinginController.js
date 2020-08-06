@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { User,Membresia,Util } = require('../../db');
+const { User,Afiliacion,Util } = require('../../db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
 
                     if(user.rol_id_rol==2 ){
                         let membresia_vencida=false;
-                        await Membresia.findOne({where:{user_id_user:user.id_user}}).
+                        await Afiliacion.findOne({where:{user_id_user:user.id_user}}).
                         then(membresia=>{
                            
                             let fecha_actual= new Date(moment().utc(0).format('YYYY-MM-DD'));

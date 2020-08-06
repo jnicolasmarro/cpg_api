@@ -1,22 +1,20 @@
 const validator = require('validator');
-const { User, Membresia, Util} = require('../../db');
+const { User, Afiliacion, Util } = require('../../db');
 const bcrypt = require('bcryptjs');
 
-
+// Funcion que permite validar datos de un nuevo usuario final devuelve errores si los hay //
 async function validacionNuevoUsuario(req) {
     let error = [];
-    let codigo_membresia;
+
     if (validator.isEmpty(req.body.codigo, { ignore_whitespace: true })) {
-        error.push('No ha ingresado el código de la membresía')
+        error.push('No ha ingresado el código de la afiliación')
     } else {
-        await Membresia.findOne({ where: { codigo_membresia: req.body.codigo } })
-            .then(membresia => {
-                if (!membresia) {
-                    error.push('La membresía ingresada no es válida')
-                } else if (!membresia.user_id_user && membresia.asignada==1) {
-                    codigo_membresia = membresia.codigo_membresia;
-                } else {
-                    error.push('La membresía se encuentra asignada a un usuario');
+        await Afiliacion.findOne({ where: { codigo_afiliacion: req.body.codigo } })
+            .then(afiliacion => {
+                if (!afiliacion) {
+                    error.push('El código ingresado no es válida')
+                } else if (afiliacion.user_id_user || afiliacion.asignada == 0) {
+                    error.push('El código se encuentra asignado a un usuario');
                 }
             })
     }
@@ -48,42 +46,49 @@ async function validacionNuevoUsuario(req) {
     if (error.length == 0) {
         error = null;
     }
-    return { error, codigo_membresia };
+    return error;
 };
 
 module.exports = async (req, res) => {
-    let validacion = await validacionNuevoUsuario(req);
-        if (!validacion.error) {
-            let dias_vencimiento;
-            await Util.findOne({where:{id_param:1}}).
-            then(util=>{dias_vencimiento=util.valor_param})
-            let salt = bcrypt.genSaltSync(10);
-            let user = {
-                nombre_usuario: req.body.nombre_usuario,
-                email: req.body.email,
-                numero_celular: req.body.numero_celular,
-                password: bcrypt.hashSync(req.body.password, salt),
-                rol_id_rol: 2
-            }
-            await User.create(user).then(usuario => {
-                let hoy = new Date();
-                let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
-                let fecha_vencimiento = new Date();
-                fecha_vencimiento.setDate(fecha_vencimiento.getDate() + parseInt(dias_vencimiento));
-                let membresia = {
-                    user_id_user: usuario.id_user,
-                    fecha_uso: fecha_hoy,
-                    fecha_vencimiento: fecha_vencimiento
-                }
-             Membresia.update(membresia, {
-                    where: {
-                        codigo_membresia: validacion.codigo_membresia
-                    }
-                });
-            });
-            return res.json({ success: 'Usuario registrado correctamente' })
-        } else {
-            return res.json(validacion)
+    let error = await validacionNuevoUsuario(req);
+    if (!error) {
+        let dias_vencimiento;
+
+        await Util.findOne({ where: { id_param: 1 } }).
+            then(util => { dias_vencimiento = util.valor_param })
+
+        let salt = bcrypt.genSaltSync(10);
+
+        let user = {
+            nombre_usuario: req.body.nombre_usuario,
+            email: req.body.email,
+            numero_celular: req.body.numero_celular,
+            password: bcrypt.hashSync(req.body.password, salt),
+            rol_id_rol: 2
         }
-    
+
+        User.create(user).then(usuario => {
+            let hoy = new Date();
+            let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+            let fecha_vencimiento = new Date();
+            fecha_vencimiento.setDate(fecha_vencimiento.getDate() + parseInt(dias_vencimiento));
+
+            let afiliacion = {
+                user_id_user: usuario.id_user,
+                fecha_uso: fecha_hoy,
+                fecha_vencimiento: fecha_vencimiento,
+                periodo_afiliacion: 1
+            }
+
+            Afiliacion.update(afiliacion, {
+                where: {
+                    codigo_afiliacion: req.body.codigo
+                }
+            });
+        });
+        return res.json({ success: 'Usuario registrado correctamente' })
+    } else {
+        return res.json({ error })
+    }
+
 }

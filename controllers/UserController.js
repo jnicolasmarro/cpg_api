@@ -1,6 +1,6 @@
 /*Controlador de Usuario*/
 const validator = require('validator');
-const { User, Membresia } = require('../db');
+const { User, Afiliacion } = require('../db');
 const bcrypt = require('bcryptjs');
 
 /* 
@@ -22,7 +22,7 @@ async function validacionNuevoUsuario(req) {
     if (validator.isEmpty(req.body.codigo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el código de la membresía')
     } else {
-        await Membresia.findOne({ where: { codigo: req.body.codigo } })
+        await Afiliacion.findOne({ where: { codigo: req.body.codigo } })
             .then(membresia => {
                 if (!membresia) {
                     error.push('La membresía ingresada no es válida')
@@ -104,7 +104,7 @@ module.exports = {
                 rol_id_rol: 2
             }
             await User.create(user).then(usuario => {
-             Membresia.update({ user_id_user: usuario.id_user }, {
+             Afiliacion.update({ user_id_user: usuario.id_user }, {
                     where: {
                         id_membresia: validacion.id_membresia
                     }

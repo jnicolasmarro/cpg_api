@@ -5,8 +5,7 @@ const AsistenteController = require('../controllers/AsistenteController');
 /*Creación de un asistente*/
 router.post('/creacion', AsistenteController.crearAsistente);
 
-
-/*Listar asistentes*/
+/*Listar asistentes de un establecimiento*/
 router.get('/asistentes', AsistenteController.listarAsistentesActivos);
 
 module.exports = router;

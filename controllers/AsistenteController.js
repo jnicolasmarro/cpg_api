@@ -1,20 +1,18 @@
-const { User, User_Establecimiento, Establecimiento } = require('../db');
+const { User, Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-async function traeEstablecimiento(admin) {
 
+//Funcion que permite traer el Nit de un establecimiento mediante su administrador//
+async function traeNitEstablecimiento(admin) {
   let nit;
-
-  await User_Establecimiento.findOne({ where: { user_id_user: admin } }).
-    then(establecimiento => {
-      if (establecimiento) {
-        nit = establecimiento.establecimiento_nit;
+  await User.findOne({ where: { id_user: admin } }).
+    then(usuario => {
+      if (usuario) {
+        nit = user.establecimiento_nit_user;
       }
     })
-
   return nit;
-
 }
 
 async function validacionDatosAsistente(asistente) {
@@ -51,7 +49,8 @@ async function validacionDatosAsistente(asistente) {
   return error
 }
 
-async function añadirAsistente(asistente, establecimiento) {
+//Funcion que permite añadir un usuario con rol de asistente de un establecimiento//
+async function añadirAsistente(asistente) {
 
   let salt = bcrypt.genSaltSync(10);
 
@@ -60,76 +59,61 @@ async function añadirAsistente(asistente, establecimiento) {
     email: asistente.email,
     numero_celular: asistente.numero_celular,
     password: bcrypt.hashSync(asistente.password, salt),
+    establecimiento_nit_user: asistente.establecimiento_nit_user,
     rol_id_rol: 4
   }
 
-  await User.create(user).
-    then(async usuario => {
-      let userEstablecimiento = {
-        user_id_user: usuario.id_user,
-        establecimiento_nit: establecimiento
-      }
-      await User_Establecimiento.create(userEstablecimiento)
-    })
-
+  await User.create(user)
 }
 
 async function listarAsistentes(establecimiento) {
-  User.belongsToMany(Establecimiento, { through: User_Establecimiento, foreignKey: 'user_id_user' });
-  Establecimiento.belongsToMany(User, { through: User_Establecimiento, foreignKey: 'establecimiento_nit' });
-  let establecimientos = await Establecimiento.findOne({
-    where: { nit: establecimiento }, include: {
-      model: User,
-      as: 'users',
-      where: {
-        rol_id_rol: 4,
-        estado_user:1
-      }
-    }
-  });
+  let asistentes = await User.findAll({where: { establecimiento_nit_user: establecimiento,estado_user:1 }});
 
-  if (establecimientos == null) {
+  if (asistentes == null) {
     return null
   } else {
-    return establecimientos.users
+    return asistentes
   }
-
-
 }
 
 
 module.exports = {
 
+  // Funcion para la creación de un asistente (Primera funcion al realizar la petición sin validaciones) //
   async crearAsistente(req, res) {
     let admin = req.body.admin;
-    let establecimiento = await traeEstablecimiento(admin);
+    let establecimiento = await traeNitEstablecimiento(admin);
+
     if (establecimiento) {
       let asistente = {
         nombre_usuario: req.body.nombre_usuario,
         email: req.body.email,
         numero_celular: req.body.numero_celular,
-        password: req.body.password
+        password: req.body.password,
+        establecimiento_nit_user: establecimiento
       }
 
-      let errores = await validacionDatosAsistente(asistente);
+      let error = await validacionDatosAsistente(asistente);
 
-      if (errores) {
-        res.json(errores)
+      if (error) {
+        return res.json({ error })
       } else {
-        await añadirAsistente(asistente, establecimiento);
-        res.json({ success: 'Asistente creado!' })
+        await añadirAsistente(asistente);
+        return res.json({ success: 'Asistente creado!' })
       }
     } else {
-      res.json({ error: 'Error administrador de establecimiento!' })
+      return res.json({ error: 'Error administrador de establecimiento!' })
     }
 
   },
+
+  // Funcion para listar los asistentes activos de un establecimiento (Primera funcion al realizar la petición sin validaciones) //
   async listarAsistentesActivos(req, res) {
     let admin = req.body.admin;
-    let establecimiento = await traeEstablecimiento(admin);
+    let establecimiento = await traeNitEstablecimiento(admin);
     if (establecimiento) {
       let asistentes = await listarAsistentes(establecimiento);
-      if (asistentes==null) {
+      if (asistentes == null) {
         res.json({ error: 'El establecimiento no tiene asistentes!' })
       } else {
         res.json({ asistentesEstablecimiento: asistentes })
