@@ -160,7 +160,7 @@ module.exports = {
                 estado_experiencia: 1
             }
         }).
-            then(result => { res.json(result) })
+            then(experiencias => { res.json({experiencias}) })
 
     },
     async obtenerEntretenimiento(req, res) {
@@ -247,7 +247,8 @@ module.exports = {
         await Experiencia.findOne({
             where: { id_experiencia: req.body.id_experiencia },
             include: [{
-                model: Item
+                model: Item,
+                where: {estado_item:1}
             }]
         }).
             then(experiencia => {
