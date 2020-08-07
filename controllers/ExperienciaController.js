@@ -4,7 +4,7 @@ const fs = require('fs');
 const CryptoJS = require("crypto-js");
 const Sequelize = require('sequelize');
 
-
+//Validaciones antes de agregar una experiencia//
 async function validacionExperiencia(experiencia) {
     let error = [];
     if (validator.isEmpty(experiencia.titulo_experiencia, { ignore_whitespace: true })) {
@@ -50,6 +50,10 @@ async function validacionExperiencia(experiencia) {
             .then(establecimiento => {
                 if (!establecimiento) {
                     error.push('El establecimiento no existe')
+                } else {
+                    if (!establecimiento.estado_establecimiento) {
+                        error.push('El establecimiento no está activo')
+                    }
                 }
             })
     }
@@ -129,35 +133,31 @@ module.exports = {
             establecimiento_nit: req.body.establecimiento_nit
         }
 
-        let errores = await validacionExperiencia(experiencia);
+        let error = await validacionExperiencia(experiencia);
 
-        if (errores) {
-            res.json(errores)
+        if (error) {
+            return res.json({ error })
         } else {
-            await Experiencia.create(experiencia).
-                then(exp => {
-                    if (exp) {
-                        res.json({ success: 'Experiencia creada!' })
-                    }
-                })
+            Experiencia.create(experiencia)
+            return res.json({ success: 'Experiencia creada!' })
         }
     },
     async obtenerGastronomicas(req, res) {
 
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia'], where: { user_id_user: req.body.id_user } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user,renovado_experiencia_usada:0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
                 });
             })
-        
+
         await Experiencia.findAll({
             where: {
                 id_experiencia: {
                     [Sequelize.Op.notIn]: usados
                 },
-                estado_experiencia:1
+                estado_experiencia: 1
             }
         }).
             then(result => { res.json(result) })
@@ -178,14 +178,14 @@ module.exports = {
             id_experiencia: req.body.id_experiencia
         }
 
-        let errores = await validacionActivacionExperiencia(experiencia)
+        let error = await validacionActivacionExperiencia(experiencia)
 
-        if (errores) {
-            res.json({ errores })
+        if (error) {
+            return res.json({ error })
         } else {
-            await Experiencia.update({ estado_experiencia: 1 },
-                { where: { id_experiencia: req.body.id_experiencia } }).
-                then(res.json({ success: 'Experiencia activada!' }))
+            Experiencia.update({ estado_experiencia: 1 },
+                { where: { id_experiencia: req.body.id_experiencia } })
+            return res.json({ success: 'Experiencia activada!' })
         }
 
     },
@@ -194,14 +194,14 @@ module.exports = {
             id_experiencia: req.body.id_experiencia
         }
 
-        let errores = await validacionInactivacionExperiencia(experiencia)
+        let error = await validacionInactivacionExperiencia(experiencia)
 
-        if (errores) {
-            res.json({ errores })
+        if (error) {
+           return  res.json({ error })
         } else {
-            await Experiencia.update({ estado_experiencia: 0 },
-                { where: { id_experiencia: req.body.id_experiencia } }).
-                then(res.json({ success: 'Experiencia inactivada!' }))
+            Experiencia.update({ estado_experiencia: 0 },
+                { where: { id_experiencia: req.body.id_experiencia } })
+            return res.json({ success: 'Experiencia inactivada!' })
         }
 
     },
@@ -240,17 +240,19 @@ module.exports = {
         let originalText_id_experiencia = bytes_id_experiencia.toString(CryptoJS.enc.Utf8);
         return res.json({ originalText_id_usuario, originalText_id_experiencia })
     },
-    async obtenerInfoExperiencia(req,res){
+    async obtenerInfoExperiencia(req, res) {
 
-        Experiencia.hasMany(Item,{foreignKey: 'experiencia_id_experiencia_item' })
+        Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia_item' })
 
-        await Experiencia.findOne({where:{id_experiencia:req.body.id_experiencia},
+        await Experiencia.findOne({
+            where: { id_experiencia: req.body.id_experiencia },
             include: [{
-            model: Item
-          }]}).
-          then(experiencia=>{
-              res.json(experiencia)
-          })
+                model: Item
+            }]
+        }).
+            then(experiencia => {
+                res.json(experiencia)
+            })
 
     }
 

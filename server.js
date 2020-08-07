@@ -25,17 +25,17 @@ app.use(express.static('publico'));
 
 app.use('/api/auth', authRouter)
 
-app.use('/api/user', usersRouter)
+app.use('/api/user',authMiddleware, usersRouter)
 
-app.use('/api/establecimiento', establecimientosRouter)
+app.use('/api/establecimiento',authMiddleware, establecimientosRouter)
 
-app.use('/api/adminEstablecimiento', adminEstablecimientoRouter)
+app.use('/api/adminEstablecimiento',authMiddleware, adminEstablecimientoRouter)
 
-app.use('/api/experiencia', ExperienciaRouter)
+app.use('/api/experiencia',authMiddleware, ExperienciaRouter)
 
-app.use('/api/itemExp', ItemRouter)
+app.use('/api/itemExp',authMiddleware, ItemRouter)
 
-app.use('/api/afiliacion', AfiliacionRouter)
+app.use('/api/afiliacion',authMiddleware, AfiliacionRouter)
 
 app.listen(process.env.PORT, () => {
     console.log('Servidor arrancado!');

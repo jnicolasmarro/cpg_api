@@ -15,10 +15,7 @@ module.exports = (sequelize, type) => {
             type: type.DATE
         },
         fecha_vencimiento: {
-            type: type.DATEONLY
-        },
-        periodo_afiliacion:{
-            type: type.INTEGER
+            type: type.DATE
         }
     }
         , {

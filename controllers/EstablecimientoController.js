@@ -1,15 +1,10 @@
-const { Establecimiento, User, Custormer_ePayco, Ciudad, User_Establecimiento } = require('../db');
+const { Establecimiento, User, Ciudad, Historico_Establecimiento } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const epayco = require('epayco-sdk-node')({
-  apiKey: process.env.PUBLIC_KEY,
-  privateKey: process.env.PRIVATE_KEY,
-  lang: 'ES',
-  test: (process.env.EPAYCO_TEST == 'true')
-})
 
 
+// Permite validar los datos del establecimiento antes de agregarlo//
 async function validacionDatosEstablecimiento(establecimiento) {
   let error = [];
   if (validator.isEmpty(establecimiento.nit, { ignore_whitespace: true })) {
@@ -52,6 +47,17 @@ async function validacionDatosEstablecimiento(establecimiento) {
     error.push('No ha ingresado la dirección del establecimiento')
   }
 
+  if (validator.isEmpty(establecimiento.ciudad_id_ciudad, { ignore_whitespace: true })) {
+    error.push('No ha ingresado la ciudad del establecimiento')
+  }else{
+    await Ciudad.findOne({where:{id_ciudad:establecimiento.ciudad_id_ciudad}}).
+    then(ciudad=>{
+      if(!ciudad){
+        error.push('La ciudad ingresada no existe')
+      }
+    })
+  }
+
   if (validator.isEmpty(establecimiento.cantidad_lote, { ignore_whitespace: true })) {
     error.push('No ha ingresado la cantidad del lote de experiencias!')
   } else if (!validator.isInt(establecimiento.cantidad_lote)) {
@@ -64,7 +70,7 @@ async function validacionDatosEstablecimiento(establecimiento) {
     error = null
   return error
 }
-
+// Permite validar los datos del administrador de establecimiento antes de agregarlo//
 async function validacionDatosAdministrador(admin) {
   let error = [];
 
@@ -98,7 +104,7 @@ async function validacionDatosAdministrador(admin) {
   }
   return error
 }
-
+// Permite validar los datos de autorización//
 function validacionHD(hd) {
   let error = [];
 
@@ -113,30 +119,29 @@ function validacionHD(hd) {
   }
   return error
 }
-
-async function añadirEstablecimiento(establecimiento, hd, admin) {
-  await Establecimiento.create(Object.assign(establecimiento, hd)).
-    then(await añadirAdminEstablecimiento(admin, establecimiento.nit))
+// Permite añadir al establecimiento luego de las validaciones//
+function añadirEstablecimiento(establecimiento, hd, admin) {
+  Establecimiento.create(Object.assign(establecimiento, hd)).
+    then(establecimiento => {
+      añadirAdminEstablecimiento(admin, establecimiento.nit);
+      let historico_cero = {
+        establecimiento_nit_historico: establecimiento.nit
+      }
+      Historico_Establecimiento.create(historico_cero);
+    })
 }
-
-async function añadirAdminEstablecimiento(admin, nit) {
+// Permite añadir al administrador del establecimiento luego de las validaciones//
+function añadirAdminEstablecimiento(admin, nit) {
   let salt = bcrypt.genSaltSync(10);
   let user = {
     nombre_usuario: admin.nombre_usuario,
     email: admin.email,
     numero_celular: admin.numero_celular,
     password: bcrypt.hashSync(admin.password, salt),
+    establecimiento_nit_user: nit,
     rol_id_rol: 3
   }
-  await User.create(user).
-    then(async usuario => {
-      let userEstablecimiento = {
-        user_id_user: usuario.id_user,
-        establecimiento_nit: nit
-      }
-      await User_Establecimiento.create(userEstablecimiento)
-    })
-
+  User.create(user)
 }
 
 async function validaNit(nitEstablecimiento) {
@@ -226,8 +231,6 @@ async function registroTarjeta(req, res) {
 
 module.exports = {
   async creaEstablecimiento(req, res) {
-
-
     let establecimiento = {
       nit: req.body.nit,
       nombre_empresa: req.body.nombre_empresa,
@@ -255,24 +258,24 @@ module.exports = {
     let errorAdmin = await validacionDatosAdministrador(admin);
     let errorHD = await validacionHD(hd);
 
-    let errores = [];
+    let error = [];
 
     if (errorEstablecimiento != null)
-      errores = errores.concat(errorEstablecimiento);
+      error = error.concat(errorEstablecimiento);
     if (errorAdmin != null)
-      errores = errores.concat(errorAdmin);
+      error = error.concat(errorAdmin);
     if (errorHD != null)
-      errores = errores.concat(errorHD);
+      error = error.concat(errorHD);
 
-    if (errores.length == 0) {
-      errores = null
+    if (error.length == 0) {
+      error = null
     }
 
-    if (errores) {
-      res.json(errores)
+    if (error) {
+      res.json({ error })
     } else {
-      await añadirEstablecimiento(establecimiento, hd, admin);
-      res.json({ success: 'Establecimiento y Admin agregados' })
+      añadirEstablecimiento(establecimiento, hd, admin);
+      return res.json({ success: 'Establecimiento y Administrador creados' })
     }
 
   },

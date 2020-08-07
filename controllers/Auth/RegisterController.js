@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { User, Afiliacion, Util } = require('../../db');
+const { User, Afiliacion, Util,Periodo_Afiliacion } = require('../../db');
 const bcrypt = require('bcryptjs');
 
 // Funcion que permite validar datos de un nuevo usuario final devuelve errores si los hay //
@@ -67,24 +67,32 @@ module.exports = async (req, res) => {
             rol_id_rol: 2
         }
 
-        User.create(user).then(usuario => {
-            let hoy = new Date();
-            let fecha_hoy = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+        User.create(user).then(usuario => {    
             let fecha_vencimiento = new Date();
             fecha_vencimiento.setDate(fecha_vencimiento.getDate() + parseInt(dias_vencimiento));
-
+            fecha_vencimiento.setHours(23)
+            fecha_vencimiento.setMinutes(59)
+            fecha_vencimiento.setSeconds(59)
             let afiliacion = {
                 user_id_user: usuario.id_user,
-                fecha_uso: fecha_hoy,
-                fecha_vencimiento: fecha_vencimiento,
-                periodo_afiliacion: 1
+                fecha_uso: new Date(),
+                fecha_vencimiento: fecha_vencimiento
             }
 
             Afiliacion.update(afiliacion, {
                 where: {
                     codigo_afiliacion: req.body.codigo
                 }
-            });
+            })
+
+            let periodo={
+                afiliacion_codigo_afiliacion:req.body.codigo,
+                periodo_afiliacion:1,
+                fecha_afiliacion: new Date()
+            }
+            Periodo_Afiliacion.create(periodo)
+
+
         });
         return res.json({ success: 'Usuario registrado correctamente' })
     } else {
