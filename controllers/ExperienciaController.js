@@ -1,4 +1,4 @@
-const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, sequelize } = require('../db');
+const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, Afiliacion } = require('../db');
 const validator = require('validator');
 const fs = require('fs');
 const CryptoJS = require("crypto-js");
@@ -38,9 +38,9 @@ async function validacionExperiencia(experiencia) {
     }
     if (validator.isEmpty(experiencia.experiencia_tipo_id_tipo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el tipo de experiencia!')
-    } else if (!(parseInt(experiencia.experiencia_tipo_id_tipo) == 1 || parseInt(experiencia.experiencia_tipo_id_tipo) == 2)) {
+    } /*else if (!(parseInt(experiencia.experiencia_tipo_id_tipo) == 1 || parseInt(experiencia.experiencia_tipo_id_tipo) == 2)) {
         error.push('Error tipo de experiencia!')
-    }
+    }*/
     if (validator.isEmpty(experiencia.establecimiento_nit, { ignore_whitespace: true })) {
         error.push('No ha ingresado el establecimiento!')
     } else if (!validator.isInt(experiencia.establecimiento_nit)) {
@@ -83,6 +83,13 @@ async function validacionActivacionExperiencia(experiencia) {
     if (error.length == 0)
         error = null
     return error
+}
+
+const getNit = async (id_user)=>{
+    return await User.findOne({where:{id_user:id_user}})
+    .then(user=>{
+        return user.establecimiento_nit_user
+    })
 }
 
 async function validacionInactivacionExperiencia(experiencia) {
@@ -157,21 +164,52 @@ module.exports = {
                 id_experiencia: {
                     [Sequelize.Op.notIn]: usados
                 },
-                estado_experiencia: 1
+                estado_experiencia: 1,
+                experiencia_tipo_id_tipo:1
             }
         }).
             then(experiencias => { res.json({experiencias}) })
 
     },
-    async obtenerEntretenimiento(req, res) {
-        await Experiencia.findAll({ where: { experiencia_tipo_id_tipo: 2, estado_experiencia: 1 } }).
-            then(experienciasEntretenimiento => {
-                if (experienciasEntretenimiento.length > 0) {
-                    res.json(experienciasEntretenimiento)
-                } else {
-                    res.json({ error: 'No existen experiencias de entretenimiento aún!' })
-                }
+    async obtenerSeleccion(req, res) {
+        let usados = [];
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user,renovado_experiencia_usada:0 } }).
+            then(usado => {
+                usado.forEach(e => {
+                    usados.push(e.experiencia_id_experiencia_usada)
+                });
             })
+
+        await Experiencia.findAll({
+            where: {
+                id_experiencia: {
+                    [Sequelize.Op.notIn]: usados
+                },
+                estado_experiencia: 1,
+                experiencia_tipo_id_tipo:2
+            }
+        }).
+            then(experiencias => { res.json({experiencias}) })
+    },
+    async obtenerBienestar(req, res) {
+        let usados = [];
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user,renovado_experiencia_usada:0 } }).
+            then(usado => {
+                usado.forEach(e => {
+                    usados.push(e.experiencia_id_experiencia_usada)
+                });
+            })
+
+        await Experiencia.findAll({
+            where: {
+                id_experiencia: {
+                    [Sequelize.Op.notIn]: usados
+                },
+                estado_experiencia: 1,
+                experiencia_tipo_id_tipo:3
+            }
+        }).
+            then(experiencias => { res.json({experiencias}) })
     },
     async activacionExperiencia(req, res) {
         let experiencia = {
@@ -229,32 +267,124 @@ module.exports = {
         }
     },
     async encriptaDatos(req, res) {
-        let id_usuario = CryptoJS.AES.encrypt(req.body.id_usuario, process.env.KEY_AES).toString();
-        let id_experiencia = CryptoJS.AES.encrypt(req.body.id_experiencia, process.env.KEY_AES).toString();
+        let id_usuario = CryptoJS.AES.encrypt(req.params.id_user, process.env.KEY_AES).toString();
+        let id_experiencia = CryptoJS.AES.encrypt(req.params.id_exp, process.env.KEY_AES).toString();
         return res.json({ id_usuario, id_experiencia })
     },
-    async desencriptaDatos(req, res) {
-        let bytes_id_usuario = CryptoJS.AES.decrypt(req.body.id_usuario, process.env.KEY_AES);
-        let originalText_id_usuario = bytes_id_usuario.toString(CryptoJS.enc.Utf8);
-        let bytes_id_experiencia = CryptoJS.AES.decrypt(req.body.id_experiencia, process.env.KEY_AES);
-        let originalText_id_experiencia = bytes_id_experiencia.toString(CryptoJS.enc.Utf8);
-        return res.json({ originalText_id_usuario, originalText_id_experiencia })
+    async procesaQR(req, res) {
+        const QR = req.body.data.split(' ');
+        
+        if(QR.length!=2){
+            return res.json({error:'Se ha leído un QR no válido'})
+        }else{
+            let id_usuario = QR[0];
+            let id_experiencia = QR[1];
+
+            id_usuario=CryptoJS.AES.decrypt(id_usuario, process.env.KEY_AES);
+            id_usuario=id_usuario.toString(CryptoJS.enc.Utf8);
+
+            id_experiencia=CryptoJS.AES.decrypt(id_experiencia, process.env.KEY_AES);
+            id_experiencia=id_experiencia.toString(CryptoJS.enc.Utf8);
+
+            let result= await User.findOne({where:{id_user:id_usuario}})
+            .then(async (user)=>{
+                if(!user){
+                    return {error:'Error de información en el QR'}
+                }else{
+                    if(!user.estado_user){
+                        return {error:'Usuario no se encuentra activo'}
+                    }else{
+                        let fecha_vto_afiliacion = await Afiliacion
+                        .findOne({where:{user_id_user:user.id_user}})
+                        .then((afiliacion)=>{
+                            return afiliacion.fecha_vencimiento
+                        })
+                        let fecha_actual = new Date();
+                        if(fecha_actual>fecha_vto_afiliacion){
+                            return {error:'La afiliación del usuario ha expirado'}
+                        }
+                    }
+                    return await Experiencia.findOne({where:{id_experiencia:id_experiencia}})
+                    .then(async (experiencia)=>{
+                        if(!experiencia){
+                            return {error:'Error de información en el QR'}
+                        }else{
+                            let nit;
+                            await User.findOne({where:{id_user:req.headers.id_user}})
+                            .then((asistente)=>{
+                                nit = asistente.establecimiento_nit_user;
+                            })
+                            if(nit!=experiencia.establecimiento_nit){
+                                return {error:'La experiencia no corresponde a este establecimiento'}
+                            }
+                            if(!experiencia.estado_experiencia){
+                                return {error:'La experiencia no está activa'}
+                            }else{
+                                return await Experiencia_Usada
+                                .findOne({where:{
+                                    experiencia_id_experiencia_usada:id_experiencia,
+                                    user_id_user_usada:id_usuario,
+                                    renovado_experiencia_usada:false
+                                }})
+                                .then((usada)=>{
+                                    if(usada){
+                                        return {error:'La experiencia ya se ha sido usada por este usuario'}
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+
+            if(result!=undefined){
+                if(result.error){
+                    return res.json(result)
+                }
+            }
+
+            let registro_uso ={
+                user_id_user_usada:id_usuario,
+                experiencia_id_experiencia_usada:id_experiencia,
+                fecha_uso_experiencia_usada:new Date()
+            }
+
+            return await Experiencia_Usada.create(registro_uso)
+            .then((registro)=>{
+                return res.json({success:'Experiencia procesada y registrada'})
+            })
+
+            
+
+            
+            
+        }
     },
     async obtenerInfoExperiencia(req, res) {
 
         Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia_item' })
+        Experiencia.belongsTo(Establecimiento,{foreignKey: 'establecimiento_nit'})
 
-        await Experiencia.findOne({
-            where: { id_experiencia: req.body.id_experiencia },
+       return await Experiencia.findOne({
+            where: { id_experiencia: req.params.id},
             include: [{
                 model: Item,
                 where: {estado_item:1}
-            }]
+            },
+        {
+            model: Establecimiento
+        }]
         }).
             then(experiencia => {
-                res.json(experiencia)
+               return res.json({experiencia})
             })
 
+    },
+    async listarExperiencias (req,res){
+        let admin = req.headers.id_user;
+        let nit = await getNit(admin);
+        let experiencias = await Experiencia.findAll({where:{establecimiento_nit:nit}})
+        return res.json({experiencias})
     }
 
 }

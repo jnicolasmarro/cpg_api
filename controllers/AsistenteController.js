@@ -9,7 +9,7 @@ async function traeNitEstablecimiento(admin) {
   await User.findOne({ where: { id_user: admin } }).
     then(usuario => {
       if (usuario) {
-        nit = user.establecimiento_nit_user;
+        nit = usuario.establecimiento_nit_user;
       }
     })
   return nit;
@@ -81,7 +81,7 @@ module.exports = {
 
   // Funcion para la creación de un asistente (Primera funcion al realizar la petición sin validaciones) //
   async crearAsistente(req, res) {
-    let admin = req.body.admin;
+    let admin = req.headers.id_user;
     let establecimiento = await traeNitEstablecimiento(admin);
 
     if (establecimiento) {
@@ -121,6 +121,9 @@ module.exports = {
     } else {
       res.json({ error: 'Error administrador de establecimiento!' })
     }
+  },
+  async obtenerUsuario(req,res){
+
   }
 
 }

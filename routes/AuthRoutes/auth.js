@@ -7,6 +7,6 @@ const SinginController = require('../../controllers/Auth/SinginController');
 router.post('/singup', SingupController)
 
 /*Autenticación de usuario*/
-router.get('/singin', SinginController)
+router.post('/singin', SinginController)
 
 module.exports = router

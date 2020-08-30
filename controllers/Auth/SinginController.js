@@ -59,9 +59,10 @@ module.exports = async (req, res) => {
                     const token = jwt.sign(
                         { id_user: user.id_user },
                         process.env.JWT_TOKEN);
-                    return res.status(200).json({
-                        header_id_user: user.id_user,
-                        token: token
+                    return res.status(200).json({token:
+                        {header_id_user: user.id_user,
+                        token: token,
+                        rol: user.rol_id_rol}
                     });
                 } else {
                     return res.json({ error: 'Contraseña incorrecta' })

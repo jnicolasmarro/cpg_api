@@ -8,6 +8,9 @@ module.exports= (sequelize, type) => {
         nombre_usuario: {
             type: type.STRING(100)
         },
+        numero_identificacion:{
+            type: type.BIGINT(15)
+        },
         email: {
             type: type.STRING(50),
             unique: true
