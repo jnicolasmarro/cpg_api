@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `util`
+-- Dumping data for table `establecimiento`
 --
 
-LOCK TABLES `util` WRITE;
-/*!40000 ALTER TABLE `util` DISABLE KEYS */;
-INSERT INTO `util` VALUES (1,'Días de vencimiento de una afiliación','183'),(2,'Línea de WhatsApp','3150000000'),(3,'Link Chat de WhatsApp','https://api.whatsapp.com/send?phone=573192522839&text=Quiero%20soporte%20en%20la%20aplicaci%C3%B3n');
-/*!40000 ALTER TABLE `util` ENABLE KEYS */;
+LOCK TABLES `establecimiento` WRITE;
+/*!40000 ALTER TABLE `establecimiento` DISABLE KEYS */;
+INSERT INTO `establecimiento` VALUES (2708101546,'HABANA 93 FUSIÓN CARNE','Comida saludable','establecimiento1@gmail.com','3152045796','Cra 100 # 4 67',10,1,1,'/establecimiento/2708101546.jpg',1,1,'2020-07-07 04:07:32','2020-08-07 04:13:19'),(8894409766,'LA PUERTA DE ALCALA','Comida saludable','establecimiento2@gmail.com','3152045797','Cra 100 # 4 68',10,1,1,'/establecimiento/8894409766.png',1,1,'2020-08-17 13:56:29','2020-08-17 13:58:06');
+/*!40000 ALTER TABLE `establecimiento` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -34,4 +34,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-06 20:27:13
+-- Dump completed on 2020-09-06 20:27:14

@@ -21,7 +21,7 @@
 
 LOCK TABLES `experiencia_tipo` WRITE;
 /*!40000 ALTER TABLE `experiencia_tipo` DISABLE KEYS */;
-INSERT INTO `experiencia_tipo` VALUES (1,'Gastronómica'),(2,'Entretenimiento');
+INSERT INTO `experiencia_tipo` VALUES (1,'Cenas Especiales'),(2,'Selección de Productos'),(3,'Bienestar');
 /*!40000 ALTER TABLE `experiencia_tipo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -34,4 +34,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-06 21:16:46
+-- Dump completed on 2020-09-06 20:27:13

@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `util`
+-- Dumping data for table `item`
 --
 
-LOCK TABLES `util` WRITE;
-/*!40000 ALTER TABLE `util` DISABLE KEYS */;
-INSERT INTO `util` VALUES (1,'Días de vencimiento de una afiliación','183'),(2,'Línea de WhatsApp','3150000000'),(3,'Link Chat de WhatsApp','https://api.whatsapp.com/send?phone=573192522839&text=Quiero%20soporte%20en%20la%20aplicaci%C3%B3n');
-/*!40000 ALTER TABLE `util` ENABLE KEYS */;
+LOCK TABLES `item` WRITE;
+/*!40000 ALTER TABLE `item` DISABLE KEYS */;
+INSERT INTO `item` VALUES (1,'Título Item 1','Descripción Item 1',1,1,'2020-08-07 04:15:49','2020-08-07 04:15:49'),(2,'Título Item 2','Descripción Item 2',1,1,'2020-08-07 04:15:57','2020-08-07 04:15:57'),(3,'Título Item 3','Descripción Item 3',0,1,'2020-08-07 04:16:03','2020-08-07 04:16:03'),(4,'Título Item 4','Descripción Item 4',1,1,'2020-08-07 04:16:08','2020-08-07 04:16:08'),(5,'Título Item 1','Descripción Item 1',1,2,'2020-08-07 04:18:19','2020-08-07 04:18:19'),(6,'Título Item 2','Descripción Item 2',1,2,'2020-08-07 04:18:25','2020-08-07 04:18:25'),(7,'Título Item 3','Descripción Item 3',1,2,'2020-08-07 04:18:30','2020-08-07 04:18:30'),(8,'Plato de entrada','Porcion para una persona',1,3,'2020-08-17 14:00:32','2020-08-17 14:00:32'),(9,'Bebida','Cerveza ',1,3,'2020-08-17 14:00:52','2020-08-17 14:00:52'),(10,'Seleccion de producto','Descripcion',1,4,'2020-08-17 18:59:25','2020-08-17 18:59:25');
+/*!40000 ALTER TABLE `item` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

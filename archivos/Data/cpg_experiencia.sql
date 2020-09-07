@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `util`
+-- Dumping data for table `experiencia`
 --
 
-LOCK TABLES `util` WRITE;
-/*!40000 ALTER TABLE `util` DISABLE KEYS */;
-INSERT INTO `util` VALUES (1,'Días de vencimiento de una afiliación','183'),(2,'Línea de WhatsApp','3150000000'),(3,'Link Chat de WhatsApp','https://api.whatsapp.com/send?phone=573192522839&text=Quiero%20soporte%20en%20la%20aplicaci%C3%B3n');
-/*!40000 ALTER TABLE `util` ENABLE KEYS */;
+LOCK TABLES `experiencia` WRITE;
+/*!40000 ALTER TABLE `experiencia` DISABLE KEYS */;
+INSERT INTO `experiencia` VALUES (1,'Título Experiencia 1','Descripción Experiencia 1',100000,150000,1,4.00,'/experiencias/1.jpg',1,2708101546,'2020-08-07 04:15:17','2020-08-07 16:21:50'),(2,'Título Experiencia 2','Descripción Experiencia 2',80000,90000,0,5.00,'/experiencias/2.jpg',1,2708101546,'2020-08-07 04:17:23','2020-08-17 02:10:58'),(3,'Paella','Paella Marinera',80000,90000,1,5.00,'/experiencias/3.jpg',1,8894409766,'2020-08-17 13:59:33','2020-08-17 14:01:01'),(4,'Selección de productos 1','descripcion de experiencia',60000,90000,1,5.00,'/experiencias/4.jpg',2,2708101546,'2020-08-17 18:58:09','2020-08-17 18:59:32');
+/*!40000 ALTER TABLE `experiencia` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

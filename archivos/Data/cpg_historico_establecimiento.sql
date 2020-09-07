@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `util`
+-- Dumping data for table `historico_establecimiento`
 --
 
-LOCK TABLES `util` WRITE;
-/*!40000 ALTER TABLE `util` DISABLE KEYS */;
-INSERT INTO `util` VALUES (1,'Días de vencimiento de una afiliación','183'),(2,'Línea de WhatsApp','3150000000'),(3,'Link Chat de WhatsApp','https://api.whatsapp.com/send?phone=573192522839&text=Quiero%20soporte%20en%20la%20aplicaci%C3%B3n');
-/*!40000 ALTER TABLE `util` ENABLE KEYS */;
+LOCK TABLES `historico_establecimiento` WRITE;
+/*!40000 ALTER TABLE `historico_establecimiento` DISABLE KEYS */;
+INSERT INTO `historico_establecimiento` VALUES (2708101546,0,0),(8894409766,0,0);
+/*!40000 ALTER TABLE `historico_establecimiento` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
