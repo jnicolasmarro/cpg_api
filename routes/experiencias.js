@@ -33,4 +33,10 @@ router.put('/procesarQR',ExperienciaController.procesaQR)
 /*Obtiene la información de una experiencia*/
 router.get('/obtener/:id',ExperienciaController.obtenerInfoExperiencia)
 
+/*Obtiene la información de una experiencia*/
+router.get('/escuchandoRespuesta/:id_user/:id_exp',ExperienciaController.esperaRespuesta)
+
+/*Genera busqueda*/
+router.get('/busqueda/:tipo/:search',ExperienciaController.busquedaExperiencias)
+
 module.exports = router

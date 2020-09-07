@@ -3,6 +3,7 @@ const router = express.Router()
 const AsistenteController = require('../controllers/AsistenteController');
 const AdminEstablecimientoController = require('../controllers/AdminEstablecimientoController');
 const ExperienciaController = require('../controllers/ExperienciaController')
+const ReporteController = require ('../controllers/ReporteController')
 
 /*Creación de un asistente*/
 router.post('/creacionAsistente', AsistenteController.crearAsistente);
@@ -21,5 +22,8 @@ router.get('/experiencias',ExperienciaController.listarExperiencias);
 
 /*Obtener estadisticas de un establecimiento*/
 router.get('/estadisticas',AdminEstablecimientoController.traeEstadisticas);
+
+/*Obtener reporte usuarios*/
+router.get('/reporteUsuarios',ReporteController.clientesEstablecimiento);
 
 module.exports = router;
