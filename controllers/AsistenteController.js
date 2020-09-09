@@ -67,7 +67,7 @@ async function añadirAsistente(asistente) {
 }
 
 async function listarAsistentes(establecimiento) {
-  let asistentes = await User.findAll({where: { establecimiento_nit_user: establecimiento,estado_user:1 }});
+  let asistentes = await User.findAll({where: { establecimiento_nit_user: establecimiento,estado_user:1,rol_id_rol:4 }});
 
   if (asistentes == null) {
     return null
@@ -109,21 +109,28 @@ module.exports = {
 
   // Funcion para listar los asistentes activos de un establecimiento (Primera funcion al realizar la petición sin validaciones) //
   async listarAsistentesActivos(req, res) {
-    let admin = req.body.admin;
+    let admin = req.headers.id_user;
     let establecimiento = await traeNitEstablecimiento(admin);
     if (establecimiento) {
       let asistentes = await listarAsistentes(establecimiento);
       if (asistentes == null) {
         res.json({ error: 'El establecimiento no tiene asistentes!' })
       } else {
-        res.json({ asistentesEstablecimiento: asistentes })
+        res.json({ asistentes })
       }
     } else {
       res.json({ error: 'Error administrador de establecimiento!' })
     }
   },
-  async obtenerUsuario(req,res){
-
+  async inactivarAsistente(req,res){
+    let id_asistente=req.params.id_asistente
+    return await User.update({estado_user:0},{where:{
+      id_user:id_asistente
+    }})
+    .then(res.json({success:'Asistente inactivado'}))
+    .catch((error)=>{
+      throw error
+    })
   }
 
 }

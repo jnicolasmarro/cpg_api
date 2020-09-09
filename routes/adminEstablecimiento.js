@@ -11,6 +11,9 @@ router.post('/creacionAsistente', AsistenteController.crearAsistente);
 /*Listar asistentes de un establecimiento*/
 router.get('/asistentes', AsistenteController.listarAsistentesActivos);
 
+/*Inactivar asistente*/
+router.put('/inactivar/:id_asistente', AsistenteController.inactivarAsistente);
+
 /*Obtener datos del administrador de establecimiento*/
 router.get('/adminEsta/:id', AdminEstablecimientoController.obtenerAdministradorAsistenteEstablecimiento);
 
