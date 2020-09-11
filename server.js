@@ -22,6 +22,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
 
+app.set('views', './views')
+
+app.set('view engine', 'pug')
+
 app.use('/api/',express.static('publico'));
 
 app.use('/api/auth', authRouter)

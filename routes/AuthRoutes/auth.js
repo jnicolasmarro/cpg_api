@@ -3,7 +3,7 @@ const router = express.Router()
 const SingupController = require('../../controllers/Auth/RegisterController');
 const SinginController = require('../../controllers/Auth/SinginController');
 const RememberController = require('../../controllers/Auth/RememberController');
-const ChangeController = require('../../controllers/Auth/CambiarContraseñaController');
+const {CambiarContraseña,RealizarCambioContraseña,SolicitarCambioContraseña} = require('../../controllers/Auth/CambiarContraseñaController');
 
 /*Crear nuevo usuario*/
 router.post('/singup', SingupController)
@@ -15,6 +15,12 @@ router.post('/singin', SinginController)
 router.get('/remember/:email', RememberController)
 
 /*Cambiar contraseña*/
-router.get('/cambio_contrasena/:id_user/:time/:hash', ChangeController)
+router.get('/cambio_contrasena/:id_user/:time/:hash', CambiarContraseña)
+
+/*Realizar cambio contraseña*/
+router.post('/cambio_contrasena',RealizarCambioContraseña )
+
+/*Solicitar cambio de contraseña*/
+router.get('/solicitar_cambio',SolicitarCambioContraseña )
 
 module.exports = router
