@@ -15,6 +15,9 @@ module.exports = {
         time = time.replace(/SLASH/gi, '/');
         hash = hash.replace(/SLASH/gi, '/');
 
+        let id_user_token=id_user
+        
+
         id_user = CryptoJS.AES.decrypt(id_user, process.env.KEY_AES);
         id_user = id_user.toString(CryptoJS.enc.Utf8);
 
@@ -28,6 +31,8 @@ module.exports = {
         let email_hash = hash[2]
         let password_hash = hash[3]
 
+        let email_token=email_hash
+        let password_token=password_hash
 
 
         time_hash = CryptoJS.AES.decrypt(time_hash, process.env.KEY_AES);
@@ -106,7 +111,10 @@ module.exports = {
         }
 
         res.render('cambio_contrasena', {
-            correo_actual: email_hash
+            correo_actual: email_hash,
+            token1: password_token,
+            token2: email_token,
+            token3: id_user_token
         })
 
 
@@ -115,8 +123,44 @@ module.exports = {
     async RealizarCambioContraseña(req, res) {
         let salt = bcrypt.genSaltSync(10);
         let password = bcrypt.hashSync(req.body.password, salt)
-        return await User.update({password:password},{where:{email:req.body.email}})
+        let token1=req.body.token1
+        let token2=req.body.token2
+        let token3=req.body.token3
+
+        token1 = CryptoJS.AES.decrypt(token1, process.env.KEY_AES);
+        token1 = token1.toString(CryptoJS.enc.Utf8);
+
+        token2 = CryptoJS.AES.decrypt(token2, process.env.KEY_AES);
+        token2 = token2.toString(CryptoJS.enc.Utf8);
+
+        token3 = CryptoJS.AES.decrypt(token3, process.env.KEY_AES);
+        token3 = token3.toString(CryptoJS.enc.Utf8);
+
+        let validacion = await User.findOne({where:{email:req.body.email}})
+        .then((user)=>{
+            if(user.email!=token2){
+                return {validacion:false,error:'Error'}
+            }else{
+                if(user.id_user!=token3){
+                    return {validacion:false,error:'Error'}
+                }else{
+                    if(user.password!=token1){
+                        return {validacion:false,error:'Error'}
+                    }else{
+                        return {validacion:true}
+                    }
+                }
+
+            }
+        })
+
+        if(validacion.validacion){
+            return await User.update({password:password},{where:{email:req.body.email}})
         .then(res.json({success:'La contraseña se ha cambiado'}))
+        }else{
+            return res.json({error:'Error'})
+        }
+        
     },
     async SolicitarCambioContraseña(req,res){
          return res.render('solicitud_cambio')

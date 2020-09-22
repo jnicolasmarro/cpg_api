@@ -21,7 +21,7 @@ module.exports = async (req, res, next) => {
                         permitido = false
                     }
                 })
-            if (rol == 2) {
+          /*  if (rol == 2) {
                 await Afiliacion.findOne({ where: { user_id_user: id_user } }).
                     then(afiliacion => {
                         let fecha_actual = new Date();
@@ -30,7 +30,7 @@ module.exports = async (req, res, next) => {
                             permitido = false;
                         }
                     })
-            }
+            }*/
             if (permitido) { next() }
             else { throw 'Denegado'; }
         }

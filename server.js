@@ -12,6 +12,7 @@ const ItemRouter = require('./routes/items')
 const AfiliacionRouter = require('./routes/afiliaciones')
 const authRouter = require('./routes/AuthRoutes/auth')
 const ContactoRouter = require('./routes/datosContacto')
+const NoticiaRouter = require('./routes/noticias')
 
 //Middleware de autenticación//
 const authMiddleware = require('./middleware/auth')
@@ -43,6 +44,8 @@ app.use('/api/itemExp',authMiddleware, ItemRouter)
 app.use('/api/afiliacion',authMiddleware, AfiliacionRouter)
 
 app.use('/api/contacto',authMiddleware, ContactoRouter)
+
+app.use('/api/noticia',authMiddleware, NoticiaRouter)
 
 app.listen(process.env.PORT, () => {
     console.log('Servidor arrancado!');

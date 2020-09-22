@@ -15,6 +15,7 @@ const UtilModel = require('./models/util')
 const Experiencia_Usada_Model = require('./models/experiencia_usada')
 const Historico_Establecimiento_Model = require('./models/historico_establecimiento')
 const Periodo_AfiliacionModel = require('./models/periodo_afiliacion')
+const NoticiaModel = require('./models/noticia')
 
 const User = UsuarioModel(sequelize, Sequelize)
 const Afiliacion = AfiliacionModel(sequelize, Sequelize)
@@ -26,6 +27,7 @@ const Util = UtilModel(sequelize, Sequelize)
 const Experiencia_Usada = Experiencia_Usada_Model(sequelize, Sequelize)
 const Historico_Establecimiento = Historico_Establecimiento_Model(sequelize, Sequelize)
 const Periodo_Afiliacion = Periodo_AfiliacionModel(sequelize, Sequelize)
+const Noticia = NoticiaModel(sequelize, Sequelize)
 
 module.exports = {
     User,
@@ -38,5 +40,6 @@ module.exports = {
     Experiencia_Usada,
     Historico_Establecimiento,
     Periodo_Afiliacion,
+    Noticia,
     Sequelize
 }

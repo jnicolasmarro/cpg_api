@@ -1,7 +1,12 @@
+
 function cambioContrasena() {
     let email = document.getElementById('email');
     let password1 = document.getElementById('password1');
     let password2 = document.getElementById('password2');
+    let token1 = document.getElementById('token1').value;
+    let token2 = document.getElementById('token2').value;
+    let token3 = document.getElementById('token3').value;
+    
     if (password1.value != password2.value) {
         document.getElementById("titulo_modal").innerHTML = "Error";
         let html = '<div class="alert alert-danger">' + 'Las contraseñas ingresadas no son iguales' + '</div>';
@@ -17,7 +22,10 @@ function cambioContrasena() {
             let url = 'http://192.168.1.100:3000/api/auth/cambio_contrasena/';
             let data = {
                 email: email.value,
-                password: password1.value
+                password: password1.value,
+                token1:token1,
+                token2:token2,
+                token3:token3
             };
             fetch(url, {
                     method: 'POST', // or 'PUT'

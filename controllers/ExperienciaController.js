@@ -4,6 +4,21 @@ const fs = require('fs');
 const CryptoJS = require("crypto-js");
 
 //Validaciones antes de agregar una experiencia//
+
+async function validacionAfiliacion(id_user){
+       return await Afiliacion.findOne({ where: { user_id_user: id_user } }).
+            then(afiliacion => {
+                let fecha_actual = new Date();
+                let fecha_venc = new Date(afiliacion.fecha_vencimiento); 
+                if (fecha_actual > fecha_venc) {
+                    return false;
+                }else{
+                    return true;
+                }
+            })
+}
+
+
 async function validacionExperiencia(experiencia) {
     let error = [];
     if (validator.isEmpty(experiencia.titulo_experiencia, { ignore_whitespace: true })) {
@@ -150,8 +165,15 @@ module.exports = {
     },
     async obtenerGastronomicas(req, res) {
 
+        let id_user = req.headers.id_user;
+
+        if(! await validacionAfiliacion(id_user)){
+            return res.json({error:'Afiliación vencida'})
+        }
+
+
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -171,8 +193,15 @@ module.exports = {
 
     },
     async obtenerSeleccion(req, res) {
+
+        let id_user = req.headers.id_user;
+
+        if(! await validacionAfiliacion(id_user)){
+            return res.json({error:'Afiliación vencida'})
+        }
+
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -191,8 +220,15 @@ module.exports = {
             then(experiencias => { res.json({ experiencias }) })
     },
     async obtenerBienestar(req, res) {
+
+        let id_user = req.headers.id_user;
+
+        if(! await validacionAfiliacion(id_user)){
+            return res.json({error:'Afiliación vencida'})
+        }
+
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: req.headers.id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -420,6 +456,11 @@ module.exports = {
         let tipo = req.params.tipo
         let search = req.params.search
         let id_user = req.headers.id_user
+
+        if(! await validacionAfiliacion(id_user)){
+            return res.json({busqueda:[]})
+
+        }
         let usados = await Experiencia_Usada.findAll({
             raw: true,
             attributes: ['experiencia_id_experiencia_usada'], where: {

@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
                     let validacionPassword = await bcrypt.compare(req.body.password, user.password);
 
                 if (validacionPassword) {
-                    if (user.rol_id_rol == 2) {
+                   /* if (user.rol_id_rol == 2) {
                         let afiliacion_vencida = false;
                         await Afiliacion.findOne({ where: { user_id_user: user.id_user } }).
                             then(afiliacion => {
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
                                 })
                             return res.json({ error: "Tu afiliación se ha vencido, por favor comunícate a nuestra línea de WhatsApp: " + whatsapp + " para reactivarla" })
                         }
-                    }
+                    }*/
                     const token = jwt.sign(
                         { id_user: user.id_user },
                         process.env.JWT_TOKEN);
