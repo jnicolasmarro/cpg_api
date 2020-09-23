@@ -1,8 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const ItemController = require('../controllers/ItemController');
+const NoticiaController = require('../controllers/NoticiaController');
 
-/*Creación de un item de una experiencia*/
-router.post('/creacion', ItemController.crearItem);
+/*Creación de una noticia*/
+router.post('/creacion', NoticiaController.crearNoticia);
+
+/*Obtener noticias ordenadas de mas reciente a mas antigua*/
+router.get('/obtener', NoticiaController.obtenerNoticias);
+
+/*Obtener una noticia*/ 
+router.get('/obtener/:id_noticia', NoticiaController.obtenerNoticia);
 
 module.exports = router

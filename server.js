@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const fileUpload = require('express-fileupload')
 require('dotenv').config();
 
 // Routers de la app//
@@ -22,6 +23,8 @@ const authMiddleware = require('./middleware/auth')
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
+
+app.use(fileUpload())
 
 app.set('views', './views')
 
