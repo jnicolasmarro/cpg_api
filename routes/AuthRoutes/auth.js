@@ -6,10 +6,10 @@ const RememberController = require('../../controllers/Auth/RememberController');
 const {CambiarContraseña,RealizarCambioContraseña,SolicitarCambioContraseña} = require('../../controllers/Auth/CambiarContraseñaController');
 
 /*Crear nuevo usuario*/
-router.post('/singup', SingupController)
+router.post('/signup', SingupController)
 
 /*Autenticación de usuario*/
-router.post('/singin', SinginController)
+router.post('/signin', SinginController)
 
 /*Recordar contraseña*/
 router.get('/remember/:email', RememberController)
