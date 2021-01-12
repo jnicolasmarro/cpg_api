@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const fileUpload = require('express-fileupload')
+const cors = require('cors');
 require('dotenv').config();
 
 // Routers de la app//
@@ -18,7 +19,7 @@ const NoticiaRouter = require('./routes/noticias')
 //Middleware de autenticación//
 const authMiddleware = require('./middleware/auth')
 
-
+app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }))
 

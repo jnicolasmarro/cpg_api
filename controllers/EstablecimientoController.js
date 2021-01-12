@@ -5,7 +5,7 @@ const fs = require('fs');
 
 
 // Permite validar los datos del establecimiento antes de agregarlo//
-async function validacionDatosEstablecimiento(establecimiento) {
+async function validacionDatosEstablecimiento(establecimiento,files) {
   let error = [];
   if (validator.isEmpty(establecimiento.nit, { ignore_whitespace: true })) {
     error.push('No ha ingresado el NIT del establecimiento')
@@ -66,6 +66,15 @@ async function validacionDatosEstablecimiento(establecimiento) {
     error.push('La cantidad del lote de experiencias debe de ser mayor a cero!')
   }
 
+  if (!files || Object.keys(files).length === 0){
+    error.push('No ha subido el logo del establecimiento!')
+  }else{
+    let mime = files.logo_establecimiento.mimetype.split('/')
+    if (mime[0] != 'image') {
+      error.push('El formato de la imagen no es válido!')
+    }
+  }
+
   if (error.length == 0)
     error = null
   return error
@@ -120,9 +129,20 @@ function validacionHD(hd) {
   return error
 }
 // Permite añadir al establecimiento luego de las validaciones//
-function añadirEstablecimiento(establecimiento, hd, admin) {
+function añadirEstablecimiento(establecimiento, hd, admin,files) {
   Establecimiento.create(Object.assign(establecimiento, hd)).
     then(establecimiento => {
+
+      files.logo_establecimiento.mv(`./publico/establecimiento/${establecimiento.nit}.${files.logo_establecimiento.mimetype.split('/')[1]}`, err => {
+        if (err) return res.json({error:['Error al guardar la imagen']})
+
+        Establecimiento.update({logo_establecimiento:`/establecimiento/${establecimiento.nit}.${files.logo_establecimiento.mimetype.split('/')[1]}`},
+                    {where:{nit:establecimiento.nit}})
+
+        
+    })
+
+
       añadirAdminEstablecimiento(admin, establecimiento.nit);
       let historico_cero = {
         establecimiento_nit_historico: establecimiento.nit
@@ -231,6 +251,9 @@ async function registroTarjeta(req, res) {
 
 module.exports = {
   async creaEstablecimiento(req, res) {
+
+    let files = req.files;
+
     let establecimiento = {
       nit: req.body.nit,
       nombre_empresa: req.body.nombre_empresa,
@@ -254,7 +277,7 @@ module.exports = {
       autorizacion_debito: req.body.autorizacion_debito
     }
 
-    let errorEstablecimiento = await validacionDatosEstablecimiento(establecimiento);
+    let errorEstablecimiento = await validacionDatosEstablecimiento(establecimiento,files);
     let errorAdmin = await validacionDatosAdministrador(admin);
     let errorHD = await validacionHD(hd);
 
@@ -274,7 +297,7 @@ module.exports = {
     if (error) {
       res.json({ error })
     } else {
-      añadirEstablecimiento(establecimiento, hd, admin);
+      añadirEstablecimiento(establecimiento, hd, admin,files);
       return res.json({ success: 'Establecimiento y Administrador creados' })
     }
 

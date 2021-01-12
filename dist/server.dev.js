@@ -8,6 +8,8 @@ var app = express();
 
 var fileUpload = require('express-fileupload');
 
+var cors = require('cors');
+
 require('dotenv').config(); // Routers de la app//
 
 
@@ -32,6 +34,7 @@ var NoticiaRouter = require('./routes/noticias'); //Middleware de autenticación
 
 var authMiddleware = require('./middleware/auth');
 
+app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
