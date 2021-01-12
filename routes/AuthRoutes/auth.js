@@ -1,15 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const SingupController = require('../../controllers/Auth/RegisterController');
-const SinginController = require('../../controllers/Auth/SinginController');
+const SignupController = require('../../controllers/Auth/RegisterController');
+const SigninController = require('../../controllers/Auth/SigninController');
 const RememberController = require('../../controllers/Auth/RememberController');
 const {CambiarContraseña,RealizarCambioContraseña,SolicitarCambioContraseña} = require('../../controllers/Auth/CambiarContraseñaController');
 
 /*Crear nuevo usuario*/
-router.post('/signup', SingupController)
+router.post('/signup', SignupController)
 
 /*Autenticación de usuario*/
-router.post('/signin', SinginController)
+router.post('/signin', SigninController)
 
 /*Recordar contraseña*/
 router.get('/remember/:email', RememberController)
