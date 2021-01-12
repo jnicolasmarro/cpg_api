@@ -6,14 +6,20 @@ const moment = require('moment');
 // Funcion que permite validar el código de una afiliación antes de ser asignada//
 async function validacionAfiliacion(p_afiliacion) {
     let error = [];
+
+    //Se valida que se haya ingresado un código
     if (validator.isEmpty(p_afiliacion, { ignore_whitespace: true })) {
         error.push('No ha ingresado una afiliación!')
     } else {
+
+        //Se valida si existe el código en la tabla de afiliaciones
         await Afiliacion.findOne({ where: { codigo_afiliacion: p_afiliacion } }).
             then(afiliacion => {
                 if (!afiliacion) {
                     error.push('No existe la afiliación ingresada!')
                 } else {
+
+                    // Se valida si la afiliación ya se encuentra asignada a alguien
                     if (afiliacion.asignada == 1) {
                         error.push('La afiliación ya se encuentra asignada!')
                     }
@@ -28,15 +34,21 @@ async function validacionAfiliacion(p_afiliacion) {
 //Funcion que permite validar el correo ingresado de un usuario antes de que se realice la reactivación//
 async function validarCorreo(p_correo) {
     let error = [];
+
+    // Se valida que el correo se haya indicado
     if (validator.isEmpty(p_correo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el correo!')
     } else {
+
+        // Se valida si el correo ingresado existe para algun usuario
         await User.findOne({ where: { email: p_correo } }).
             then(user => {
                 if (!user) {
+                    // Sino existe se genera el error
                     error.push('El correo ingresado no existe!')
                 } else {
                     if (user.rol_id_rol != 2) {
+                        // Si el correo del usuario no corresponde al de un usuario final se genera error
                         error.push('El correo ingresado no corresponde al de un usuario final!')
                     }
                 }
@@ -86,39 +98,56 @@ async function actualizaPeriodo(p_id_usuario) {
 }
 
 module.exports = {
-    async asignarAfiliacion(req, res) {
 
-        let error = await validacionAfiliacion(req.body.afiliacion)
-        if (error) {
-            return res.json({ error })
+    // Funcion que permite marcar una afiliación como asignada
+    async asignarAfiliacion(req, res) {
+        // Se valida el código de afiliación ingresado
+        let errores = await validacionAfiliacion(req.body.afiliacion)
+
+        // Si existen errores se retornan
+        if (errores) {
+            return res.json({ errores })
         } else {
+
+            // Si no existen errores se marca la afiliación como asignada
             Afiliacion.update({ asignada: 1 }, { where: { codigo_afiliacion: req.body.afiliacion } })
             return res.json({ success: "Afiliación asignada!" })
         }
     },
-
+    // Funcion que permite renovar una afiliación por medio del correo de un usuario final
     async renovarAfiliacion(req, res) {
-        let error = await validarCorreo(req.body.correo)
 
-        if (error) {
-            return res.json({ error })
+        //Se valida el correo ingresado
+        let errores = await validarCorreo(req.body.correo)
+
+        if (errores) {
+            // Si existen errores se envian a la interfaz web
+            return res.json({ errores })
         } else {
             let v_afiliacion;
             let v_id_user;
+
+            // Se obtiene el usuario correspondiente al correo electrónico
             await User.findOne({ where: { email: req.body.correo } }).
                 then(user => {
                     if (user) {
+                        // Se guarda el id del usuario
                         v_id_user = user.id_user
                     }
                 })
+            // Se obtiene la afiliación del usuario
             await Afiliacion.findOne({ where: { user_id_user: v_id_user } }).
                 then(afiliacion => {
                     if (afiliacion) {
+                        //Se guarda el código de afiliación del usuario
                         v_afiliacion = afiliacion.codigo_afiliacion
                     }
                 })
+            // Se actualiza la fecha de vencimiento de la afiliación del usuario
             actualizarFecha_Vto(v_afiliacion)
+            // Se actualiza el historial del experiencias usadas para poder usarlas nuevamente
             actualizaHistorialUso(v_id_user)
+            // Se actualiza el periodo de afiliación del usuario
             actualizaPeriodo(v_id_user)
 
             return res.json({ success: "Afiliación renovada!" })
