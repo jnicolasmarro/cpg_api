@@ -5,7 +5,7 @@ const SigninController = require('../../controllers/Auth/SigninController');
 const RememberController = require('../../controllers/Auth/RememberController');
 const {CambiarContraseña,RealizarCambioContraseña,SolicitarCambioContraseña} = require('../../controllers/Auth/CambiarContraseñaController');
 
-/*Crear nuevo usuario*/
+/*Crear nuevo usuario final por medio del cliente móvil*/
 router.post('/signup', SignupController)
 
 /*Autenticación de usuario*/
