@@ -81,7 +81,9 @@ module.exports = {
                     res.json({ error: 'Usuario no existe' });
             })
     },
+    // Funcion que permite actualizar los datos de un usuario
     async actualizarUsuario(req, res) {
+        // Se obtienen los campos ingresados en el front
         let user = {
             nombre_usuario: req.body.nombre_usuario,
             numero_identificacion:req.body.numero_identificacion,
@@ -91,13 +93,16 @@ module.exports = {
             contraseñaActual: req.body.contraseñaActual,
             id_user: req.params.id
         }
+        // Se validan los datos suministrados
         let error = await validacionActualizarUsuario(user)
         if (error) {
+            // Si existen errores se retornan al front
             return res.json({ error })
         } else {
 
             let userUpdate;
 
+            // Si la nueva contraseña no está en blanco se establece la variable userUpdate a actualizar
             if(!validator.isEmpty(user.contraseñaNueva, { ignore_whitespace: true })){
                 let salt = bcrypt.genSaltSync(10);
                 userUpdate={
@@ -108,6 +113,8 @@ module.exports = {
                     password:bcrypt.hashSync(user.contraseñaNueva, salt)
                 }
             }else{
+            
+                // Si no existe una nueva contraseña se actualizan los demas datos 
                 userUpdate={
                     nombre_usuario:user.nombre_usuario,
                     numero_identificacion:user.numero_identificacion,
@@ -117,6 +124,7 @@ module.exports = {
 
             }
 
+            // Se actualizan los datos del usuario
             await User.update(userUpdate, {
                 where: {
                     id_user: user.id_user
