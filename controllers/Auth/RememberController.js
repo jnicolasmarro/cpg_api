@@ -6,7 +6,10 @@ const nodemailer = require("nodemailer");
 var handlebars = require('handlebars');
 var fs = require('fs');
 
+// Funcion que permite validar un correo ingresado
 const validarEmail = async (email) => {
+
+    // Se obtiene la validación mediante un correo indicado 
     return await User.findOne({
             where: {
                 email: email
@@ -53,55 +56,61 @@ const readHTMLFile = function (path, callback) {
 
 
 module.exports = async (req, res) => {
+
+    // Se obtiene el correo ingresado para restablecer la contraseña
     let email = req.params.email;
+    // Se valida el correo ingresado
     let validacion_email = await validarEmail(email)
 
+    // Si la validación no fue correcta se envia el error
     if (!validacion_email.validacion) {
         return res.json({
             error: validacion_email.error
         })
     }
+
+    // Se obtiene la fecha actual
     let today = new Date().toISOString()
+    // Se encripta el correo del usuario
     let emailEncode = await CryptoJS.AES.encrypt(email, process.env.KEY_AES).toString().replace(/[/]/gi, "SLASH");
+    // Se encripta el id del usuario
     let id_userEncode = await CryptoJS.AES.encrypt(validacion_email.id_user.toString(), process.env.KEY_AES).toString().replace(/[/]/gi, "SLASH");
+    // Se encripta la fecha 
     let timestamp_today = await CryptoJS.AES.encrypt(today, process.env.KEY_AES).toString().replace(/[/]/gi, "SLASH");
+    // Se encripta la contraseña actual del usuario
     let password = await CryptoJS.AES.encrypt(validacion_email.password, process.env.KEY_AES).toString().replace(/[/]/gi, "SLASH");
+    // Se genera una cadena de texto con las anteriores variables
     let hash = timestamp_today + '&' + id_userEncode + '&' + emailEncode + '&' + password;
-    console.log({
-        hash
-    })
-
-
+    
+    // Se genera objeto para poder realizar envio de correo
     let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
-        secure: false, // true for 465, false for other ports
+        secure: false, 
         auth: {
-            user: 'jnicolas.marro@gmail.com', // generated ethereal user
-            pass: 'Tuv267mato', // generated ethereal password
+            user: process.env.EMAIL_APP, 
+            pass: process.env.PASSWORD_EMAIL_APP, 
         },
     });
 
+    // Se establece la plantilla a enviar
     let htmlToSend;
     readHTMLFile(__dirname + '/index.html', async function (err, html) {
         let template = handlebars.compile(html);
         let replacements = {
-            v_link: `http://192.168.1.100:3000/api/auth/cambio_contrasena/${id_userEncode}/${timestamp_today}/${hash}`
+            // Se genera link para enviar en la plantilla
+            v_link: `${process.env.API_URL}/auth/cambio_contrasena/${id_userEncode}/${timestamp_today}/${hash}`
         };
         htmlToSend = template(replacements);
 
+        // Se envia correo
         let info = await transporter.sendMail({
             from: '"CPG" <info@cpg.com>', // sender address
             to: email, // list of receivers
             subject: "Restablecimiento de contraseña", // Subject line
             html: htmlToSend, // html body
         });
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-        // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+        
     });
 
     return res.json({
