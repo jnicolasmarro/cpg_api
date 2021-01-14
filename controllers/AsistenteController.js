@@ -14,7 +14,7 @@ async function traeNitEstablecimiento(admin) {
     })
   return nit;
 }
-
+// Funcion que permite validar los datos de un asistente antes de su creacion
 async function validacionDatosAsistente(asistente) {
   let error = [];
 
@@ -81,10 +81,13 @@ module.exports = {
 
   // Funcion para la creación de un asistente (Primera funcion al realizar la petición sin validaciones) //
   async crearAsistente(req, res) {
+    // Se obtiene el id del usuario del administrador del establecimiento
     let admin = req.headers.id_user;
+    // Por medio del id se obtiene el NIT del establecimiento
     let establecimiento = await traeNitEstablecimiento(admin);
-
+    
     if (establecimiento) {
+      // Si se encuentra el NIT del establecimiento se obtienen los datos suministrados en el front
       let asistente = {
         nombre_usuario: req.body.nombre_usuario,
         email: req.body.email,
@@ -92,16 +95,19 @@ module.exports = {
         password: req.body.password,
         establecimiento_nit_user: establecimiento
       }
-
+      // Se validan los datos 
       let error = await validacionDatosAsistente(asistente);
 
       if (error) {
+        // Si existen errores se retornan
         return res.json({ error })
       } else {
+        // Si no existen errores se pasa a su creación
         await añadirAsistente(asistente);
         return res.json({ success: 'Asistente creado!' })
       }
     } else {
+      // Si no se puede obtener el NIT se retorna el error
       return res.json({ error: 'Error administrador de establecimiento!' })
     }
 
@@ -122,6 +128,7 @@ module.exports = {
       res.json({ error: 'Error administrador de establecimiento!' })
     }
   },
+  // Funcion que permite inactivar a un asistente
   async inactivarAsistente(req,res){
     let id_asistente=req.params.id_asistente
     return await User.update({estado_user:0},{where:{
