@@ -3,8 +3,10 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 moment.locale('es-es');
+const {obtenerIDEstablecimientoXIDAdmin} = require('./EstablecimientoController')
+
+
 const getAdminEstablecimiento = async(id) => {
-    User.belongsTo(Establecimiento, { foreignKey: 'establecimiento_nit_user' })
     return User.findOne({
         where: { id_user: id },
         include: {
@@ -121,16 +123,13 @@ module.exports = {
         let usos_meses;
         let meses=[];
         let cantidadespormeses=[];
-        await getAdminEstablecimiento(admin)
-        .then((user)=>{
-            nit=user.establecimiento_nit_user;
-        })
-        Experiencia_Usada.belongsTo(Experiencia,{foreignKey:'experiencia_id_experiencia_usada'})
+        
+        nit = await obtenerIDEstablecimientoXIDAdmin(admin)
 
         await Experiencia_Usada.findAll({raw: true,include: {
             model: Experiencia,
             where: {
-                establecimiento_nit:nit
+                id_establecimiento_experiencia:nit
               },
               attributes: []
         }})
@@ -138,15 +137,15 @@ module.exports = {
             cantidad_leidas=experiencias.length;
         })
 
-        User.hasMany(Experiencia_Usada,{foreignKey:'user_id_user_usada'})
-        Experiencia_Usada.belongsTo(Experiencia,{foreignKey:'experiencia_id_experiencia_usada'})
+        
+        
 
         await User.findAll({raw: true,attributes: ['nombre_usuario','numero_celular','email'],group: ['nombre_usuario','numero_celular','email'],include: [{
             model: Experiencia_Usada,
               include: {
                 model: Experiencia,
                 where:{
-                    establecimiento_nit:nit
+                    id_establecimiento_experiencia:nit
                 },
                 attributes: []
               },
@@ -163,7 +162,7 @@ module.exports = {
             });
         })
 
-        await Establecimiento.findOne({where:{nit}})
+        await Establecimiento.findOne({where:{id_establecimiento:nit}})
         .then(async (establecimiento)=>{
             let inicio=establecimiento.createdAt;
             let startDate = moment([inicio.getFullYear(), inicio.getMonth()]);
@@ -181,7 +180,7 @@ module.exports = {
                 },include: {
                     model: Experiencia,
                     where: {
-                        establecimiento_nit:nit
+                        id_establecimiento_experiencia:nit
                       },
                       attributes: []
                 }})

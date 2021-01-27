@@ -1,15 +1,15 @@
 module.exports= (sequelize, type) => {
     const Experiencia_Usada = sequelize.define('experiencia_usada',{
         id_experiencia_usada: {
-            type: type.INTEGER,
+            type: type.BIGINT(20),
             primaryKey: true,
             autoIncrement: true
         },
-        user_id_user_usada: {
+        id_user_experiencia_usada: {
             type: type.INTEGER,
             primaryKey: true
         },
-        experiencia_id_experiencia_usada: {
+        id_experiencia_experiencia_usada: {
             type: type.INTEGER,
             primaryKey: true
         },

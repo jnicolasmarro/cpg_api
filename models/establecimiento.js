@@ -1,10 +1,15 @@
 module.exports= (sequelize, type) => {
     const Establecimiento = sequelize.define('establecimiento',{
-        nit: {
-            type: type.BIGINT(20),
-            primaryKey: true
+        id_establecimiento: {
+            type: type.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        nombre_empresa: {
+        nit_establecimiento: {
+            type: type.BIGINT(20),
+            primaryKey: false
+        },
+        nombre_establecimiento: {
             type: type.STRING(50),
             unique:true
         },

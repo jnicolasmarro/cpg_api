@@ -1,4 +1,5 @@
 const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, Afiliacion, Sequelize } = require('../db');
+const {obtenerIDEstablecimientoXIDAdmin} = require ('./EstablecimientoController');
 const validator = require('validator');
 const fs = require('fs');
 const CryptoJS = require("crypto-js");
@@ -6,7 +7,7 @@ const CryptoJS = require("crypto-js");
 //Validaciones antes de agregar una experiencia//
 
 async function validacionAfiliacion(id_user){
-       return await Afiliacion.findOne({ where: { user_id_user: id_user } }).
+       return await Afiliacion.findOne({ where: { id_user_afiliacion: id_user } }).
             then(afiliacion => {
                 let fecha_actual = new Date();
                 let fecha_venc = new Date(afiliacion.fecha_vencimiento); 
@@ -19,7 +20,7 @@ async function validacionAfiliacion(id_user){
 }
 
 
-async function validacionExperiencia(experiencia) {
+async function validacionExperiencia(experiencia,files) {
     let error = [];
     if (validator.isEmpty(experiencia.titulo_experiencia, { ignore_whitespace: true })) {
         error.push('No ha ingresado un título para la experiencia!')
@@ -55,12 +56,12 @@ async function validacionExperiencia(experiencia) {
     } /*else if (!(parseInt(experiencia.experiencia_tipo_id_tipo) == 1 || parseInt(experiencia.experiencia_tipo_id_tipo) == 2)) {
         error.push('Error tipo de experiencia!')
     }*/
-    if (validator.isEmpty(experiencia.establecimiento_nit, { ignore_whitespace: true })) {
+    if (validator.isEmpty(experiencia.id_establecimiento_experiencia, { ignore_whitespace: true })) {
         error.push('No ha ingresado el establecimiento!')
-    } else if (!validator.isInt(experiencia.establecimiento_nit)) {
+    } else if (!validator.isInt(experiencia.id_establecimiento_experiencia)) {
         error.push('El NIT de establecimiento no es válido!')
     } else {
-        await Establecimiento.findOne({ where: { nit: experiencia.establecimiento_nit } })
+        await Establecimiento.findOne({ where: { id_establecimiento: experiencia.id_establecimiento_experiencia } })
             .then(establecimiento => {
                 if (!establecimiento) {
                     error.push('El establecimiento no existe')
@@ -71,6 +72,15 @@ async function validacionExperiencia(experiencia) {
                 }
             })
     }
+
+    if (!files || Object.keys(files).length === 0){
+        error.push('No ha subido la imagen de la experiencia!')
+      }else{
+        let mime = files.imagen_experiencia.mimetype.split('/')
+        if (mime[0] != 'image') {
+          error.push('El formato de la imagen no es válido!')
+        }
+      }
 
     if (error.length == 0)
         error = null
@@ -99,12 +109,7 @@ async function validacionActivacionExperiencia(experiencia) {
     return error
 }
 
-const getNit = async (id_user) => {
-    return await User.findOne({ where: { id_user: id_user } })
-        .then(user => {
-            return user.establecimiento_nit_user
-        })
-}
+
 
 async function validacionInactivacionExperiencia(experiencia) {
     let error = [];
@@ -144,6 +149,8 @@ async function validaImagenExperiencia(id_experiencia) {
 
 module.exports = {
     async crearExperiencia(req, res) {
+        let files = req.files;
+
         let experiencia = {
             titulo_experiencia: req.body.titulo,
             descripcion_experiencia: req.body.descripcion,
@@ -151,17 +158,60 @@ module.exports = {
             precio_publico: req.body.precio_publico,
             comision: req.body.comision,
             experiencia_tipo_id_tipo: req.body.tipo_experiencia,
-            establecimiento_nit: req.body.establecimiento_nit
+            id_establecimiento_experiencia: req.body.id_establecimiento
         }
 
-        let error = await validacionExperiencia(experiencia);
+        let error = await validacionExperiencia(experiencia,files);
 
         if (error) {
             return res.json({ error })
         } else {
             Experiencia.create(experiencia)
+            .then(newExperiencia=>{
+                files.imagen_experiencia.mv(`./publico/experiencias/${newExperiencia.id_experiencia}.${files.imagen_experiencia.mimetype.split('/')[1]}`, err => {
+                    if (err) return res.json({error:['Error al guardar la imagen']})
+            
+                    Experiencia.update({imagen_experiencia:`/experiencias/${newExperiencia.id_experiencia}.${files.imagen_experiencia.mimetype.split('/')[1]}`},
+                                {where:{id_experiencia:newExperiencia.id_experiencia}})
+                })
+            })
             return res.json({ success: 'Experiencia creada!' })
         }
+    },
+    async obtenerExperienciasDisponibles(req,res){
+        let id_user = req.headers.id_user;
+
+        let tipo_experiencia = req.params.tipo_experiencia;
+        console.log(tipo_experiencia)
+
+        if(! await validacionAfiliacion(id_user)){
+            return res.json({error:'Afiliación vencida'})
+        }
+
+        await Experiencia.findAll({
+            
+            include:
+            {
+                model:Experiencia_Usada,
+                where:{
+                    id_user_experiencia_usada:{
+                        [Sequelize.Op.eq]:id_user
+                    },
+                    renovado_experiencia_usada:0
+                },
+                required:false
+            },
+            where:{
+                '$Experiencia_usadas.id_experiencia_usada$':null,
+                experiencia_tipo_id_tipo:tipo_experiencia
+            },
+            attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia']
+           
+            
+        }).
+        then(experiencias => { res.json({ experiencias }) })
+
+
     },
     async obtenerGastronomicas(req, res) {
 
@@ -171,9 +221,30 @@ module.exports = {
             return res.json({error:'Afiliación vencida'})
         }
 
+        await Experiencia.findAll({
+            
+            include:
+            {
+                model:Experiencia_Usada,
+                where:{
+                    id_user_experiencia_usada:{
+                        [Sequelize.Op.eq]:id_user
+                    },
+                    renovado_experiencia_usada:0
+                },
+                required:false
+            },
+            where:{
+                '$Experiencia_usadas.id_experiencia_usada$':null
+            }
+           
+            
+        }).
+        then(experiencias => { res.json({ experiencias }) })
 
+/*
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['id_experiencia_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -189,7 +260,7 @@ module.exports = {
                 experiencia_tipo_id_tipo: 1
             }
         }).
-            then(experiencias => { res.json({ experiencias }) })
+            then(experiencias => { res.json({ experiencias }) })*/
 
     },
     async obtenerSeleccion(req, res) {
@@ -201,7 +272,7 @@ module.exports = {
         }
 
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -228,7 +299,7 @@ module.exports = {
         }
 
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { user_id_user_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -330,7 +401,7 @@ module.exports = {
                             return { error: 'Usuario no se encuentra activo' }
                         } else {
                             let fecha_vto_afiliacion = await Afiliacion
-                                .findOne({ where: { user_id_user: user.id_user } })
+                                .findOne({ where: { id_user_afiliacion: user.id_user } })
                                 .then((afiliacion) => {
                                     return afiliacion.fecha_vencimiento
                                 })
@@ -344,12 +415,9 @@ module.exports = {
                                 if (!experiencia) {
                                     return { error: 'Error de información en el QR' }
                                 } else {
-                                    let nit;
-                                    await User.findOne({ where: { id_user: req.headers.id_user } })
-                                        .then((asistente) => {
-                                            nit = asistente.establecimiento_nit_user;
-                                        })
-                                    if (nit != experiencia.establecimiento_nit) {
+                                    let nit = await obtenerIDEstablecimientoXIDAdmin(req.headers.id_user);
+                                    
+                                    if (nit != experiencia.id_establecimiento_experiencia) {
                                         return { error: 'La experiencia no corresponde a este establecimiento' }
                                     }
                                     if (!experiencia.estado_experiencia) {
@@ -358,8 +426,8 @@ module.exports = {
                                         return await Experiencia_Usada
                                             .findOne({
                                                 where: {
-                                                    experiencia_id_experiencia_usada: id_experiencia,
-                                                    user_id_user_usada: id_usuario,
+                                                    id_experiencia_experiencia_usada: id_experiencia,
+                                                    id_user_experiencia_usada: id_usuario,
                                                     renovado_experiencia_usada: false
                                                 }
                                             })
@@ -381,8 +449,8 @@ module.exports = {
             }
 
             let registro_uso = {
-                user_id_user_usada: id_usuario,
-                experiencia_id_experiencia_usada: id_experiencia,
+                id_user_experiencia_usada: id_usuario,
+                id_experiencia_experiencia_usada: id_experiencia,
                 fecha_uso_experiencia_usada: new Date()
             }
 
@@ -399,14 +467,14 @@ module.exports = {
     },
     async obtenerInfoExperiencia(req, res) {
 
-        Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia_item' })
-        Experiencia.belongsTo(Establecimiento, { foreignKey: 'establecimiento_nit' })
+        
 
         return await Experiencia.findOne({
             where: { id_experiencia: req.params.id },
             include: [{
                 model: Item,
-                where: { estado_item: 1 }
+                where: { estado_item: 1 },
+                required: false
             },
             {
                 model: Establecimiento
@@ -419,8 +487,8 @@ module.exports = {
     },
     async listarExperiencias(req, res) {
         let admin = req.headers.id_user;
-        let nit = await getNit(admin);
-        let experiencias = await Experiencia.findAll({ where: { establecimiento_nit: nit } })
+        let id_establecimiento = await obtenerIDEstablecimientoXIDAdmin(admin);
+        let experiencias = await Experiencia.findAll({ where: { id_establecimiento_experiencia: id_establecimiento } })
         return res.json({ experiencias })
     },
     async esperaRespuesta(req, res) {
@@ -433,8 +501,8 @@ module.exports = {
 
             await Experiencia_Usada.findOne({
                 where: {
-                    user_id_user_usada: id_user,
-                    experiencia_id_experiencia_usada: id_exp,
+                    id_user_experiencia_usada: id_user,
+                    id_experiencia_experiencia_usada: id_exp,
                     renovado_experiencia_usada: false
                 }
             })
@@ -461,60 +529,76 @@ module.exports = {
             return res.json({busqueda:[]})
 
         }
-        let usados = await Experiencia_Usada.findAll({
-            raw: true,
-            attributes: ['experiencia_id_experiencia_usada'], where: {
-                user_id_user_usada: id_user,
-                renovado_experiencia_usada: false
-            }
-        })
-        let id_usados = [];
-
-        usados.forEach(usado => {
-            id_usados.push(usado.experiencia_id_experiencia_usada)
-        });
-
 
         if (tipo == 1) {
 
-            Experiencia.belongsTo(Establecimiento, { foreignKey: 'establecimiento_nit' })
-            Experiencia.hasMany(Experiencia_Usada, { foreignKey: 'experiencia_id_experiencia_usada' })
-            Experiencia_Usada.belongsTo(User, { foreignKey: 'user_id_user_usada' })
 
             return await Experiencia.findAll({
-                raw: true, where: {
-                    id_experiencia: {
-                        [Sequelize.Op.notIn]: id_usados
-                    }
-                },include:
-                    {
-                        model: Establecimiento,
+                raw: true,
+                include:
+                [
+                {
+                    model:Experiencia_Usada,
+                    where:{
+                        id_user_experiencia_usada:{
+                            [Sequelize.Op.eq]:id_user
+                        },
+                        renovado_experiencia_usada:0
+                    },
+                    required:false
+                },
+                {
+                    model: Establecimiento,
                         where:{
-                            nombre_empresa:{
+                            nombre_establecimiento:{
                                 [Sequelize.Op.like]:`%${search}%`
                             }
                         },
                         require:true,
                         attributes:[]
-                    }
+                }
+                ],
+                where:{
+                    '$Experiencia_usadas.id_experiencia_usada$':null
+                },
+                attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia']
+               
                 
-            })
-            .then((busqueda)=>{
+            }).
+            then((busqueda)=>{
                 res.json({busqueda})
             })
+            
         }
         if(tipo==2){
-            return await Experiencia.findAll({raw:true,where:{
-                id_experiencia: {
-                    [Sequelize.Op.notIn]: id_usados
-                },
-                titulo_experiencia:{
-                    [Sequelize.Op.like]:`%${search}%`
+
+            return await Experiencia.findAll({
+                raw: true,
+                include:
+                [
+                {
+                    model:Experiencia_Usada,
+                    where:{
+                        id_user_experiencia_usada:{
+                            [Sequelize.Op.eq]:id_user
+                        },
+                        renovado_experiencia_usada:0
+                    },
+                    required:false
                 }
-            }})
-            .then((busqueda)=>{
+                ],
+                where:{
+                    '$Experiencia_usadas.id_experiencia_usada$':null,
+                    titulo_experiencia:{
+                        [Sequelize.Op.like]:`%${search}%`
+                    }
+                },
+                attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia'] 
+            }).
+            then((busqueda)=>{
                 res.json({busqueda})
             })
+            
         }
     }
 

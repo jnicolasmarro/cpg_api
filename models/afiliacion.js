@@ -5,16 +5,19 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             unique: true
         },
-        asignada:{
+        codigo_asignado:{
             type: type.BOOLEAN
         },
-        user_id_user: {
+        id_user_afiliacion: {
             type: type.INTEGER
         },
-        fecha_uso: {
+        fecha_activacion: {
             type: type.DATE
         },
         fecha_vencimiento: {
+            type: type.DATE
+        },
+        fecha_expiracion:{
             type: type.DATE
         }
     }

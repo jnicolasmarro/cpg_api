@@ -5,15 +5,18 @@ const UserController = require('../controllers/UserController');
 
 
 /*Obtener un usuario*/
-router.get('/:id', UserController.obtenerUsuario)
+router.get('/obtenerUsuario/:id', UserController.obtenerUsuario)
 
 /*Obtener todos los usuarios*/
-router.get('/', UserController.obtenerUsuarios)
+router.get('/obtenerUsuarios', UserController.obtenerUsuarios)
 
 /*Actualizar Usuario*/
-router.put('/:id', UserController.actualizarUsuario)
+router.put('/actualizarUsuarioFinalMovil/:id', UserController.actualizarUsuario)
+
+/*Actualizar Usuario por medio del administrador*/
+router.put('/actualizarUsuario/:id', UserController.actualizarDatosUsuario)
 
 /*Inactivar usuario*/
-router.delete('/:id',UserController.inactivarUsuario)
+//router.delete('/:id',UserController.inactivarUsuario)
 
 module.exports = router

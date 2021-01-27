@@ -7,18 +7,18 @@ const fs = require('fs');
 // Permite validar los datos del establecimiento antes de agregarlo//
 async function validacionDatosEstablecimiento(establecimiento,files) {
   let error = [];
-  if (validator.isEmpty(establecimiento.nit, { ignore_whitespace: true })) {
+  if (validator.isEmpty(establecimiento.nit_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado el NIT del establecimiento')
-  } else if (!validator.isInt(establecimiento.nit)) {
+  } else if (!validator.isInt(establecimiento.nit_establecimiento)) {
     error.push('El NIT ingresado no es valido')
   } else {
-    await Establecimiento.findOne({ where: { nit: establecimiento.nit } })
+    await Establecimiento.findOne({ where: { nit_establecimiento: establecimiento.nit_establecimiento } })
       .then(establecimiento => {
         if (establecimiento)
           error.push('Ya existe un establecimiento con el NIT ingresado')
       })
   }
-  if (validator.isEmpty(establecimiento.nombre_empresa, { ignore_whitespace: true })) {
+  if (validator.isEmpty(establecimiento.nombre_establecimiento, { ignore_whitespace: true })) {
     error.push('No ha ingresado el nombre del establecimiento')
   }
   if (validator.isEmpty(establecimiento.establecimiento_comercial, { ignore_whitespace: true })) {
@@ -129,36 +129,36 @@ function validacionHD(hd) {
   return error
 }
 // Permite añadir al establecimiento luego de las validaciones//
-function añadirEstablecimiento(establecimiento, hd, admin,files) {
-  Establecimiento.create(Object.assign(establecimiento, hd)).
-    then(establecimiento => {
+async function añadirEstablecimiento(establecimiento, hd, admin,files) {
+ await Establecimiento.create(Object.assign(establecimiento, hd)).
+    then((newEstablecimiento) => {
 
-      files.logo_establecimiento.mv(`./publico/establecimiento/${establecimiento.nit}.${files.logo_establecimiento.mimetype.split('/')[1]}`, err => {
+      files.logo_establecimiento.mv(`./publico/establecimiento/${newEstablecimiento.id_establecimiento}.${files.logo_establecimiento.mimetype.split('/')[1]}`, err => {
         if (err) return res.json({error:['Error al guardar la imagen']})
 
-        Establecimiento.update({logo_establecimiento:`/establecimiento/${establecimiento.nit}.${files.logo_establecimiento.mimetype.split('/')[1]}`},
-                    {where:{nit:establecimiento.nit}})
+        Establecimiento.update({logo_establecimiento:`/establecimiento/${newEstablecimiento.id_establecimiento}.${files.logo_establecimiento.mimetype.split('/')[1]}`},
+                    {where:{id_establecimiento:newEstablecimiento.id_establecimiento}})
 
         
     })
 
 
-      añadirAdminEstablecimiento(admin, establecimiento.nit);
+      añadirAdminEstablecimiento(admin, newEstablecimiento.id_establecimiento);
       let historico_cero = {
-        establecimiento_nit_historico: establecimiento.nit
+        id_establecimiento_historico: newEstablecimiento.id_establecimiento
       }
       Historico_Establecimiento.create(historico_cero);
     })
 }
 // Permite añadir al administrador del establecimiento luego de las validaciones//
-function añadirAdminEstablecimiento(admin, nit) {
+function añadirAdminEstablecimiento(admin, id_establecimiento) {
   let salt = bcrypt.genSaltSync(10);
   let user = {
     nombre_usuario: admin.nombre_usuario,
     email: admin.email,
     numero_celular: admin.numero_celular,
     password: bcrypt.hashSync(admin.password, salt),
-    establecimiento_nit_user: nit,
+    id_establecimiento_user: id_establecimiento,
     rol_id_rol: 3
   }
   User.create(user)
@@ -255,8 +255,8 @@ module.exports = {
     let files = req.files;
 
     let establecimiento = {
-      nit: req.body.nit,
-      nombre_empresa: req.body.nombre_empresa,
+      nit_establecimiento: req.body.nit,
+      nombre_establecimiento: req.body.nombre_empresa,
       establecimiento_comercial: req.body.establecimiento_comercial,
       correo_establecimiento: req.body.correo_establecimiento,
       celular_establecimiento: req.body.celular_establecimiento,
@@ -463,5 +463,18 @@ module.exports = {
 
 
 
+  },
+  async obtenerIDEstablecimientoXIDAdmin (id_usuario_admin){
+    let id;
+    
+    await User.findOne({ where: { id_user: id_usuario_admin } }).
+      then(usuario => {
+        if (usuario) {
+          
+          id = usuario.id_establecimiento_user;
+        }
+      })
+      
+    return id;
   }
 }

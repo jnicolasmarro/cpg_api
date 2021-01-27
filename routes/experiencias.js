@@ -7,6 +7,9 @@ const {upload} = require('../middleware/upload');
 router.post('/creacionExperiencia', ExperienciaController.crearExperiencia)
 
 /*Obtener todas las experiencias cenas especiales*/
+router.get('/disponibles/:tipo_experiencia', ExperienciaController.obtenerExperienciasDisponibles)
+
+/*Obtener todas las experiencias cenas especiales*/
 router.get('/gastronomicas', ExperienciaController.obtenerGastronomicas)
 
 /*Obtener todas las experiencias de seleccion de productos*/

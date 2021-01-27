@@ -20,7 +20,7 @@ async function validacionAfiliacion(p_afiliacion) {
                 } else {
 
                     // Se valida si la afiliación ya se encuentra asignada a alguien
-                    if (afiliacion.asignada == 1) {
+                    if (afiliacion.codigo_asignado == 1) {
                         error.push('La afiliación ya se encuentra asignada!')
                     }
                 }
@@ -78,13 +78,13 @@ async function actualizarFecha_Vto(p_afiliacion) {
 }
 // Funcion que permite cambiar el estado de las experiencias usadas a renovadas//
 function actualizaHistorialUso(p_id_usuario) {
-    Experiencia_Usada.update({ renovado_experiencia_usada: 1 }, { where: { user_id_user_usada: p_id_usuario } })
+    Experiencia_Usada.update({ renovado_experiencia_usada: 1 }, { where: { id_user_experiencia_usada: p_id_usuario } })
 }
 
 //Funcion que permite registrar un nuevo periodo de afiliacion
 async function actualizaPeriodo(p_id_usuario) {
 
-    let afiliacion = await Afiliacion.findOne({ where: { user_id_user: p_id_usuario } })
+    let afiliacion = await Afiliacion.findOne({ where: { id_user_afiliacion: p_id_usuario } })
 
     let periodo_actual = await Periodo_Afiliacion.findAndCountAll({ where: { afiliacion_codigo_afiliacion: afiliacion.codigo_afiliacion } })
 
@@ -110,7 +110,7 @@ module.exports = {
         } else {
 
             // Si no existen errores se marca la afiliación como asignada
-            Afiliacion.update({ asignada: 1 }, { where: { codigo_afiliacion: req.body.afiliacion } })
+            Afiliacion.update({ codigo_asignado: 1 }, { where: { codigo_afiliacion: req.body.afiliacion } })
             return res.json({ success: "Afiliación asignada!" })
         }
     },
@@ -136,7 +136,7 @@ module.exports = {
                     }
                 })
             // Se obtiene la afiliación del usuario
-            await Afiliacion.findOne({ where: { user_id_user: v_id_user } }).
+            await Afiliacion.findOne({ where: { id_user_afiliacion: v_id_user } }).
                 then(afiliacion => {
                     if (afiliacion) {
                         //Se guarda el código de afiliación del usuario
@@ -152,6 +152,35 @@ module.exports = {
 
             return res.json({ success: "Afiliación renovada!" })
         }
+
+    },
+    async generarCodigos(req,res){
+        let cantidad=req.body.cantidad
+
+        let longitud=8;
+        let caracteres = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+        for (let index = 0; index < cantidad; index++) {
+            let cadena = "";
+            let max = caracteres.length-1;
+            for (let i = 0; i<longitud; i++) {
+                cadena += caracteres[ Math.floor(Math.random() * (max+1)) ];
+            }
+
+            cadena=cadena.toUpperCase();
+
+            await Afiliacion.findOne({where:{codigo_afiliacion:cadena}})
+            .then(async afiliacion=>{
+                if(afiliacion){
+                    index=index--;
+                }else{
+                    await Afiliacion.create({codigo_afiliacion:cadena});
+                }
+            })
+
+        }
+
+        return res.json({ success: `Se han generado ${cantidad} códigos nuevos.` });
 
     }
 }

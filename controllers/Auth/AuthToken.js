@@ -1,6 +1,5 @@
 const validator = require('validator');
 const { User, Rol } = require('../../db');
-const {generarToken} = require('../Auth/AuthToken');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -40,8 +39,8 @@ async function validacionUsuarioContraseña(datosIngreso) {
                             {header_id_user: user.id_user,
                             token: token,
                             rol: user.rol_id_rol,
-                            interfaz_movil:user.interfaz_movil,
-                            interfaz_web:user.interfaz_movil }
+                            interfaz_movil:user.rol.interfaz_movil,
+                            interfaz_web:user.rol.interfaz_web }
                     } else {
                         errores.push('Contraseña incorrecta')
                     }
@@ -60,28 +59,10 @@ async function validacionUsuarioContraseña(datosIngreso) {
     }
 }
 
-module.exports = async (req, res) => {
+module.exports = {
+    async generarToken(datos){
 
-    // Se toman los datos de correo y contraseña de ingreso
-    let datosIngreso = {
-        email:req.body.email,
-        password:req.body.password
+        return validacionUsuarioContraseña({email:datos.email,password:datos.password});
+
     }
-
-    // Se realiza validación de los datos
-    let validacion = await generarToken(datosIngreso)
-
-    // Si generó errores se envian al cliente
-    if(validacion.errores){
-        let errores = validacion.errores
-        return res.json(
-            {errores}
-        )
-    }else{
-        // Sino generó errores se envia token
-        let token = validacion.token
-        return res.status(200).json({token});
-    }
-
-
 }

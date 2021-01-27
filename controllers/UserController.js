@@ -38,6 +38,7 @@ async function validacionActualizarUsuario(user) {
         error.push('No ha ingresado el nombre')
     }
 
+    if(user.contraseñaNueva){
     if (!validator.isEmpty(user.contraseñaNueva, { ignore_whitespace: true })) {
         
         if (!validator.isByteLength(user.contraseñaNueva, { min: 8 })) {
@@ -57,6 +58,7 @@ async function validacionActualizarUsuario(user) {
 
         }
     }
+}
     if (validator.isEmpty(user.numero_identificacion, { ignore_whitespace: true })) {
         error.push('No ha ingresado el número de identificación')
     }else{
@@ -72,16 +74,19 @@ async function validacionActualizarUsuario(user) {
 
 
 module.exports = {
+    // Funcion que permite obtener los datos de un usuario por su Id
     obtenerUsuario(req, res) {
-        User.findOne({ where: { id_user: req.params.id } })
+        User.findOne({ 
+            where: { id_user: req.params.id },
+            attributes:['id_user','nombre_usuario','numero_identificacion','email','numero_celular'] })
             .then(user => {
                 if (user)
-                    res.json(user)
+                    res.json({user})
                 else
                     res.json({ error: 'Usuario no existe' });
             })
     },
-    // Funcion que permite actualizar los datos de un usuario
+    // Funcion que permite a un usuario final actualizar sus datos
     async actualizarUsuario(req, res) {
         // Se obtienen los campos ingresados en el front
         let user = {
@@ -136,13 +141,48 @@ module.exports = {
         }
 
     },
+    // Funcion que permite actualizar por medio de un administrador
+    // los datos de un usuario final
+    async actualizarDatosUsuario (req,res){
+        // Se obtienen los campos ingresados en el front
+        let user = {
+            nombre_usuario: req.body.nombre_usuario,
+            numero_identificacion:req.body.numero_identificacion,
+            email: req.body.email,
+            numero_celular: req.body.numero_celular,
+            estado_user: req.body.estado_user,
+            id_user: req.params.id
+        }
+
+        // Se validan los datos suministrados
+        let errores = await validacionActualizarUsuario(user)
+
+        if (errores){
+            // Si existen errores se retornan al front
+            return res.json({ errores })
+        }else{
+            // Se actualizan los datos del usuario
+            await User.update(user, {
+                where: {
+                    id_user: user.id_user
+                }
+            })
+            .then(
+                res.json({success:"Usuario actualizado con éxito"})
+            );
+        }
+
+
+
+
+    },
+    // Permite obtener todos los usuarios finales 
     async obtenerUsuarios(req, res) {
-        await User.findAll({ where: { rol_id_rol: 2 } })
+        await User.findAll({ 
+            where: { rol_id_rol: 2 }, 
+            attributes: ['id_user', 'nombre_usuario','numero_identificacion','email','numero_celular','estado_user'] })
             .then(users => {
-                if (users.length > 0)
-                    res.json(users)
-                else
-                    res.json("No existen usuarios")
+                    res.json({users})
             })
     },
     async inactivarUsuario(req, res) {

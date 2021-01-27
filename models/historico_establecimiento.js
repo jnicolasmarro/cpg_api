@@ -1,7 +1,7 @@
 module.exports= (sequelize, type) => {
     const Historico_Establecimiento = sequelize.define('historico_establecimiento',{
-        establecimiento_nit_historico: {
-            type: type.BIGINT(20),
+        id_establecimiento_historico: {
+            type: type.INTEGER,
             primaryKey: true
         },
         procesados_total: {

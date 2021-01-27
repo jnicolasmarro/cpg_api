@@ -30,7 +30,7 @@ module.exports= (sequelize, type) => {
         experiencia_tipo_id_tipo: {
             type: type.INTEGER
         },
-        establecimiento_nit: {
+        id_establecimiento_experiencia: {
             type: type.BIGINT(20)
         }
     }

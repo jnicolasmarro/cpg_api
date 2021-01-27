@@ -1,9 +1,10 @@
 const excel = require('node-excel-export');
 const { User, Establecimiento,Experiencia, Experiencia_Usada,Sequelize } = require('../db');
-
+const {obtenerIDEstablecimientoXIDAdmin} = require('./EstablecimientoController')
+const moment = require('moment');
 
 const getAdminEstablecimiento = async(id) => {
-  User.belongsTo(Establecimiento, { foreignKey: 'establecimiento_nit_user' })
+  
   return User.findOne({
       where: { id_user: id },
       include: {
@@ -17,25 +18,22 @@ module.exports={
 
 
       let admin = req.headers.id_user;
-        let nit;
+        let nit = await obtenerIDEstablecimientoXIDAdmin(admin);
       
         let clientes;
-        await getAdminEstablecimiento(admin)
-        .then((user)=>{
-            nit=user.establecimiento_nit_user;
-        })
+        
 
 
 
-      User.hasMany(Experiencia_Usada,{foreignKey:'user_id_user_usada'})
-        Experiencia_Usada.belongsTo(Experiencia,{foreignKey:'experiencia_id_experiencia_usada'})
+      
+        
 
         await User.findAll({raw: true,attributes: ['nombre_usuario','numero_celular','email'],group: ['nombre_usuario','numero_celular','email'],include: [{
             model: Experiencia_Usada,
               include: {
                 model: Experiencia,
                 where:{
-                    establecimiento_nit:nit
+                  id_establecimiento_experiencia:nit
                 },
                 attributes: []
               },
@@ -135,9 +133,12 @@ module.exports={
               }
             ]
           );
-           
+          let fecha = moment();
+          fecha = fecha.local();
+          fecha = `${fecha.date().toString()}${(fecha.month()+1).toString()}${fecha.year().toString()}
+                    ${fecha.hour().toString()}${fecha.minute().toString()}`
           // You can then return this straight
-          res.attachment('reporte_usuarios_establecimiento.xlsx'); // This is sails.js specific (in general you need to set headers)
+          res.attachment(`reporte_usuarios_establecimiento.xlsx`); // This is sails.js specific (in general you need to set headers)
           return res.send(report);
     }
 }

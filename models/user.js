@@ -27,8 +27,8 @@ module.exports= (sequelize, type) => {
         rol_id_rol: {
             type: type.INTEGER
         },
-        establecimiento_nit_user: {
-            type: type.BIGINT(20)
+        id_establecimiento_user: {
+            type: type.INTEGER
         }
     }
         , {

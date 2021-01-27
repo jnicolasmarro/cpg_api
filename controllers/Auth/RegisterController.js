@@ -1,5 +1,6 @@
 const validator = require('validator');
 const { User, Afiliacion, Util, Periodo_Afiliacion } = require('../../db');
+const {generarToken} = require ('../Auth/AuthToken');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -16,7 +17,7 @@ async function validacionNuevoUsuarioFinal(usuario) {
             .then(afiliacion => {
                 if (!afiliacion) {
                     errores.push('El código ingresado no es válido')
-                } else if (afiliacion.user_id_user || afiliacion.asignada == 0) {
+                } else if (afiliacion.id_user_afiliacion || afiliacion.codigo_asignado == 0) {
                     errores.push('El código se encuentra asignado a un usuario');
                 }
             })
@@ -104,7 +105,7 @@ module.exports = async (req, res) => {
         }
 
          return await User.create(user)
-        .then(usuario => {
+        .then(async usuario => {
 
             // Se establece fecha de vencimiento de la afiliación sumando los días de vencimiento a la fecha actual
             let fecha_vencimiento = new Date();
@@ -115,8 +116,8 @@ module.exports = async (req, res) => {
 
             // Se genera afiliación para almacenar en la base de datos
             let afiliacion = {
-                user_id_user: usuario.id_user,
-                fecha_uso: new Date(),
+                id_user_afiliacion: usuario.id_user,
+                fecha_activacion: new Date(),
                 fecha_vencimiento: fecha_vencimiento
             }
             Afiliacion.update(afiliacion, {
@@ -134,14 +135,11 @@ module.exports = async (req, res) => {
             Periodo_Afiliacion.create(periodo)
 
             // Se genera token para la autenticación en el cliente móvil
-            const token = jwt.sign(
-                { id_user: usuario.id_user},
-                process.env.JWT_TOKEN);
-                return res.status(200).json({token:
-                    {header_id_user: usuario.id_user,
-                    token: token,
-                    rol: usuario.rol_id_rol}
-                });
+            let authToken = await generarToken({email:user_req.email,password:user_req.password});
+            let token=authToken.token;
+            return res.status(200).json({token}
+            );
+                        
         });
     } else {
 

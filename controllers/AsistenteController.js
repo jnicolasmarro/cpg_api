@@ -1,18 +1,19 @@
 const { User, Establecimiento } = require('../db');
+const {obtenerIDEstablecimientoXIDAdmin} = require ('./EstablecimientoController')
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 
-//Funcion que permite traer el Nit de un establecimiento mediante su administrador//
-async function traeNitEstablecimiento(admin) {
-  let nit;
+//Funcion que permite traer el ID de un establecimiento mediante su administrador//
+async function traeIDEstablecimiento(admin) {
+  let id;
   await User.findOne({ where: { id_user: admin } }).
     then(usuario => {
       if (usuario) {
-        nit = usuario.establecimiento_nit_user;
+        id = usuario.id_establecimiento_user;
       }
     })
-  return nit;
+  return id;
 }
 // Funcion que permite validar los datos de un asistente antes de su creacion
 async function validacionDatosAsistente(asistente) {
@@ -59,7 +60,7 @@ async function añadirAsistente(asistente) {
     email: asistente.email,
     numero_celular: asistente.numero_celular,
     password: bcrypt.hashSync(asistente.password, salt),
-    establecimiento_nit_user: asistente.establecimiento_nit_user,
+    id_establecimiento_user: asistente.id_establecimiento_user,
     rol_id_rol: 4
   }
 
@@ -67,7 +68,7 @@ async function añadirAsistente(asistente) {
 }
 
 async function listarAsistentes(establecimiento) {
-  let asistentes = await User.findAll({where: { establecimiento_nit_user: establecimiento,estado_user:1,rol_id_rol:4 }});
+  let asistentes = await User.findAll({where: { id_establecimiento_user: establecimiento,estado_user:1,rol_id_rol:4 }});
 
   if (asistentes == null) {
     return null
@@ -83,8 +84,9 @@ module.exports = {
   async crearAsistente(req, res) {
     // Se obtiene el id del usuario del administrador del establecimiento
     let admin = req.headers.id_user;
-    // Por medio del id se obtiene el NIT del establecimiento
-    let establecimiento = await traeNitEstablecimiento(admin);
+    // Por medio del id se obtiene el ID del establecimiento
+    console.log(admin)
+    let establecimiento = await obtenerIDEstablecimientoXIDAdmin(admin);
     
     if (establecimiento) {
       // Si se encuentra el NIT del establecimiento se obtienen los datos suministrados en el front
@@ -93,7 +95,7 @@ module.exports = {
         email: req.body.email,
         numero_celular: req.body.numero_celular,
         password: req.body.password,
-        establecimiento_nit_user: establecimiento
+        id_establecimiento_user: establecimiento
       }
       // Se validan los datos 
       let error = await validacionDatosAsistente(asistente);
@@ -116,7 +118,7 @@ module.exports = {
   // Funcion para listar los asistentes activos de un establecimiento (Primera funcion al realizar la petición sin validaciones) //
   async listarAsistentesActivos(req, res) {
     let admin = req.headers.id_user;
-    let establecimiento = await traeNitEstablecimiento(admin);
+    let establecimiento = await obtenerIDEstablecimientoXIDAdmin(admin);
     if (establecimiento) {
       let asistentes = await listarAsistentes(establecimiento);
       if (asistentes == null) {
