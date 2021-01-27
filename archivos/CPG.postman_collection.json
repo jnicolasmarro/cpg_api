@@ -9,47 +9,23 @@
 			"name": "user",
 			"item": [
 				{
-					"name": "singup",
+					"name": "obtenerUsuarios",
 					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "nombre_usuario",
-									"value": "Juan Nicolás ",
-									"description": "Nombre del usuario que se registra",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "jnicolas.marro789@gmail.com",
-									"description": "Correo del usuario que se registra",
-									"type": "text"
-								},
-								{
-									"key": "numero_celular",
-									"value": "3192522839",
-									"description": "Célular del usuario que se registra",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "Tuv267mato",
-									"description": "Contraseña del usuario que se registra",
-									"type": "text"
-								},
-								{
-									"key": "codigo",
-									"value": "631261",
-									"description": "Código de la membresía que el usuario adquiere",
-									"type": "text"
-								}
-							]
-						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:3000/api/user/singup",
+							"raw": "http://localhost:3000/api/user/obtenerUsuarios",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -58,28 +34,7 @@
 							"path": [
 								"api",
 								"user",
-								"singup"
-							]
-						},
-						"description": "Petición POST para el registro de un nuevo usuario"
-					},
-					"response": []
-				},
-				{
-					"name": "obtenerUsuarios",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/user",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"user"
+								"obtenerUsuarios"
 							]
 						},
 						"description": "Permite obtener todos los usuarios"
@@ -90,9 +45,20 @@
 					"name": "obtenerUsuario",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:3000/api/user/5",
+							"raw": "http://localhost:3000/api/user/obtenerUsuario/9",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -101,7 +67,8 @@
 							"path": [
 								"api",
 								"user",
-								"5"
+								"obtenerUsuario",
+								"9"
 							]
 						},
 						"description": "Petición para obtener un solo usuario"
@@ -112,7 +79,18 @@
 					"name": "actualizarUsuario",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "urlencoded",
 							"urlencoded": [
@@ -123,18 +101,33 @@
 								},
 								{
 									"key": "email",
-									"value": "nicolas@gmail.com",
+									"value": "prueba1@gmail.com",
 									"type": "text"
 								},
 								{
 									"key": "numero_celular",
 									"value": "3157468514",
 									"type": "text"
+								},
+								{
+									"key": "contraseñaNueva",
+									"value": "Tuv267mato",
+									"type": "text"
+								},
+								{
+									"key": "contraseñaActual",
+									"value": "123456789",
+									"type": "text"
+								},
+								{
+									"key": "numero_identificacion",
+									"value": "",
+									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/user/4",
+							"raw": "http://localhost:3000/api/user/actualizarUsuarioFinalMovil/9",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -143,15 +136,84 @@
 							"path": [
 								"api",
 								"user",
-								"4"
+								"actualizarUsuarioFinalMovil",
+								"9"
+							]
+						},
+						"description": "Petición para actualizar un usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "actualizarUsuarioWeb",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{authorization}}"
+							},
+							{
+								"key": "id_user",
+								"type": "text",
+								"value": "{{id_user}}"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nombre_usuario",
+									"value": "Pepito",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "prueba1@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "numero_celular",
+									"value": "3157468514",
+									"type": "text"
+								},
+								{
+									"key": "contraseñaNueva",
+									"value": "Tuv267mato",
+									"type": "text"
+								},
+								{
+									"key": "contraseñaActual",
+									"value": "123456789",
+									"type": "text"
+								},
+								{
+									"key": "numero_identificacion",
+									"value": "4444444",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/user/actualizarUsuario/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"user",
+								"actualizarUsuario",
+								"9"
 							]
 						},
 						"description": "Petición para actualizar un usuario"
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "establecimiento",
@@ -160,53 +222,44 @@
 					"name": "crearEstablecimiento",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
+							"mode": "formdata",
+							"formdata": [
 								{
-									"key": "nit",
-									"value": "456",
-									"type": "text"
+									"key": "logo_establecimiento",
+									"type": "file",
+									"src": "/C:/Users/NICOLAS_PC/Desktop/CPG/cpg-api/publico/establecimiento/2708101546.jpg"
 								},
 								{
-									"key": "nombre_empresa",
-									"value": "La Habana",
-									"type": "text"
-								},
-								{
-									"key": "establecimiento_comercial",
-									"value": "Comida Picante y Carnes",
-									"type": "text"
-								},
-								{
-									"key": "correo_establecimiento",
-									"value": "info@habana.com",
-									"type": "text"
-								},
-								{
-									"key": "celular_establecimiento",
-									"value": "3157849564",
-									"type": "text"
-								},
-								{
-									"key": "direccion_establecimiento",
-									"value": "ewwerwerwer",
+									"key": "cantidad_lote",
+									"value": "45",
 									"type": "text"
 								},
 								{
 									"key": "nombre_usuario",
-									"value": "fsdsdfsdsgg",
+									"value": "prueb",
 									"type": "text"
 								},
 								{
 									"key": "email",
-									"value": "j@gmail.com",
+									"value": "eredheweer@gail.com",
 									"type": "text"
 								},
 								{
 									"key": "numero_celular",
-									"value": "3152090283",
+									"value": "3122045789",
 									"type": "text"
 								},
 								{
@@ -222,6 +275,41 @@
 								{
 									"key": "autorizacion_debito",
 									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "ciudad",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "nit",
+									"value": "1234562744",
+									"type": "text"
+								},
+								{
+									"key": "nombre_empresa",
+									"value": "pruebda l",
+									"type": "text"
+								},
+								{
+									"key": "establecimiento_comercial",
+									"value": "werwerew",
+									"type": "text"
+								},
+								{
+									"key": "correo_establecimiento",
+									"value": "corodwf2@dfsdf.com",
+									"type": "text"
+								},
+								{
+									"key": "celular_establecimiento",
+									"value": "3154614631",
+									"type": "text"
+								},
+								{
+									"key": "direccion_establecimiento",
+									"value": "cra sifgsdfihd",
 									"type": "text"
 								}
 							]
@@ -242,11 +330,1272 @@
 						"description": "Petición POST para la creación de un cliente"
 					},
 					"response": []
+				},
+				{
+					"name": "subirLogo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "destino",
+									"value": "establecimiento",
+									"type": "text"
+								},
+								{
+									"key": "id_imagen",
+									"value": "8894409766",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/NICOLAS/Downloads/logo-tasca-web-1.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/establecimiento/subirLogo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"establecimiento",
+								"subirLogo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "vincularTarjeta",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nit",
+									"value": "1111111111",
+									"type": "text"
+								},
+								{
+									"key": "number",
+									"value": "4575623182290326",
+									"type": "text"
+								},
+								{
+									"key": "exp_year",
+									"value": "2025",
+									"type": "text"
+								},
+								{
+									"key": "exp_month",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "cvc",
+									"value": "123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/establecimiento/vincularTarjeta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"establecimiento",
+								"vincularTarjeta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "realizarPago",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nit",
+									"value": "123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/establecimiento/realizarPago",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"establecimiento",
+								"realizarPago"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"description": "Peticiones respecto a los clientes/establecimientos (Beta)",
-			"protocolProfileBehavior": {}
+			"description": "Peticiones respecto a los clientes/establecimientos (Beta)"
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "jnicolasmarro@gmail.com",
+									"description": "Email de ingreso",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456789",
+									"description": "Contraseña de ingreso",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nombre_usuario",
+									"value": "Administrador",
+									"description": "Nombre del usuario que se registra",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "administrador@gmail.com",
+									"description": "Correo del usuario que se registra",
+									"type": "text"
+								},
+								{
+									"key": "numero_celular",
+									"value": "3194874864",
+									"description": "Célular del usuario que se registra",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456789",
+									"description": "Contraseña del usuario que se registra",
+									"type": "text"
+								},
+								{
+									"key": "codigo",
+									"value": "11119166",
+									"description": "Código de la afiliación que el usuario adquiere",
+									"type": "text"
+								},
+								{
+									"key": "numero_identificacion",
+									"value": "1023931636",
+									"description": "Número de identificación del nuevo usuario final",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Petición POST para el registro de un nuevo usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "RecordarContraseña",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/auth/remember/jnicolas.marro@gmail.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"remember",
+								"jnicolas.marro@gmail.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CambiarContraseña",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/auth/remember/:email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"remember",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CambioContraseña",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "adminEstablecimiento",
+			"item": [
+				{
+					"name": "crearAsistente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nombre_usuario",
+									"value": "Pepito Asistente ",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "pruebaasistente2@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "numero_celular",
+									"value": "3167894561",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "2345678781",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/adminEstablecimiento/creacionAsistente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"adminEstablecimiento",
+								"creacionAsistente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listarAsistentes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "admin",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/adminEstablecimiento/asistentes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"adminEstablecimiento",
+								"asistentes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerAdminEstablecimiento",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/adminEstablecimiento/asistentes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"adminEstablecimiento",
+								"asistentes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizarAdminEsta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/adminEstablecimiento/adminEsta/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"adminEstablecimiento",
+								"adminEsta",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerExperiencias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "traeEstadisticas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reporteUsuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "experiencia",
+			"item": [
+				{
+					"name": "crearExperiencia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "titulo",
+									"value": "Prueba experiencia",
+									"type": "text"
+								},
+								{
+									"key": "descripcion",
+									"value": "prueba",
+									"type": "text"
+								},
+								{
+									"key": "precio_experiencia",
+									"value": "40000",
+									"type": "text"
+								},
+								{
+									"key": "precio_publico",
+									"value": "50000",
+									"type": "text"
+								},
+								{
+									"key": "comision",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "tipo_experiencia",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "id_establecimiento",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "imagen_experiencia",
+									"type": "file",
+									"src": "/C:/Users/NICOLAS_PC/Desktop/CPG/cpg-api/publico/experiencias/2.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/creacionExperiencia",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"creacionExperiencia"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerGastronomicas",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/gastronomicas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"gastronomicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerExpDisponibles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{authorization}}"
+							},
+							{
+								"key": "id_user",
+								"type": "text",
+								"value": "{{id_user}}"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/disponibles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"disponibles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerEntretenimiento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/entretenimiento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"entretenimiento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "activacionExperiencia",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_experiencia",
+									"value": "4",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/activacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"activacion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inactivacionExperiencia",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_experiencia",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/inactivacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"inactivacion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "subirImagen",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "destino",
+									"value": "experiencias",
+									"type": "text"
+								},
+								{
+									"key": "id_imagen",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/NICOLAS/Downloads/paella.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/subirImagenExp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"subirImagenExp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "encriptaDatos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/encriptar/1/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"encriptar",
+								"1",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "desencriptarDatos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_usuario",
+									"value": "U2FsdGVkX18sBNpajk9Rb+I9xv1sZIlZ73kSeea3tkQ=",
+									"type": "text"
+								},
+								{
+									"key": "id_experiencia",
+									"value": "U2FsdGVkX1/otCl2fMR+FSAVDMjFWtTznqu5S9VPvi8=",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/desencriptar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"desencriptar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerInfoExperiencia",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/experiencia/obtener/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"experiencia",
+								"obtener",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "procesarQR",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "busquedaExperiencias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "item",
+			"item": [
+				{
+					"name": "crearItem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "titulo_item",
+									"value": "Seleccion de producto",
+									"type": "text"
+								},
+								{
+									"key": "descripcion_item",
+									"value": "Descripcion",
+									"type": "text"
+								},
+								{
+									"key": "id_experiencia",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/itemExp/creacionItem",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"itemExp",
+								"creacionItem"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "afiliacion",
+			"item": [
+				{
+					"name": "asignarAfiliacion",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "afiliacion",
+									"value": "8E31L021",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/afiliacion/asignar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"afiliacion",
+								"asignar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "renovarAfiliacion",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "correo",
+									"value": "jnicolasmarro@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/afiliacion/renovar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"afiliacion",
+								"renovar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "generarCodigos",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "cantidad",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/afiliacion/generarNuevos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"afiliacion",
+								"generarNuevos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "contacto",
+			"item": [
+				{
+					"name": "obtenerlinkWhatsapp",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "noticia",
+			"item": [
+				{
+					"name": "crearNoticia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "imagen_noticia",
+									"type": "file",
+									"src": "/C:/Users/NICOLAS/Downloads/11.png"
+								},
+								{
+									"key": "titulo_noticia",
+									"value": "Titulo Noticia 1",
+									"type": "text"
+								},
+								{
+									"key": "contenido_noticia",
+									"value": "Contenido Noticia 1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/noticia/creacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"noticia",
+								"creacion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerNoticias",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/noticia/obtener",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"noticia",
+								"obtener"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerNoticia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
