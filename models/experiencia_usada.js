@@ -13,10 +13,16 @@ module.exports= (sequelize, type) => {
             type: type.INTEGER,
             primaryKey: true
         },
+        valor_comision:{
+            type: type.BIGINT(7)
+        },
         fecha_uso_experiencia_usada: {
             type: type.DATE
         },
         renovado_experiencia_usada: {
+            type: type.BOOLEAN
+        },
+        cobrada_experiencia_usada: {
             type: type.BOOLEAN
         }
     }

@@ -15,6 +15,7 @@ const AfiliacionRouter = require('./routes/afiliaciones')
 const authRouter = require('./routes/AuthRoutes/auth')
 const ContactoRouter = require('./routes/datosContacto')
 const NoticiaRouter = require('./routes/noticias')
+const VersionRouter = require('./routes/versiones')
 
 //Middleware de autenticación//
 const authMiddleware = require('./middleware/auth')
@@ -34,6 +35,8 @@ app.set('view engine', 'pug')
 app.use('/api/',express.static('publico'));
 
 app.use('/api/auth', authRouter)
+
+app.use('/api/versiones', VersionRouter)
 
 app.use('/api/user',authMiddleware, usersRouter)
 

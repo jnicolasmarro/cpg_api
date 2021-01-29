@@ -1,3 +1,9 @@
 {
-    "compile-hero.disable-compile-files-on-did-save-code": false
+    "compile-hero.disable-compile-files-on-did-save-code": false,
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/71fbf4e2-959f-4125-b4c6-943d1d69ae18/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/cpgapi",
+    "appService.deploySubpath": "."
 }

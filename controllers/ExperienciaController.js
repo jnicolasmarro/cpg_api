@@ -19,6 +19,22 @@ async function validacionAfiliacion(id_user){
             })
 }
 
+async function calcularValorComision(id_experiencia){
+
+    let valorComision;
+    let porcentajeComision;
+    let valorExperiencia;
+
+    await Experiencia.findOne({where:{id_experiencia:id_experiencia}})
+    .then(experiencia=>{
+        porcentajeComision = experiencia.comision
+        valorExperiencia = experiencia.precio_experiencia
+    })
+
+    valorComision = valorExperiencia*(porcentajeComision/100)
+    return valorComision;
+}
+
 
 async function validacionExperiencia(experiencia,files) {
     let error = [];
@@ -202,8 +218,9 @@ module.exports = {
                 required:false
             },
             where:{
-                '$Experiencia_usadas.id_experiencia_usada$':null,
-                experiencia_tipo_id_tipo:tipo_experiencia
+                '$experiencia_usadas.id_experiencia_usada$':null,
+                experiencia_tipo_id_tipo:tipo_experiencia,
+                estado_experiencia:true
             },
             attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia']
            
@@ -451,7 +468,8 @@ module.exports = {
             let registro_uso = {
                 id_user_experiencia_usada: id_usuario,
                 id_experiencia_experiencia_usada: id_experiencia,
-                fecha_uso_experiencia_usada: new Date()
+                fecha_uso_experiencia_usada: new Date(),
+                valor_comision: await calcularValorComision(id_experiencia)
             }
 
             return await Experiencia_Usada.create(registro_uso)
@@ -559,7 +577,8 @@ module.exports = {
                 }
                 ],
                 where:{
-                    '$Experiencia_usadas.id_experiencia_usada$':null
+                    '$experiencia_usadas.id_experiencia_usada$':null,
+                    estado_experiencia:true
                 },
                 attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia']
                
@@ -588,10 +607,11 @@ module.exports = {
                 }
                 ],
                 where:{
-                    '$Experiencia_usadas.id_experiencia_usada$':null,
+                    '$experiencia_usadas.id_experiencia_usada$':null,
                     titulo_experiencia:{
                         [Sequelize.Op.like]:`%${search}%`
-                    }
+                    },
+                    estado_experiencia:true
                 },
                 attributes:['id_experiencia','titulo_experiencia','descripcion_experiencia','imagen_experiencia'] 
             }).
