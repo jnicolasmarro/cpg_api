@@ -4,6 +4,7 @@ const app = express();
 const fileUpload = require('express-fileupload')
 const cors = require('cors');
 require('dotenv').config();
+const cron = require('node-cron');
 
 // Routers de la app//
 const usersRouter = require('./routes/users')
@@ -15,10 +16,14 @@ const AfiliacionRouter = require('./routes/afiliaciones')
 const authRouter = require('./routes/AuthRoutes/auth')
 const ContactoRouter = require('./routes/datosContacto')
 const NoticiaRouter = require('./routes/noticias')
+const PagoRouter = require('./routes/pagos')
 const VersionRouter = require('./routes/versiones')
 
 //Middleware de autenticación//
 const authMiddleware = require('./middleware/auth')
+
+const {realizarPagoJob} = require('./controllers/PagoController')
+
 
 app.use(cors())
 
@@ -53,6 +58,13 @@ app.use('/api/afiliacion',authMiddleware, AfiliacionRouter)
 app.use('/api/contacto',authMiddleware, ContactoRouter)
 
 app.use('/api/noticia',authMiddleware, NoticiaRouter)
+
+app.use('/api/pago',authMiddleware, PagoRouter)
+
+cron.schedule('4 * * * *', async () => {
+    console.log('Ejecutando cobro a los establecimientos');
+    await realizarPagoJob();
+  });
 
 app.listen(process.env.PORT, () => {
     console.log('Servidor arrancado!');
