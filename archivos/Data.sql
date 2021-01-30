@@ -45,6 +45,7 @@ CREATE TABLE `afiliacion` (
 
 LOCK TABLES `afiliacion` WRITE;
 /*!40000 ALTER TABLE `afiliacion` DISABLE KEYS */;
+INSERT INTO `afiliacion` VALUES ('AP3AUAOP',1,5,'2021-01-30 11:07:36','2021-08-01 23:59:59',NULL,'2021-01-30 16:07:07','2021-01-30 16:07:36'),('B7WSAGGB',1,6,'2021-01-30 11:08:47','2021-08-01 23:59:59',NULL,'2021-01-30 16:07:07','2021-01-30 16:08:47'),('DSG0XEWH',1,7,'2021-01-30 11:09:48','2021-08-01 23:59:59',NULL,'2021-01-30 16:07:07','2021-01-30 16:09:48'),('L2Z5WMI2',1,NULL,NULL,NULL,NULL,'2021-01-30 16:07:07','2021-01-30 16:07:07');
 /*!40000 ALTER TABLE `afiliacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,7 +105,7 @@ CREATE TABLE `establecimiento` (
   UNIQUE KEY `logo_establecimiento_UNIQUE` (`logo_establecimiento`),
   KEY `fk_establecimiento_ciudad1_idx` (`ciudad_id_ciudad`),
   CONSTRAINT `fk_establecimiento_ciudad1` FOREIGN KEY (`ciudad_id_ciudad`) REFERENCES `ciudad` (`id_ciudad`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,6 +114,7 @@ CREATE TABLE `establecimiento` (
 
 LOCK TABLES `establecimiento` WRITE;
 /*!40000 ALTER TABLE `establecimiento` DISABLE KEYS */;
+INSERT INTO `establecimiento` VALUES (1,123456789,'Establecimiento 1','Establecimiento de prueba','establecimiento1@gmail.com','3152090300','CRA 1 CALLE 1 - 1',45,1,1,'/establecimiento/1.png',1,1,'2021-01-30 15:20:10','2021-01-30 15:20:10'),(2,223456789,'Establecimiento 2','Establecimiento de prueba','establecimiento2@gmail.com','3152090301','CRA 1 CALLE 1 - 2',45,1,1,'/establecimiento/2.jpeg',1,1,'2021-01-30 15:23:12','2021-01-30 15:23:12'),(3,323456789,'Establecimiento 3','Establecimiento de prueba','establecimiento3@gmail.com','3152090302','CRA 1 CALLE 1 - 3',45,1,1,'/establecimiento/3.jpeg',1,1,'2021-01-30 15:23:51','2021-01-30 15:23:51');
 /*!40000 ALTER TABLE `establecimiento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -142,7 +144,7 @@ CREATE TABLE `experiencia` (
   KEY `fk_experiencia_establecimiento1_idx` (`id_establecimiento_experiencia`),
   CONSTRAINT `fk_experiencia_establecimiento1` FOREIGN KEY (`id_establecimiento_experiencia`) REFERENCES `establecimiento` (`id_establecimiento`),
   CONSTRAINT `fk_experiencia_experiencia_tipo1` FOREIGN KEY (`experiencia_tipo_id_tipo`) REFERENCES `experiencia_tipo` (`id_tipo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,6 +153,7 @@ CREATE TABLE `experiencia` (
 
 LOCK TABLES `experiencia` WRITE;
 /*!40000 ALTER TABLE `experiencia` DISABLE KEYS */;
+INSERT INTO `experiencia` VALUES (1,'Prueba experiencia 1','prueba ',100000,140000,1,30.00,'/experiencias/1.jpeg',1,1,'2021-01-30 15:30:23','2021-01-30 15:30:49'),(2,'Prueba experiencia 2','prueba ',10000,14000,1,50.00,'/experiencias/2.jpeg',2,2,'2021-01-30 15:35:43','2021-01-30 15:35:55'),(3,'Prueba experiencia 3','prueba ',80000,100000,1,20.00,'/experiencias/3.jpeg',3,3,'2021-01-30 15:39:36','2021-01-30 15:39:36'),(4,'Prueba experiencia 4','prueba ',85000,150000,1,26.50,'/experiencias/4.jpeg',3,1,'2021-01-30 15:42:20','2021-01-30 15:42:20'),(5,'Prueba experiencia 5','prueba ',85000,150000,1,26.56,'/experiencias/5.jpeg',2,2,'2021-01-30 15:43:28','2021-01-30 15:43:28'),(6,'Prueba experiencia 6','prueba ',85000,150000,1,26.56,'/experiencias/6.jpeg',1,3,'2021-01-30 15:44:07','2021-01-30 15:44:07');
 /*!40000 ALTER TABLE `experiencia` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -189,7 +192,7 @@ CREATE TABLE `experiencia_usada` (
   `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
   `id_user_experiencia_usada` int NOT NULL,
   `id_experiencia_experiencia_usada` int NOT NULL,
-  `valor_comision` bigint NOT NULL,
+  `valor_comision` decimal(10,2) NOT NULL,
   `fecha_uso_experiencia_usada` datetime NOT NULL,
   `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
   `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
@@ -200,7 +203,7 @@ CREATE TABLE `experiencia_usada` (
   KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
   CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
   CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -209,6 +212,7 @@ CREATE TABLE `experiencia_usada` (
 
 LOCK TABLES `experiencia_usada` WRITE;
 /*!40000 ALTER TABLE `experiencia_usada` DISABLE KEYS */;
+INSERT INTO `experiencia_usada` VALUES (1,7,1,30000.00,'2021-01-30 11:29:34',0,1,'2021-01-30 16:29:34','2021-01-30 16:47:01'),(2,7,4,22525.00,'2021-01-30 11:31:11',0,1,'2021-01-30 16:31:11','2021-01-30 16:47:01'),(3,7,2,5000.00,'2021-01-30 11:33:36',0,1,'2021-01-30 16:33:36','2021-01-30 16:44:01'),(4,7,5,22576.00,'2021-01-30 11:33:47',0,1,'2021-01-30 16:33:47','2021-01-30 16:44:01'),(5,7,6,22576.00,'2021-01-30 11:34:49',0,1,'2021-01-30 16:34:49','2021-01-30 16:38:06'),(6,7,3,16000.00,'2021-01-30 11:35:03',0,1,'2021-01-30 16:35:03','2021-01-30 16:38:06'),(7,5,6,22576.00,'2021-01-30 11:36:24',0,1,'2021-01-30 16:36:24','2021-01-30 16:38:06'),(8,5,3,16000.00,'2021-01-30 11:36:48',0,1,'2021-01-30 16:36:48','2021-01-30 16:38:06'),(9,5,2,5000.00,'2021-01-30 11:43:15',0,0,'2021-01-30 16:43:15','2021-01-30 16:44:01'),(10,5,1,30000.00,'2021-01-30 11:46:43',0,0,'2021-01-30 16:46:43','2021-01-30 16:47:01');
 /*!40000 ALTER TABLE `experiencia_usada` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -237,6 +241,7 @@ CREATE TABLE `fuente_pago` (
 
 LOCK TABLES `fuente_pago` WRITE;
 /*!40000 ALTER TABLE `fuente_pago` DISABLE KEYS */;
+INSERT INTO `fuente_pago` VALUES (7612,'eyJhbGciOiJIUzI1NiJ9.eyJjb250cmFjdF9pZCI6MSwicGVybWFsaW5rIjoiaHR0cHM6Ly93b21waS5jby93cC1jb250ZW50L3VwbG9hZHMvMjAxOS8wOS9URVJNSU5PUy1ZLUNPTkRJQ0lPTkVTLURFLVVTTy1VU1VBUklPUy1XT01QSS5wZGYiLCJmaWxlX2hhc2giOiIzZGNkMGM5OGU3NGFhYjk3OTdjZmY3ODExNzMxZjc3YiIsImppdCI6IjE2MTIwMjA1NjQtNzA3NTAiLCJleHAiOjE2MTIwMjQxNjR9.exNP4GkmAoctGSNdqlpkq2yAFlgYOe6zSHjPVncixZQ','adminprueba1@gmail.com','CARD','tok_test_9401_5038692586375bBA911b6e48F25a6E10'),(7613,'eyJhbGciOiJIUzI1NiJ9.eyJjb250cmFjdF9pZCI6MSwicGVybWFsaW5rIjoiaHR0cHM6Ly93b21waS5jby93cC1jb250ZW50L3VwbG9hZHMvMjAxOS8wOS9URVJNSU5PUy1ZLUNPTkRJQ0lPTkVTLURFLVVTTy1VU1VBUklPUy1XT01QSS5wZGYiLCJmaWxlX2hhc2giOiIzZGNkMGM5OGU3NGFhYjk3OTdjZmY3ODExNzMxZjc3YiIsImppdCI6IjE2MTIwMjA4OTUtMjIzMjYiLCJleHAiOjE2MTIwMjQ0OTV9.JsdlrRpquXj-uMoI01RhNz22mFJuJLYlxh4fYXc4re4','adminprueba2@gmail.com','CARD','tok_test_9401_27Cd1257e5ab2B93442b9f11d48baB91'),(7614,'eyJhbGciOiJIUzI1NiJ9.eyJjb250cmFjdF9pZCI6MSwicGVybWFsaW5rIjoiaHR0cHM6Ly93b21waS5jby93cC1jb250ZW50L3VwbG9hZHMvMjAxOS8wOS9URVJNSU5PUy1ZLUNPTkRJQ0lPTkVTLURFLVVTTy1VU1VBUklPUy1XT01QSS5wZGYiLCJmaWxlX2hhc2giOiIzZGNkMGM5OGU3NGFhYjk3OTdjZmY3ODExNzMxZjc3YiIsImppdCI6IjE2MTIwMjExMzUtMTQ5NzYiLCJleHAiOjE2MTIwMjQ3MzV9.DNR1aKUUgeBfjiLGXDmZ9KT2EcAUuiVKCpWsXA_ne24','adminprueba3@gmail.com','CARD','tok_test_9401_f099d11ed9C1d224c97c3c5EC1B1011D');
 /*!40000 ALTER TABLE `fuente_pago` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -262,6 +267,7 @@ CREATE TABLE `historico_establecimiento` (
 
 LOCK TABLES `historico_establecimiento` WRITE;
 /*!40000 ALTER TABLE `historico_establecimiento` DISABLE KEYS */;
+INSERT INTO `historico_establecimiento` VALUES (1,0,0),(2,0,0),(3,0,0);
 /*!40000 ALTER TABLE `historico_establecimiento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -283,7 +289,7 @@ CREATE TABLE `item` (
   PRIMARY KEY (`id_item`),
   KEY `fk_item_experiencia1_idx` (`experiencia_id_experiencia_item`),
   CONSTRAINT `fk_item_experiencia1` FOREIGN KEY (`experiencia_id_experiencia_item`) REFERENCES `experiencia` (`id_experiencia`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -292,6 +298,7 @@ CREATE TABLE `item` (
 
 LOCK TABLES `item` WRITE;
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
+INSERT INTO `item` VALUES (1,'Seleccion de producto 1','Descripcion 1',1,1,'2021-01-30 15:32:27','2021-01-30 15:32:27'),(2,'Seleccion de producto 2','Descripcion 2',1,1,'2021-01-30 15:32:33','2021-01-30 15:32:33'),(3,'Seleccion de producto 3','Descripcion 3',1,1,'2021-01-30 15:32:39','2021-01-30 15:32:39'),(4,'Seleccion de producto 4','Descripcion 4',1,1,'2021-01-30 15:32:44','2021-01-30 15:32:44'),(5,'Seleccion de producto 1','Descripcion 1',1,2,'2021-01-30 15:36:16','2021-01-30 15:36:16'),(6,'Seleccion de producto 2','Descripcion 2',1,2,'2021-01-30 15:36:22','2021-01-30 15:36:22'),(7,'Seleccion de producto 1','Descripcion 1',1,3,'2021-01-30 15:39:55','2021-01-30 15:39:55'),(8,'Seleccion de producto 2','Descripcion 2',1,3,'2021-01-30 15:40:02','2021-01-30 15:40:02'),(9,'Seleccion de producto 3','Descripcion 3',1,3,'2021-01-30 15:40:07','2021-01-30 15:40:07'),(10,'Seleccion de producto 4','Descripcion 4',1,3,'2021-01-30 15:40:12','2021-01-30 15:40:12'),(11,'Seleccion de producto 1','Descripcion 1',1,4,'2021-01-30 15:42:50','2021-01-30 15:42:50'),(12,'Seleccion de producto 1','Descripcion 1',1,5,'2021-01-30 15:43:35','2021-01-30 15:43:35'),(13,'Seleccion de producto 1','Descripcion 1',1,6,'2021-01-30 15:44:11','2021-01-30 15:44:11');
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -332,7 +339,7 @@ DROP TABLE IF EXISTS `pago`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pago` (
   `id_pago` bigint NOT NULL AUTO_INCREMENT,
-  `total_monto` bigint NOT NULL,
+  `total_monto` decimal(10,2) NOT NULL,
   `id_establecimiento_pago` int NOT NULL,
   `pago_enviado` tinyint DEFAULT NULL,
   `fuente_pago_id_fuente_pago` bigint NOT NULL,
@@ -340,12 +347,13 @@ CREATE TABLE `pago` (
   `updatedAt` timestamp NOT NULL,
   `id_transaction` varchar(100) DEFAULT NULL,
   `observacion_pago` varchar(100) DEFAULT NULL,
+  `pago_aceptado` tinyint DEFAULT NULL,
   PRIMARY KEY (`id_pago`),
   KEY `fk_pago_establecimiento1_idx` (`id_establecimiento_pago`),
   KEY `fk_pago_fuente_pago1_idx` (`fuente_pago_id_fuente_pago`),
   CONSTRAINT `fk_pago_establecimiento1` FOREIGN KEY (`id_establecimiento_pago`) REFERENCES `establecimiento` (`id_establecimiento`),
   CONSTRAINT `fk_pago_fuente_pago1` FOREIGN KEY (`fuente_pago_id_fuente_pago`) REFERENCES `fuente_pago` (`id_fuente_pago`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -354,6 +362,7 @@ CREATE TABLE `pago` (
 
 LOCK TABLES `pago` WRITE;
 /*!40000 ALTER TABLE `pago` DISABLE KEYS */;
+INSERT INTO `pago` VALUES (1,52525.00,1,1,7612,'2021-01-30 16:38:00','2021-01-30 16:38:06','19401-1612024659-10999','PAGO REALIZADO CORRECTAMENTE',NULL),(2,77152.00,3,1,7614,'2021-01-30 16:38:00','2021-01-30 16:38:06','19401-1612024659-82697','PAGO REALIZADO CORRECTAMENTE',NULL),(3,27576.00,2,1,7613,'2021-01-30 16:38:00','2021-01-30 16:38:01','19401-1612024654-72512','PAGO REALIZADO CORRECTAMENTE',NULL),(4,5000.00,2,1,7613,'2021-01-30 16:44:00','2021-01-30 16:44:01','19401-1612025014-48528','PAGO REALIZADO CORRECTAMENTE',NULL),(5,30000.00,1,1,7612,'2021-01-30 16:47:00','2021-01-30 16:47:01','19401-1612025194-77742','PAGO REALIZADO CORRECTAMENTE',NULL),(6,30000.00,1,1,7612,'2021-01-30 20:04:00','2021-01-30 20:04:01','19401-1612037014-61109','ENVIADO A LA PASARELA DE PAGOS',NULL),(7,5000.00,2,1,7613,'2021-01-30 20:04:00','2021-01-30 20:04:07','19401-1612037020-95850','ENVIADO A LA PASARELA DE PAGOS',NULL);
 /*!40000 ALTER TABLE `pago` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -380,6 +389,7 @@ CREATE TABLE `periodo_afiliacion` (
 
 LOCK TABLES `periodo_afiliacion` WRITE;
 /*!40000 ALTER TABLE `periodo_afiliacion` DISABLE KEYS */;
+INSERT INTO `periodo_afiliacion` VALUES ('AP3AUAOP',1,'2021-01-30 11:07:36'),('B7WSAGGB',1,'2021-01-30 11:08:47'),('DSG0XEWH',1,'2021-01-30 11:09:48');
 /*!40000 ALTER TABLE `periodo_afiliacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -444,6 +454,7 @@ CREATE TABLE `tarjeta` (
 
 LOCK TABLES `tarjeta` WRITE;
 /*!40000 ALTER TABLE `tarjeta` DISABLE KEYS */;
+INSERT INTO `tarjeta` VALUES ('tok_test_9401_27Cd1257e5ab2B93442b9f11d48baB91','4111111111111111','789','12','29','Admin Prueba 2','2021-01-30T15:34:55.551+00:00','VISA','VISA-1111','1111',411111,'2021-07-29T15:34:55.000Z',1,2),('tok_test_9401_5038692586375bBA911b6e48F25a6E10','4242424242424242','789','12','29','Admin Prueba','2021-01-30T15:29:23.841+00:00','VISA','VISA-4242','4242',424242,'2021-07-29T15:29:23.000Z',1,1),('tok_test_9401_f099d11ed9C1d224c97c3c5EC1B1011D','4242424242424242','789','12','29','Admin Prueba 3','2021-01-30T15:38:54.573+00:00','VISA','VISA-4242','4242',424242,'2021-07-29T15:38:54.000Z',1,3);
 /*!40000 ALTER TABLE `tarjeta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -474,7 +485,7 @@ CREATE TABLE `user` (
   KEY `fk_user_establecimiento1_idx` (`id_establecimiento_user`),
   CONSTRAINT `fk_user_establecimiento` FOREIGN KEY (`id_establecimiento_user`) REFERENCES `establecimiento` (`id_establecimiento`),
   CONSTRAINT `fk_user_rol` FOREIGN KEY (`rol_id_rol`) REFERENCES `rol` (`id_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -483,7 +494,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Administrador',NULL,'administrador@gmail.com','3000000000','$2a$10$SFn8J7UQu2jdXbE5/JNtkexY4BzpP6KI8UzXqwV91nRpT1Y78tYiS',1,1,NULL,'2020-08-07 09:00:21','2020-09-11 09:54:02',NULL,NULL);
+INSERT INTO `user` VALUES (1,'Administrador',NULL,'administrador@gmail.com','3000000000','$2a$10$SFn8J7UQu2jdXbE5/JNtkexY4BzpP6KI8UzXqwV91nRpT1Y78tYiS',1,1,NULL,'2020-08-07 09:00:21','2020-09-11 09:54:02',NULL,NULL),(2,'Admin Prueba 1',NULL,'adminprueba1@gmail.com','3152090200','$2a$10$M515Vll2e7wAv1G8K1hraeyOQRGC38aFCU4HSAq4AzFhrtdkvZn8a',1,3,1,'2021-01-30 15:20:10','2021-01-30 15:20:10',NULL,NULL),(3,'Admin Prueba 2',NULL,'adminprueba2@gmail.com','3152090201','$2a$10$V3leb3yDH288YaD/oMuVz.Rnkl8jBSkbrznrfqTMoCTP8d/.POAb6',1,3,2,'2021-01-30 15:23:12','2021-01-30 15:23:12',NULL,NULL),(4,'Admin Prueba 3',NULL,'adminprueba3@gmail.com','3152090202','$2a$10$65JPsu1mwyHjZf2UUB4mi.Hsnuki.lmPJYDcsATS8Kz.jzFwrZC6.',1,3,3,'2021-01-30 15:23:51','2021-01-30 15:23:51',NULL,NULL),(5,'Usuario 1',111111111,'usuariof1@gmail.com','3192522100','$2a$10$b93f6NpLvaidD61V8qp8xe6igj9w25Y.iu7cw9WQOJ1hk2rxtzM1u',1,2,NULL,'2021-01-30 16:07:36','2021-01-30 16:07:36',NULL,NULL),(6,'Usuario final 2',11111112,'usuariof2@gmail.com','3152522101','$2a$10$yaT0LZgeoTxtqnclLDzOLOoq.5GYpXLKPisqfgx2QlF21kiTN2Ydi',1,2,NULL,'2021-01-30 16:08:47','2021-01-30 16:08:47',NULL,NULL),(7,'Usuario final 3',11111113,'usuariof3@gmail.com','3152522102','$2a$10$8zVTE0SUUj5Te6D9MEbVdOhoBLPQgN0CzuZj7ipeBlhr3Ejo9O5Gi',1,2,NULL,'2021-01-30 16:09:48','2021-01-30 16:09:48',NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -521,4 +532,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-30 10:16:37
+-- Dump completed on 2021-01-30 15:42:13
