@@ -14,7 +14,7 @@ module.exports= (sequelize, type) => {
             primaryKey: true
         },
         valor_comision:{
-            type: type.BIGINT(7)
+            type: type.DECIMAL(10,2)
         },
         fecha_uso_experiencia_usada: {
             type: type.DATE

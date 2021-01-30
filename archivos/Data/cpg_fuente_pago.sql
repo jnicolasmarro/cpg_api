@@ -16,37 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `experiencia_usada`
+-- Table structure for table `fuente_pago`
 --
 
-DROP TABLE IF EXISTS `experiencia_usada`;
+DROP TABLE IF EXISTS `fuente_pago`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `experiencia_usada` (
-  `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` int NOT NULL,
-  `id_experiencia_experiencia_usada` int NOT NULL,
-  `valor_comision` bigint NOT NULL,
-  `fecha_uso_experiencia_usada` datetime NOT NULL,
-  `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `createdAt` timestamp NULL DEFAULT NULL,
-  `updatedAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_experiencia_usada`,`id_user_experiencia_usada`,`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
-  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
-  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
+CREATE TABLE `fuente_pago` (
+  `id_fuente_pago` bigint NOT NULL,
+  `acceptance_token` varchar(1000) NOT NULL,
+  `customer_email` varchar(500) NOT NULL,
+  `type` varchar(45) NOT NULL,
+  `id_tarjeta_fuente_pago` varchar(200) NOT NULL,
+  PRIMARY KEY (`id_fuente_pago`),
+  KEY `fk_fuente_pago_tarjeta1_idx` (`id_tarjeta_fuente_pago`),
+  CONSTRAINT `fk_fuente_pago_tarjeta1` FOREIGN KEY (`id_tarjeta_fuente_pago`) REFERENCES `tarjeta` (`id_tarjeta`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `experiencia_usada`
+-- Dumping data for table `fuente_pago`
 --
 
-LOCK TABLES `experiencia_usada` WRITE;
-/*!40000 ALTER TABLE `experiencia_usada` DISABLE KEYS */;
-/*!40000 ALTER TABLE `experiencia_usada` ENABLE KEYS */;
+LOCK TABLES `fuente_pago` WRITE;
+/*!40000 ALTER TABLE `fuente_pago` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fuente_pago` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -58,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-30 10:17:24
+-- Dump completed on 2021-01-30 10:17:23

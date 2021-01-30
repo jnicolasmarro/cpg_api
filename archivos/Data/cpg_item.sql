@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.21, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
--- Host: localhost    Database: cpg
+-- Host: 127.0.0.1    Database: cpg
 -- ------------------------------------------------------
--- Server version	8.0.20
+-- Server version	8.0.22
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,12 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `item`
+--
+
+DROP TABLE IF EXISTS `item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `item` (
+  `id_item` int NOT NULL AUTO_INCREMENT,
+  `titulo_item` varchar(100) NOT NULL,
+  `descripcion_item` varchar(800) NOT NULL,
+  `estado_item` tinyint NOT NULL DEFAULT '1',
+  `experiencia_id_experiencia_item` int NOT NULL,
+  `createdAt` timestamp NULL DEFAULT NULL,
+  `updatedAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_item`),
+  KEY `fk_item_experiencia1_idx` (`experiencia_id_experiencia_item`),
+  CONSTRAINT `fk_item_experiencia1` FOREIGN KEY (`experiencia_id_experiencia_item`) REFERENCES `experiencia` (`id_experiencia`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `item`
 --
 
 LOCK TABLES `item` WRITE;
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
-INSERT INTO `item` VALUES (1,'Título Item 1','Descripción Item 1',1,1,'2020-08-07 04:15:49','2020-08-07 04:15:49'),(2,'Título Item 2','Descripción Item 2',1,1,'2020-08-07 04:15:57','2020-08-07 04:15:57'),(3,'Título Item 3','Descripción Item 3',0,1,'2020-08-07 04:16:03','2020-08-07 04:16:03'),(4,'Título Item 4','Descripción Item 4',1,1,'2020-08-07 04:16:08','2020-08-07 04:16:08'),(5,'Título Item 1','Descripción Item 1',1,2,'2020-08-07 04:18:19','2020-08-07 04:18:19'),(6,'Título Item 2','Descripción Item 2',1,2,'2020-08-07 04:18:25','2020-08-07 04:18:25'),(7,'Título Item 3','Descripción Item 3',1,2,'2020-08-07 04:18:30','2020-08-07 04:18:30'),(8,'Plato de entrada','Porcion para una persona',1,3,'2020-08-17 14:00:32','2020-08-17 14:00:32'),(9,'Bebida','Cerveza ',1,3,'2020-08-17 14:00:52','2020-08-17 14:00:52'),(10,'Seleccion de producto','Descripcion',1,4,'2020-08-17 18:59:25','2020-08-17 18:59:25');
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -34,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-06 20:27:13
+-- Dump completed on 2021-01-30 10:17:23

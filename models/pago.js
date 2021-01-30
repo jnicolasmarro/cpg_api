@@ -6,10 +6,13 @@ module.exports= (sequelize, type) => {
             autoIncrement: true
         },
         total_monto: {
-            type: type.BIGINT(10)
+            type: type.DECIMAL(10,2)
         },
         id_establecimiento_pago: {
             type: type.INTEGER
+        },
+        pago_enviado: {
+            type: type.BOOLEAN
         },
         pago_aceptado: {
             type: type.BOOLEAN

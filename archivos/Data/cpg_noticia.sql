@@ -16,37 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `experiencia_usada`
+-- Table structure for table `noticia`
 --
 
-DROP TABLE IF EXISTS `experiencia_usada`;
+DROP TABLE IF EXISTS `noticia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `experiencia_usada` (
-  `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` int NOT NULL,
-  `id_experiencia_experiencia_usada` int NOT NULL,
-  `valor_comision` bigint NOT NULL,
-  `fecha_uso_experiencia_usada` datetime NOT NULL,
-  `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `createdAt` timestamp NULL DEFAULT NULL,
+CREATE TABLE `noticia` (
+  `id_noticia` int NOT NULL AUTO_INCREMENT,
+  `titulo_noticia` varchar(100) NOT NULL,
+  `contenido_noticia` varchar(1000) NOT NULL,
+  `createdAt` timestamp NOT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_experiencia_usada`,`id_user_experiencia_usada`,`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
-  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
-  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
+  `imagen_noticia` varchar(100) DEFAULT NULL,
+  `estado_noticia` tinyint NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_noticia`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `experiencia_usada`
+-- Dumping data for table `noticia`
 --
 
-LOCK TABLES `experiencia_usada` WRITE;
-/*!40000 ALTER TABLE `experiencia_usada` DISABLE KEYS */;
-/*!40000 ALTER TABLE `experiencia_usada` ENABLE KEYS */;
+LOCK TABLES `noticia` WRITE;
+/*!40000 ALTER TABLE `noticia` DISABLE KEYS */;
+/*!40000 ALTER TABLE `noticia` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

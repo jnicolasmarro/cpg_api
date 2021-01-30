@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.21, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
--- Host: localhost    Database: cpg
+-- Host: 127.0.0.1    Database: cpg
 -- ------------------------------------------------------
--- Server version	8.0.20
+-- Server version	8.0.22
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,12 +16,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `historico_establecimiento`
+--
+
+DROP TABLE IF EXISTS `historico_establecimiento`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `historico_establecimiento` (
+  `id_establecimiento_historico` int NOT NULL,
+  `procesados_total` int NOT NULL DEFAULT '0',
+  `procesados_lote` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_establecimiento_historico`),
+  CONSTRAINT `fk_historico_establecimiento` FOREIGN KEY (`id_establecimiento_historico`) REFERENCES `establecimiento` (`id_establecimiento`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `historico_establecimiento`
 --
 
 LOCK TABLES `historico_establecimiento` WRITE;
 /*!40000 ALTER TABLE `historico_establecimiento` DISABLE KEYS */;
-INSERT INTO `historico_establecimiento` VALUES (2708101546,0,0),(8894409766,0,0);
 /*!40000 ALTER TABLE `historico_establecimiento` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -34,4 +49,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-06 20:27:13
+-- Dump completed on 2021-01-30 10:17:23

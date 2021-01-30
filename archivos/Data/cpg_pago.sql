@@ -16,37 +16,37 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `experiencia_usada`
+-- Table structure for table `pago`
 --
 
-DROP TABLE IF EXISTS `experiencia_usada`;
+DROP TABLE IF EXISTS `pago`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `experiencia_usada` (
-  `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` int NOT NULL,
-  `id_experiencia_experiencia_usada` int NOT NULL,
-  `valor_comision` bigint NOT NULL,
-  `fecha_uso_experiencia_usada` datetime NOT NULL,
-  `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
-  `createdAt` timestamp NULL DEFAULT NULL,
-  `updatedAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_experiencia_usada`,`id_user_experiencia_usada`,`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
-  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
-  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
+CREATE TABLE `pago` (
+  `id_pago` bigint NOT NULL AUTO_INCREMENT,
+  `total_monto` bigint NOT NULL,
+  `id_establecimiento_pago` int NOT NULL,
+  `pago_enviado` tinyint DEFAULT NULL,
+  `fuente_pago_id_fuente_pago` bigint NOT NULL,
+  `createdAt` timestamp NOT NULL,
+  `updatedAt` timestamp NOT NULL,
+  `id_transaction` varchar(100) DEFAULT NULL,
+  `observacion_pago` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_pago`),
+  KEY `fk_pago_establecimiento1_idx` (`id_establecimiento_pago`),
+  KEY `fk_pago_fuente_pago1_idx` (`fuente_pago_id_fuente_pago`),
+  CONSTRAINT `fk_pago_establecimiento1` FOREIGN KEY (`id_establecimiento_pago`) REFERENCES `establecimiento` (`id_establecimiento`),
+  CONSTRAINT `fk_pago_fuente_pago1` FOREIGN KEY (`fuente_pago_id_fuente_pago`) REFERENCES `fuente_pago` (`id_fuente_pago`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `experiencia_usada`
+-- Dumping data for table `pago`
 --
 
-LOCK TABLES `experiencia_usada` WRITE;
-/*!40000 ALTER TABLE `experiencia_usada` DISABLE KEYS */;
-/*!40000 ALTER TABLE `experiencia_usada` ENABLE KEYS */;
+LOCK TABLES `pago` WRITE;
+/*!40000 ALTER TABLE `pago` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pago` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -58,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-30 10:17:24
+-- Dump completed on 2021-01-30 10:17:23

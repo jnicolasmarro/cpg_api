@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.21, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
--- Host: localhost    Database: cpg
+-- Host: 127.0.0.1    Database: cpg
 -- ------------------------------------------------------
--- Server version	8.0.20
+-- Server version	8.0.22
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,12 +16,40 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `experiencia`
+--
+
+DROP TABLE IF EXISTS `experiencia`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `experiencia` (
+  `id_experiencia` int NOT NULL AUTO_INCREMENT,
+  `titulo_experiencia` varchar(150) NOT NULL,
+  `descripcion_experiencia` varchar(200) NOT NULL,
+  `precio_experiencia` bigint NOT NULL,
+  `precio_publico` bigint NOT NULL,
+  `estado_experiencia` tinyint NOT NULL DEFAULT '0',
+  `comision` decimal(5,2) NOT NULL,
+  `imagen_experiencia` varchar(150) DEFAULT NULL,
+  `experiencia_tipo_id_tipo` int NOT NULL,
+  `id_establecimiento_experiencia` int NOT NULL,
+  `createdAt` timestamp NULL DEFAULT NULL,
+  `updatedAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_experiencia`),
+  UNIQUE KEY `imagen_experiencia_UNIQUE` (`imagen_experiencia`),
+  KEY `fk_experiencia_experiencia_tipo1_idx` (`experiencia_tipo_id_tipo`),
+  KEY `fk_experiencia_establecimiento1_idx` (`id_establecimiento_experiencia`),
+  CONSTRAINT `fk_experiencia_establecimiento1` FOREIGN KEY (`id_establecimiento_experiencia`) REFERENCES `establecimiento` (`id_establecimiento`),
+  CONSTRAINT `fk_experiencia_experiencia_tipo1` FOREIGN KEY (`experiencia_tipo_id_tipo`) REFERENCES `experiencia_tipo` (`id_tipo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `experiencia`
 --
 
 LOCK TABLES `experiencia` WRITE;
 /*!40000 ALTER TABLE `experiencia` DISABLE KEYS */;
-INSERT INTO `experiencia` VALUES (1,'Título Experiencia 1','Descripción Experiencia 1',100000,150000,1,4.00,'/experiencias/1.jpg',1,2708101546,'2020-08-07 04:15:17','2020-08-07 16:21:50'),(2,'Título Experiencia 2','Descripción Experiencia 2',80000,90000,0,5.00,'/experiencias/2.jpg',1,2708101546,'2020-08-07 04:17:23','2020-08-17 02:10:58'),(3,'Paella','Paella Marinera',80000,90000,1,5.00,'/experiencias/3.jpg',1,8894409766,'2020-08-17 13:59:33','2020-08-17 14:01:01'),(4,'Selección de productos 1','descripcion de experiencia',60000,90000,1,5.00,'/experiencias/4.jpg',2,2708101546,'2020-08-17 18:58:09','2020-08-17 18:59:32');
 /*!40000 ALTER TABLE `experiencia` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -34,4 +62,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-06 20:27:13
+-- Dump completed on 2021-01-30 10:17:23

@@ -1,4 +1,4 @@
-const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, Afiliacion, Sequelize } = require('../db');
+const { Experiencia, Establecimiento, Item, User, Experiencia_Usada, Afiliacion, Sequelize, Tarjeta } = require('../db');
 const {obtenerIDEstablecimientoXIDAdmin} = require ('./EstablecimientoController');
 const validator = require('validator');
 const fs = require('fs');
@@ -32,7 +32,8 @@ async function calcularValorComision(id_experiencia){
     })
 
     valorComision = valorExperiencia*(porcentajeComision/100)
-    return valorComision;
+    
+    return valorComision.toFixed(2)
 }
 
 
@@ -69,21 +70,33 @@ async function validacionExperiencia(experiencia,files) {
     }
     if (validator.isEmpty(experiencia.experiencia_tipo_id_tipo, { ignore_whitespace: true })) {
         error.push('No ha ingresado el tipo de experiencia!')
-    } /*else if (!(parseInt(experiencia.experiencia_tipo_id_tipo) == 1 || parseInt(experiencia.experiencia_tipo_id_tipo) == 2)) {
-        error.push('Error tipo de experiencia!')
-    }*/
+    } 
     if (validator.isEmpty(experiencia.id_establecimiento_experiencia, { ignore_whitespace: true })) {
         error.push('No ha ingresado el establecimiento!')
     } else if (!validator.isInt(experiencia.id_establecimiento_experiencia)) {
         error.push('El NIT de establecimiento no es válido!')
     } else {
         await Establecimiento.findOne({ where: { id_establecimiento: experiencia.id_establecimiento_experiencia } })
-            .then(establecimiento => {
+            .then(async establecimiento => {
                 if (!establecimiento) {
                     error.push('El establecimiento no existe')
                 } else {
                     if (!establecimiento.estado_establecimiento) {
                         error.push('El establecimiento no está activo')
+                    }else{
+
+                        await Tarjeta.findOne({
+                            where:{
+                                estado_tarjeta:true,
+                                id_establecimiento_tarjeta:experiencia.id_establecimiento_experiencia
+                            }
+                        })
+                        .then(async tarjeta=>{
+                            if(!tarjeta){
+                                error.push('El establecimiento no tiene una tarjeta de pagos activa en el momento')
+                            }
+                        })
+
                     }
                 }
             })
@@ -472,6 +485,8 @@ module.exports = {
                 valor_comision: await calcularValorComision(id_experiencia)
             }
 
+            console.log(registro_uso.valor_comision)
+
             return await Experiencia_Usada.create(registro_uso)
                 .then((registro) => {
                     return res.json({ success: 'Experiencia procesada y registrada' })
@@ -515,7 +530,7 @@ module.exports = {
         let espera = new Date()
         espera.setMinutes(espera.getMinutes() + 1)
         let validado = false;
-        while (espera > new Date() && !validado) {
+       while (espera > new Date() && !validado) {
 
             await Experiencia_Usada.findOne({
                 where: {

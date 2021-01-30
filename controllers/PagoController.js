@@ -1,5 +1,5 @@
 const {Experiencia_Usada,Establecimiento,Experiencia,FuentePago,Tarjeta,Sequelize,Pago,sequelize} = require('../db');
-const {generarTransaccion} = require('./PasarelaController')
+const {generarTransaccion,consultarTransaccion} = require('./PasarelaController')
 
 
 async function generarTotales(){
@@ -59,10 +59,10 @@ async function marcarExperienciasCobrada(id_establecimiento){
 
 }
 
-async function generarPagos(totales){
+async function generarPagoPorEstablecimiento(establecimiento){
 
-    await totales.forEach(async establecimiento => {
-        let id_fuentePago;
+    let total_comision = parseFloat(establecimiento.total_comision).toFixed(2)
+    let id_fuentePago;
         let email;
         await FuentePago.findOne({
             include:{
@@ -80,7 +80,7 @@ async function generarPagos(totales){
 
         
         let pago ={
-            total_monto:establecimiento.total_comision,
+            total_monto:total_comision,
             id_establecimiento_pago:establecimiento.id_establecimiento,
             fuente_pago_id_fuente_pago:id_fuentePago
         }
@@ -90,7 +90,7 @@ async function generarPagos(totales){
         .then(async pago=>{
 
             let transaccion={
-                amount_in_cents:parseInt(establecimiento.total_comision)*100,
+                amount_in_cents:total_comision*100,
                 currency:'COP',
                 customer_email:email,
                 payment_method:{
@@ -107,12 +107,11 @@ async function generarPagos(totales){
                 observacion_pago=procesoTransaccion.error
             }else{
                 id_transaction=procesoTransaccion.id_transaction
-                observacion_pago='PAGO REALIZADO CORRECTAMENTE'
-                await marcarExperienciasCobrada(establecimiento.id_establecimiento);
+                observacion_pago='ENVIADO A LA PASARELA DE PAGOS'
             }
 
             let updatePago={
-                pago_aceptado:procesoTransaccion.realizada,
+                pago_enviado:procesoTransaccion.realizada,
                 id_transaction:id_transaction,
                 observacion_pago:observacion_pago
             }
@@ -126,10 +125,90 @@ async function generarPagos(totales){
 
 
         })
+}
+
+async function generarPagos(totales){
+
+    await totales.forEach(async establecimiento => {
         
+        try {
+            await generarPagoPorEstablecimiento(establecimiento);
+        } catch (error) {
+            let total_comision = parseFloat(establecimiento.total_comision).toFixed(2)
+            let pago ={
+                total_monto:total_comision,
+                id_establecimiento_pago:establecimiento.id_establecimiento,
+                pago_enviado:false,
+                observacion_pago:error.toString()
+
+            }
+            await Pago.create(pago)
+        }
         
     });
 
+}
+
+async function validarPagos(){
+    await Pago.findAll({
+        raw:true,
+        where:{
+            pago_enviado:true,
+            pago_aceptado:{
+                [Sequelize.Op.ne]:null
+            }
+        }
+    })
+    .then(pagos=>{
+
+        pagos.forEach(async pago => {
+            let estado = await consultarTransaccion(pago.id_pago)
+            let pagoUpdate;
+            switch (estado.status) {
+                case 'PENDING':
+                    pagoUpdate = {
+                        observacion_pago:'La transacción se encuentra pendiende'
+                    }
+                    break;
+                case 'APPROVED':
+                    pagoUpdate = {
+                        observacion_pago:'La transacción fue realizada con éxito',
+                        pago_aceptado:true
+                    }
+
+                    await marcarExperienciasCobrada()
+
+                    break;
+                case 'DECLINED':
+                    pagoUpdate = {
+                        observacion_pago:estado.statusMessage,
+                        pago_aceptado:false
+                    }
+                    break;
+                case 'ERROR':
+                    pagoUpdate = {
+                        observacion_pago:estado.statusMessage,
+                        pago_aceptado:false
+                    }
+                    break;
+                case 'VOIDED ':
+                    pagoUpdate = {
+                        observacion_pago:estado.statusMessage,
+                        pago_aceptado:false
+                    }
+                    break;
+                default:
+                    pagoUpdate = {
+                        observacion_pago:`No se pudo validar el pago ${pago.id_pago}`,
+                        pago_aceptado:false
+                    }
+
+                    
+                    break;
+            }
+        });
+       
+    })
 }
 
 
@@ -142,5 +221,8 @@ module.exports={
     async realizarPagoJob(){
         let totales = await generarTotales();
         await generarPagos(totales);
+    },
+    async validarPagoJob(){
+
     }
 }

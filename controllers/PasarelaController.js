@@ -272,6 +272,7 @@ async function procesarTransaccion(transaccion){
     })
     .then(res=>res.json())
     .then(res=>{
+        console.log(res)
         if(res.data){
             realizada=true;
             id_transaction=res.data.id
@@ -382,6 +383,24 @@ async RegistrarTarjeta(req, res) {
 },
 async generarTransaccion(transaccion){
     return await procesarTransaccion(transaccion)
+},
+async consultarTransaccion(id_referencia){
+    let status;
+    let statusMessage;
+    await fetch(`${process.env.URL_WOMPI}/transactions/${id_referencia}`, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.LLAVE_PRIVADA}`
+        },
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        status=res.data[0].status
+        statusMessage=res.data[0].status_message
+    })
+
+    return {status,statusMessage}
 }
 
 }
