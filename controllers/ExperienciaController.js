@@ -7,7 +7,7 @@ const CryptoJS = require("crypto-js");
 //Validaciones antes de agregar una experiencia//
 
 async function validacionAfiliacion(id_user){
-       return await Afiliacion.findOne({ where: { id_user_afiliacion: id_user } }).
+       return await Afiliacion.findOne({ where: { afiliacion_id_user: id_user } }).
             then(afiliacion => {
                 let fecha_actual = new Date();
                 let fecha_venc = new Date(afiliacion.fecha_vencimiento); 
@@ -223,7 +223,7 @@ module.exports = {
             {
                 model:Experiencia_Usada,
                 where:{
-                    id_user_experiencia_usada:{
+                    experiencia_usada_id_user:{
                         [Sequelize.Op.eq]:id_user
                     },
                     renovado_experiencia_usada:0
@@ -257,7 +257,7 @@ module.exports = {
             {
                 model:Experiencia_Usada,
                 where:{
-                    id_user_experiencia_usada:{
+                    experiencia_usada_id_user:{
                         [Sequelize.Op.eq]:id_user
                     },
                     renovado_experiencia_usada:0
@@ -274,7 +274,7 @@ module.exports = {
 
 /*
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['id_experiencia_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_usada_id_experiencia'], where: { experiencia_usada_id_user: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -302,7 +302,7 @@ module.exports = {
         }
 
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { experiencia_usada_id_user: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -329,7 +329,7 @@ module.exports = {
         }
 
         let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { id_user_experiencia_usada: id_user, renovado_experiencia_usada: 0 } }).
+        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_id_experiencia_usada'], where: { experiencia_usada_id_user: id_user, renovado_experiencia_usada: 0 } }).
             then(usado => {
                 usado.forEach(e => {
                     usados.push(e.experiencia_id_experiencia_usada)
@@ -431,7 +431,7 @@ module.exports = {
                             return { error: 'Usuario no se encuentra activo' }
                         } else {
                             let fecha_vto_afiliacion = await Afiliacion
-                                .findOne({ where: { id_user_afiliacion: user.id_user } })
+                                .findOne({ where: { afiliacion_id_user: user.id_user } })
                                 .then((afiliacion) => {
                                     return afiliacion.fecha_vencimiento
                                 })
@@ -456,8 +456,8 @@ module.exports = {
                                         return await Experiencia_Usada
                                             .findOne({
                                                 where: {
-                                                    id_experiencia_experiencia_usada: id_experiencia,
-                                                    id_user_experiencia_usada: id_usuario,
+                                                    experiencia_usada_id_experiencia: id_experiencia,
+                                                    experiencia_usada_id_user: id_usuario,
                                                     renovado_experiencia_usada: false
                                                 }
                                             })
@@ -479,8 +479,8 @@ module.exports = {
             }
 
             let registro_uso = {
-                id_user_experiencia_usada: id_usuario,
-                id_experiencia_experiencia_usada: id_experiencia,
+                experiencia_usada_id_user: id_usuario,
+                experiencia_usada_id_experiencia: id_experiencia,
                 fecha_uso_experiencia_usada: new Date(),
                 valor_comision: await calcularValorComision(id_experiencia)
             }
@@ -534,8 +534,8 @@ module.exports = {
 
             await Experiencia_Usada.findOne({
                 where: {
-                    id_user_experiencia_usada: id_user,
-                    id_experiencia_experiencia_usada: id_exp,
+                    experiencia_usada_id_user: id_user,
+                    experiencia_usada_id_experiencia: id_exp,
                     renovado_experiencia_usada: false
                 }
             })
@@ -573,7 +573,7 @@ module.exports = {
                 {
                     model:Experiencia_Usada,
                     where:{
-                        id_user_experiencia_usada:{
+                        experiencia_usada_id_user:{
                             [Sequelize.Op.eq]:id_user
                         },
                         renovado_experiencia_usada:0
@@ -613,7 +613,7 @@ module.exports = {
                 {
                     model:Experiencia_Usada,
                     where:{
-                        id_user_experiencia_usada:{
+                        experiencia_usada_id_user:{
                             [Sequelize.Op.eq]:id_user
                         },
                         renovado_experiencia_usada:0

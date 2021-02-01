@@ -47,23 +47,15 @@ async function validacionDatosEstablecimiento(establecimiento,files) {
     error.push('No ha ingresado la dirección del establecimiento')
   }
 
-  if (validator.isEmpty(establecimiento.ciudad_id_ciudad, { ignore_whitespace: true })) {
+  if (validator.isEmpty(establecimiento.establecimiento_id_ciudad, { ignore_whitespace: true })) {
     error.push('No ha ingresado la ciudad del establecimiento')
   }else{
-    await Ciudad.findOne({where:{id_ciudad:establecimiento.ciudad_id_ciudad}}).
+    await Ciudad.findOne({where:{id_ciudad:establecimiento.establecimiento_id_ciudad}}).
     then(ciudad=>{
       if(!ciudad){
         error.push('La ciudad ingresada no existe')
       }
     })
-  }
-
-  if (validator.isEmpty(establecimiento.cantidad_lote, { ignore_whitespace: true })) {
-    error.push('No ha ingresado la cantidad del lote de experiencias!')
-  } else if (!validator.isInt(establecimiento.cantidad_lote)) {
-    error.push('La cantidad del lote de experiencias debe de ser un número entero!')
-  } else if (parseInt(establecimiento.cantidad_lote) <= 0) {
-    error.push('La cantidad del lote de experiencias debe de ser mayor a cero!')
   }
 
   if (!files || Object.keys(files).length === 0){
@@ -191,8 +183,7 @@ module.exports = {
       correo_establecimiento: req.body.correo_establecimiento,
       celular_establecimiento: req.body.celular_establecimiento,
       direccion_establecimiento: req.body.direccion_establecimiento,
-      cantidad_lote: req.body.cantidad_lote,
-      ciudad_id_ciudad: req.body.ciudad
+      establecimiento_id_ciudad: req.body.ciudad
     }
 
     let admin = {

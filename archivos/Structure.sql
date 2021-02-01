@@ -56,18 +56,18 @@ CREATE TABLE IF NOT EXISTS `cpg`.`establecimiento` (
   `autorizacion_debito` TINYINT NOT NULL,
   `logo_establecimiento` VARCHAR(150) NULL,
   `estado_establecimiento` TINYINT NOT NULL DEFAULT 1,
-  `ciudad_id_ciudad` INT NOT NULL,
+  `establecimiento_id_ciudad` INT NOT NULL,
   `createdAt` TIMESTAMP NULL,
   `updatedAt` TIMESTAMP NULL,
   PRIMARY KEY (`id_establecimiento`),
-  INDEX `fk_establecimiento_ciudad1_idx` (`ciudad_id_ciudad` ASC) VISIBLE,
+  INDEX `fk_establecimiento_ciudad1_idx` (`establecimiento_id_ciudad` ASC) VISIBLE,
   UNIQUE INDEX `nombre_empresa_UNIQUE` (`nombre_establecimiento` ASC) VISIBLE,
   UNIQUE INDEX `logo_establecimiento_UNIQUE` (`logo_establecimiento` ASC) VISIBLE,
   UNIQUE INDEX `correo_establecimiento_UNIQUE` (`correo_establecimiento` ASC) VISIBLE,
   UNIQUE INDEX `nit_UNIQUE` (`nit_establecimiento` ASC) VISIBLE,
   UNIQUE INDEX `id_establecimiento_UNIQUE` (`id_establecimiento` ASC) VISIBLE,
   CONSTRAINT `fk_establecimiento_ciudad1`
-    FOREIGN KEY (`ciudad_id_ciudad`)
+    FOREIGN KEY (`establecimiento_id_ciudad`)
     REFERENCES `cpg`.`ciudad` (`id_ciudad`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -161,17 +161,17 @@ AUTO_INCREMENT = 1;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `cpg`.`afiliacion` (
   `codigo_afiliacion` VARCHAR(8) NOT NULL,
-  `codigo_asignado` TINYINT NOT NULL DEFAULT 0,
-  `id_user_afiliacion` INT NULL,
+  `afiliacion_asignada` TINYINT NOT NULL DEFAULT 0,
+  `afiliacion_id_user` INT NULL,
   `fecha_activacion` DATETIME NULL,
   `fecha_vencimiento` DATETIME NULL,
   `fecha_expiracion` DATETIME NULL,
   `createdAt` TIMESTAMP NULL,
   `updatedAt` TIMESTAMP NULL,
   PRIMARY KEY (`codigo_afiliacion`),
-  INDEX `fk_afiliacion_user1_idx` (`id_user_afiliacion` ASC) VISIBLE,
+  INDEX `fk_afiliacion_user1_idx` (`afiliacion_id_user` ASC) VISIBLE,
   CONSTRAINT `fk_afiliacion_user1`
-    FOREIGN KEY (`id_user_afiliacion`)
+    FOREIGN KEY (`afiliacion_id_user`)
     REFERENCES `cpg`.`user` (`id_user`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -183,24 +183,24 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `cpg`.`experiencia_usada` (
   `id_experiencia_usada` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` INT NOT NULL,
-  `id_experiencia_experiencia_usada` INT NOT NULL,
+  `experiencia_usada_id_user` INT NOT NULL,
+  `experiencia_usada_id_experiencia` INT NOT NULL,
   `valor_comision` DECIMAL(10,2) NOT NULL,
   `fecha_uso_experiencia_usada` DATETIME NOT NULL,
   `renovado_experiencia_usada` TINYINT NOT NULL DEFAULT 0,
   `cobrada_experiencia_usada` TINYINT NOT NULL DEFAULT 0,
   `createdAt` TIMESTAMP NULL,
   `updatedAt` TIMESTAMP NULL,
-  INDEX `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada` ASC) VISIBLE,
-  INDEX `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada` ASC) VISIBLE,
-  PRIMARY KEY (`id_experiencia_usada`, `id_user_experiencia_usada`, `id_experiencia_experiencia_usada`),
+  INDEX `fk_experiencia_usada_experiencia1_idx` (`experiencia_usada_id_experiencia` ASC) VISIBLE,
+  INDEX `fk_experiencia_usada_user1_idx` (`experiencia_usada_id_user` ASC) VISIBLE,
+  PRIMARY KEY (`id_experiencia_usada`, `experiencia_usada_id_user`, `experiencia_usada_id_experiencia`),
   CONSTRAINT `fk_experiencia_usada_experiencia`
-    FOREIGN KEY (`id_experiencia_experiencia_usada`)
+    FOREIGN KEY (`experiencia_usada_id_experiencia`)
     REFERENCES `cpg`.`experiencia` (`id_experiencia`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_experiencia_usada_user`
-    FOREIGN KEY (`id_user_experiencia_usada`)
+    FOREIGN KEY (`experiencia_usada_id_user`)
     REFERENCES `cpg`.`user` (`id_user`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

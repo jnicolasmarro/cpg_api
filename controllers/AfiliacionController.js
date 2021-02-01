@@ -20,7 +20,7 @@ async function validacionAfiliacion(p_afiliacion) {
                 } else {
 
                     // Se valida si la afiliación ya se encuentra asignada a alguien
-                    if (afiliacion.codigo_asignado == 1) {
+                    if (afiliacion.afiliacion_asignada == 1) {
                         error.push('La afiliación ya se encuentra asignada!')
                     }
                 }
@@ -78,13 +78,13 @@ async function actualizarFecha_Vto(p_afiliacion) {
 }
 // Funcion que permite cambiar el estado de las experiencias usadas a renovadas//
 function actualizaHistorialUso(p_id_usuario) {
-    Experiencia_Usada.update({ renovado_experiencia_usada: 1 }, { where: { id_user_experiencia_usada: p_id_usuario } })
+    Experiencia_Usada.update({ renovado_experiencia_usada: 1 }, { where: { experiencia_usada_id_user: p_id_usuario } })
 }
 
 //Funcion que permite registrar un nuevo periodo de afiliacion
 async function actualizaPeriodo(p_id_usuario) {
 
-    let afiliacion = await Afiliacion.findOne({ where: { id_user_afiliacion: p_id_usuario } })
+    let afiliacion = await Afiliacion.findOne({ where: { afiliacion_id_user: p_id_usuario } })
 
     let periodo_actual = await Periodo_Afiliacion.findAndCountAll({ where: { afiliacion_codigo_afiliacion: afiliacion.codigo_afiliacion } })
 
@@ -110,7 +110,7 @@ module.exports = {
         } else {
 
             // Si no existen errores se marca la afiliación como asignada
-            Afiliacion.update({ codigo_asignado: 1 }, { where: { codigo_afiliacion: req.body.afiliacion } })
+            Afiliacion.update({ afiliacion_asignada: 1 }, { where: { codigo_afiliacion: req.body.afiliacion } })
             return res.json({ success: "Afiliación asignada!" })
         }
     },
@@ -136,7 +136,7 @@ module.exports = {
                     }
                 })
             // Se obtiene la afiliación del usuario
-            await Afiliacion.findOne({ where: { id_user_afiliacion: v_id_user } }).
+            await Afiliacion.findOne({ where: { afiliacion_id_user: v_id_user } }).
                 then(afiliacion => {
                     if (afiliacion) {
                         //Se guarda el código de afiliación del usuario

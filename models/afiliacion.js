@@ -5,10 +5,10 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             unique: true
         },
-        codigo_asignado:{
+        afiliacion_asignada:{
             type: type.BOOLEAN
         },
-        id_user_afiliacion: {
+        afiliacion_id_user: {
             type: type.INTEGER
         },
         fecha_activacion: {

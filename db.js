@@ -39,13 +39,13 @@ const Pago = PagoModel(sequelize, Sequelize)
 
 User.belongsTo(Rol,{foreignKey:'rol_id_rol'})
 User.belongsTo(Establecimiento, { foreignKey: 'id_establecimiento_user' })
-Experiencia_Usada.belongsTo(Experiencia,{foreignKey:'id_experiencia_experiencia_usada'})
+Experiencia_Usada.belongsTo(Experiencia,{foreignKey:'experiencia_usada_id_experiencia'})
 Experiencia.hasMany(Item, { foreignKey: 'experiencia_id_experiencia_item' })
 Experiencia.belongsTo(Establecimiento, { foreignKey: 'id_establecimiento_experiencia' })
 Establecimiento.hasMany(Experiencia, { foreignKey: 'id_establecimiento_experiencia' })
-Experiencia.hasMany(Experiencia_Usada, { foreignKey: 'id_experiencia_experiencia_usada' })
-Experiencia_Usada.belongsTo(User, { foreignKey: 'id_user_experiencia_usada' })
-User.hasMany(Experiencia_Usada,{foreignKey:'id_user_experiencia_usada'})
+Experiencia.hasMany(Experiencia_Usada, { foreignKey: 'experiencia_usada_id_experiencia' })
+Experiencia_Usada.belongsTo(User, { foreignKey: 'experiencia_usada_id_user' })
+User.hasMany(Experiencia_Usada,{foreignKey:'experiencia_usada_id_user'})
 Establecimiento.hasMany(Tarjeta, { foreignKey: 'id_establecimiento_tarjeta' })
 Tarjeta.belongsTo(Establecimiento, { foreignKey: 'id_establecimiento_tarjeta' })
 
@@ -55,7 +55,7 @@ Pago.belongsTo(FuentePago,{foreignKey:'fuente_pago_id_fuente_pago'})
 Pago.belongsTo(Establecimiento,{foreignKey:'id_establecimiento_pago'})
 Establecimiento.hasMany(Pago,{foreignKey:'id_establecimiento_pago'})
 
-Establecimiento.belongsTo(Ciudad, { foreignKey: 'ciudad_id_ciudad' });
+Establecimiento.belongsTo(Ciudad, { foreignKey: 'establecimiento_id_ciudad' });
 
 Tarjeta.hasOne(FuentePago, { foreignKey: 'id_tarjeta_fuente_pago' })
 FuentePago.belongsTo(Tarjeta,{ foreignKey: 'id_tarjeta_fuente_pago' })

@@ -17,7 +17,7 @@ async function validacionNuevoUsuarioFinal(usuario) {
             .then(afiliacion => {
                 if (!afiliacion) {
                     errores.push('El código ingresado no es válido')
-                } else if (afiliacion.id_user_afiliacion || afiliacion.codigo_asignado == 0) {
+                } else if (afiliacion.afiliacion_id_user || afiliacion.afiliacion_asignada == 0) {
                     errores.push('El código se encuentra asignado a un usuario');
                 }
             })
@@ -116,7 +116,7 @@ module.exports = async (req, res) => {
 
             // Se genera afiliación para almacenar en la base de datos
             let afiliacion = {
-                id_user_afiliacion: usuario.id_user,
+                afiliacion_id_user: usuario.id_user,
                 fecha_activacion: new Date(),
                 fecha_vencimiento: fecha_vencimiento
             }

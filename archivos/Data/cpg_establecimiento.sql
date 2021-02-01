@@ -35,7 +35,7 @@ CREATE TABLE `establecimiento` (
   `autorizacion_debito` tinyint NOT NULL,
   `logo_establecimiento` varchar(150) DEFAULT NULL,
   `estado_establecimiento` tinyint NOT NULL DEFAULT '1',
-  `ciudad_id_ciudad` int NOT NULL,
+  `establecimiento_id_ciudad` int NOT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_establecimiento`),
@@ -44,8 +44,8 @@ CREATE TABLE `establecimiento` (
   UNIQUE KEY `nit_UNIQUE` (`nit_establecimiento`),
   UNIQUE KEY `id_establecimiento_UNIQUE` (`id_establecimiento`),
   UNIQUE KEY `logo_establecimiento_UNIQUE` (`logo_establecimiento`),
-  KEY `fk_establecimiento_ciudad1_idx` (`ciudad_id_ciudad`),
-  CONSTRAINT `fk_establecimiento_ciudad1` FOREIGN KEY (`ciudad_id_ciudad`) REFERENCES `ciudad` (`id_ciudad`)
+  KEY `fk_establecimiento_ciudad1_idx` (`establecimiento_id_ciudad`),
+  CONSTRAINT `fk_establecimiento_ciudad1` FOREIGN KEY (`establecimiento_id_ciudad`) REFERENCES `ciudad` (`id_ciudad`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

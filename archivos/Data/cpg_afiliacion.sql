@@ -24,16 +24,16 @@ DROP TABLE IF EXISTS `afiliacion`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `afiliacion` (
   `codigo_afiliacion` varchar(8) NOT NULL,
-  `codigo_asignado` tinyint NOT NULL DEFAULT '0',
-  `id_user_afiliacion` int DEFAULT NULL,
+  `afiliacion_asignada` tinyint NOT NULL DEFAULT '0',
+  `afiliacion_id_user` int DEFAULT NULL,
   `fecha_activacion` datetime DEFAULT NULL,
   `fecha_vencimiento` datetime DEFAULT NULL,
   `fecha_expiracion` datetime DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`codigo_afiliacion`),
-  KEY `fk_afiliacion_user1_idx` (`id_user_afiliacion`),
-  CONSTRAINT `fk_afiliacion_user1` FOREIGN KEY (`id_user_afiliacion`) REFERENCES `user` (`id_user`)
+  KEY `fk_afiliacion_user1_idx` (`afiliacion_id_user`),
+  CONSTRAINT `fk_afiliacion_user1` FOREIGN KEY (`afiliacion_id_user`) REFERENCES `user` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -24,19 +24,19 @@ DROP TABLE IF EXISTS `experiencia_usada`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `experiencia_usada` (
   `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` int NOT NULL,
-  `id_experiencia_experiencia_usada` int NOT NULL,
+  `experiencia_usada_id_user` int NOT NULL,
+  `experiencia_usada_id_experiencia` int NOT NULL,
   `valor_comision` bigint NOT NULL,
   `fecha_uso_experiencia_usada` datetime NOT NULL,
   `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
   `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_experiencia_usada`,`id_user_experiencia_usada`,`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
-  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
-  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
+  PRIMARY KEY (`id_experiencia_usada`,`experiencia_usada_id_user`,`experiencia_usada_id_experiencia`),
+  KEY `fk_experiencia_usada_experiencia1_idx` (`experiencia_usada_id_experiencia`),
+  KEY `fk_experiencia_usada_user1_idx` (`experiencia_usada_id_user`),
+  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`experiencia_usada_id_experiencia`) REFERENCES `experiencia` (`id_experiencia`),
+  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`experiencia_usada_id_user`) REFERENCES `user` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

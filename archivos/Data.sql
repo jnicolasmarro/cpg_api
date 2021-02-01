@@ -26,16 +26,16 @@ DROP TABLE IF EXISTS `afiliacion`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `afiliacion` (
   `codigo_afiliacion` varchar(8) NOT NULL,
-  `codigo_asignado` tinyint NOT NULL DEFAULT '0',
-  `id_user_afiliacion` int DEFAULT NULL,
+  `afiliacion_asignada` tinyint NOT NULL DEFAULT '0',
+  `afiliacion_id_user` int DEFAULT NULL,
   `fecha_activacion` datetime DEFAULT NULL,
   `fecha_vencimiento` datetime DEFAULT NULL,
   `fecha_expiracion` datetime DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`codigo_afiliacion`),
-  KEY `fk_afiliacion_user1_idx` (`id_user_afiliacion`),
-  CONSTRAINT `fk_afiliacion_user1` FOREIGN KEY (`id_user_afiliacion`) REFERENCES `user` (`id_user`)
+  KEY `fk_afiliacion_user1_idx` (`afiliacion_id_user`),
+  CONSTRAINT `fk_afiliacion_user1` FOREIGN KEY (`afiliacion_id_user`) REFERENCES `user` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -94,7 +94,7 @@ CREATE TABLE `establecimiento` (
   `autorizacion_debito` tinyint NOT NULL,
   `logo_establecimiento` varchar(150) DEFAULT NULL,
   `estado_establecimiento` tinyint NOT NULL DEFAULT '1',
-  `ciudad_id_ciudad` int NOT NULL,
+  `establecimiento_id_ciudad` int NOT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_establecimiento`),
@@ -103,8 +103,8 @@ CREATE TABLE `establecimiento` (
   UNIQUE KEY `nit_UNIQUE` (`nit_establecimiento`),
   UNIQUE KEY `id_establecimiento_UNIQUE` (`id_establecimiento`),
   UNIQUE KEY `logo_establecimiento_UNIQUE` (`logo_establecimiento`),
-  KEY `fk_establecimiento_ciudad1_idx` (`ciudad_id_ciudad`),
-  CONSTRAINT `fk_establecimiento_ciudad1` FOREIGN KEY (`ciudad_id_ciudad`) REFERENCES `ciudad` (`id_ciudad`)
+  KEY `fk_establecimiento_ciudad1_idx` (`establecimiento_id_ciudad`),
+  CONSTRAINT `fk_establecimiento_ciudad1` FOREIGN KEY (`establecimiento_id_ciudad`) REFERENCES `ciudad` (`id_ciudad`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -190,19 +190,19 @@ DROP TABLE IF EXISTS `experiencia_usada`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `experiencia_usada` (
   `id_experiencia_usada` bigint NOT NULL AUTO_INCREMENT,
-  `id_user_experiencia_usada` int NOT NULL,
-  `id_experiencia_experiencia_usada` int NOT NULL,
+  `experiencia_usada_id_user` int NOT NULL,
+  `experiencia_usada_id_experiencia` int NOT NULL,
   `valor_comision` decimal(10,2) NOT NULL,
   `fecha_uso_experiencia_usada` datetime NOT NULL,
   `renovado_experiencia_usada` tinyint NOT NULL DEFAULT '0',
   `cobrada_experiencia_usada` tinyint NOT NULL DEFAULT '0',
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_experiencia_usada`,`id_user_experiencia_usada`,`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_experiencia1_idx` (`id_experiencia_experiencia_usada`),
-  KEY `fk_experiencia_usada_user1_idx` (`id_user_experiencia_usada`),
-  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`id_experiencia_experiencia_usada`) REFERENCES `experiencia` (`id_experiencia`),
-  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`id_user_experiencia_usada`) REFERENCES `user` (`id_user`)
+  PRIMARY KEY (`id_experiencia_usada`,`experiencia_usada_id_user`,`experiencia_usada_id_experiencia`),
+  KEY `fk_experiencia_usada_experiencia1_idx` (`experiencia_usada_id_experiencia`),
+  KEY `fk_experiencia_usada_user1_idx` (`experiencia_usada_id_user`),
+  CONSTRAINT `fk_experiencia_usada_experiencia` FOREIGN KEY (`experiencia_usada_id_experiencia`) REFERENCES `experiencia` (`id_experiencia`),
+  CONSTRAINT `fk_experiencia_usada_user` FOREIGN KEY (`experiencia_usada_id_user`) REFERENCES `user` (`id_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

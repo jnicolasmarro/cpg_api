@@ -26,9 +26,6 @@ module.exports= (sequelize, type) => {
         direccion_establecimiento: {
             type: type.STRING(100)
         },
-        cantidad_lote:{
-            type: type.INTEGER
-        },
         autorizacion_datos: {
             type: type.BOOLEAN
         },
@@ -42,7 +39,7 @@ module.exports= (sequelize, type) => {
         estado_establecimiento: {
             type: type.BOOLEAN
         },
-        ciudad_id_ciudad:{
+        establecimiento_id_ciudad:{
             type: type.INTEGER
         }
     }

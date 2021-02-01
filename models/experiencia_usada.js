@@ -5,11 +5,11 @@ module.exports= (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        id_user_experiencia_usada: {
+        experiencia_usada_id_user: {
             type: type.INTEGER,
             primaryKey: true
         },
-        id_experiencia_experiencia_usada: {
+        experiencia_usada_id_experiencia: {
             type: type.INTEGER,
             primaryKey: true
         },
@@ -22,8 +22,8 @@ module.exports= (sequelize, type) => {
         renovado_experiencia_usada: {
             type: type.BOOLEAN
         },
-        cobrada_experiencia_usada: {
-            type: type.BOOLEAN
+        experiencia_usada_id_pago: {
+            type: type.BIGINT(10)
         }
     }
         , {
