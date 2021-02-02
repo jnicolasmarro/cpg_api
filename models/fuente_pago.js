@@ -10,11 +10,14 @@ module.exports= (sequelize, type) => {
         customer_email: {
             type: type.STRING(500)
         },
-        type: {
-            type: type.STRING(45)
-        },
         id_tarjeta_fuente_pago: {
             type: type.STRING(200)
+        },
+        fuente_pago_id_tipo_fuente_pago: {
+            type: type.INTEGER
+        },
+        cuotas_pago: {
+            type: type.INTEGER
         }
         
     }

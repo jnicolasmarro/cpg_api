@@ -61,7 +61,7 @@ app.use('/api/noticia',authMiddleware, NoticiaRouter)
 
 app.use('/api/pago',authMiddleware, PagoRouter)
 
-cron.schedule('4 * * * *', async () => {
+cron.schedule('52 * * * *', async () => {
     console.log('Ejecutando cobro a los establecimientos');
     await realizarPagoJob();
   });

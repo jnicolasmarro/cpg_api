@@ -22,7 +22,7 @@ module.exports= (sequelize, type) => {
         renovado_experiencia_usada: {
             type: type.BOOLEAN
         },
-        experiencia_usada_id_pago: {
+        experiencia_usada_id_factura: {
             type: type.BIGINT(10)
         }
     }

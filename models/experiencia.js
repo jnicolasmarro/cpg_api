@@ -31,7 +31,7 @@ module.exports= (sequelize, type) => {
             type: type.INTEGER
         },
         id_establecimiento_experiencia: {
-            type: type.BIGINT(20)
+            type: type.INTEGER
         }
     }
         , {

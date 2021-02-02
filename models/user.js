@@ -29,6 +29,12 @@ module.exports= (sequelize, type) => {
         },
         id_establecimiento_user: {
             type: type.INTEGER
+        },
+        user_direccion: {
+            type: type.STRING(400)
+        },
+        user_id_ciudad: {
+            type: type.INTEGER
         }
     }
         , {

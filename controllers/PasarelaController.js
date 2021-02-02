@@ -1,9 +1,10 @@
 
 const fetch = require('node-fetch');
 const { Tarjeta,Establecimiento,User, FuentePago} = require('../db');
+const {obtenerIDTipoFuentePago} = require('./FuentePagoController')
 const validator = require('validator');
 
-async function validarDatosTarjeta(id_establecimiento,tarjeta){
+async function validarDatosTarjeta(id_establecimiento,tarjeta,cuotas){
     let error = [];
 
     await Tarjeta.findOne({
@@ -64,6 +65,13 @@ async function validarDatosTarjeta(id_establecimiento,tarjeta){
 
     if (validator.isEmpty(tarjeta.card_holder, { ignore_whitespace: true })) {
         error.push('No ha ingresado el nombre registrado en la tarjeta')
+    }
+    if (validator.isEmpty(cuotas, { ignore_whitespace: true })) {
+        error.push('No ha ingresado el número de cuotas')
+    }else if(!validator.isInt(cuotas)){
+        error.push('El número de cuotas ingresado no es válido')
+    }else if(cuotas<1){
+        error.push('El número de cuotas debe ser mayor a 0')
     }
 
     if (error.length == 0)
@@ -287,31 +295,20 @@ async function procesarTransaccion(transaccion){
     return {realizada,error,id_transaction}
 }
 
+async function RegistrarTarjeta(id_establecimiento,tarjeta,cuotas){
 
-module.exports={
-async RegistrarTarjeta(req, res) {
-
-    let id_establecimiento = req.body.id_establecimiento;
-
-    let tarjeta = {
-        number: req.body.number,
-        cvc: req.body.cvc,
-        exp_month: req.body.exp_month,
-        exp_year: req.body.exp_year,
-        card_holder: req.body.card_holder
-    };
-
-    let validacion = await validarDatosTarjeta(id_establecimiento,tarjeta);
+    
+    let validacion = await validarDatosTarjeta(id_establecimiento,tarjeta,cuotas);
 
     if(validacion){
         let errores = validacion
-        return res.json({errores})
+        return {errores}
     }else{
         let tokenizacion = await tokenizarTarjeta(tarjeta)
 
         if(tokenizacion.error){
             let errores = tokenizacion.error
-            return res.json({errores})
+            return {errores}
         }else{
 
             let tarjetaGuardada = await almacenarTokenTarjeta(tokenizacion.tokenTarjeta,id_establecimiento,tarjeta)
@@ -321,7 +318,7 @@ async RegistrarTarjeta(req, res) {
                 let aceptacion = await generarTokenAceptacion (id_establecimiento);
                 if(aceptacion.error){
                     let errores=aceptacion.error
-                    return res.json({errores})
+                    return {errores}
                 }else{
                     let email;
 
@@ -347,24 +344,25 @@ async RegistrarTarjeta(req, res) {
                     if(registroFuentePago.error){
 
                         let errores=registroFuentePago.error
-                        return res.json({errores})
+                        return {errores}
                     }else{
 
                         let newFuentePago = {
                             id_fuente_pago:registroFuentePago.registroFuentePago.id,
                             acceptance_token:aceptacion.acceptance_token,
                             customer_email:email,
-                            type:'CARD',
+                            fuente_pago_id_tipo_fuente_pago:await obtenerIDTipoFuentePago('CARD'),
                             id_tarjeta_fuente_pago:tokenizacion.tokenTarjeta.id,
+                            cuotas_pago:cuotas
                         }
                         
                         let almacenadoFuentePago = await almacenarFuentePago(newFuentePago);
                         
                         if(almacenadoFuentePago){
                             let errores = almacenadoFuentePago
-                            return res.json({errores})
+                            return {errores}
                         }else{
-                            return res.json({success:'La tarjeta y fuente de pago fueron registrados exitósamente'})
+                            return {success:'La tarjeta y fuente de pago fueron registrados exitósamente'}
                         }
 
 
@@ -376,10 +374,36 @@ async RegistrarTarjeta(req, res) {
 
                 
             }else{
-                return res.json({errores:'La tarjeta pasó la pasarela pero no pudo ser almacenada'})
+                return {errores:'La tarjeta pasó la pasarela pero no pudo ser almacenada'}
             }
         }
     }
+
+}
+
+module.exports={
+async RegistrarTarjeta(req, res) {
+
+    let id_establecimiento = req.body.id_establecimiento;
+
+    let tarjeta = {
+        number: req.body.number,
+        cvc: req.body.cvc,
+        exp_month: req.body.exp_month,
+        exp_year: req.body.exp_year,
+        card_holder: req.body.card_holder
+    };
+
+    let cuotas = req.body.cuotas;
+    
+    try {
+       let resultado = await RegistrarTarjeta(id_establecimiento,tarjeta,cuotas)
+       return res.json(resultado)
+    } catch (error) {
+        return res.json({errores:error.toString()})
+    }
+    
+
 },
 async generarTransaccion(transaccion){
     return await procesarTransaccion(transaccion)

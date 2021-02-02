@@ -176,6 +176,96 @@ async function validaImagenExperiencia(id_experiencia) {
     return error
 }
 
+async function procesaQR(QR,id_user){
+    if (QR.length != 2) {
+        return { error: 'Se ha leído un QR no válido' }
+    } else {
+        let id_usuario = QR[0];
+        let id_experiencia = QR[1];
+
+        id_usuario = CryptoJS.AES.decrypt(id_usuario, process.env.KEY_AES);
+        id_usuario = id_usuario.toString(CryptoJS.enc.Utf8);
+
+        id_experiencia = CryptoJS.AES.decrypt(id_experiencia, process.env.KEY_AES);
+        id_experiencia = id_experiencia.toString(CryptoJS.enc.Utf8);
+
+        let result = await User.findOne({ where: { id_user: id_usuario } })
+            .then(async (user) => {
+                if (!user) {
+                    return { error: 'Error de información en el QR' }
+                } else {
+                    if (!user.estado_user) {
+                        return { error: 'Usuario no se encuentra activo' }
+                    } else {
+                        let fecha_vto_afiliacion = await Afiliacion
+                            .findOne({ where: { afiliacion_id_user: user.id_user } })
+                            .then((afiliacion) => {
+                                return afiliacion.fecha_vencimiento
+                            })
+                        let fecha_actual = new Date();
+                        if (fecha_actual > fecha_vto_afiliacion) {
+                            return { error: 'La afiliación del usuario ha expirado' }
+                        }
+                    }
+                    return await Experiencia.findOne({ where: { id_experiencia: id_experiencia } })
+                        .then(async (experiencia) => {
+                            if (!experiencia) {
+                                return { error: 'Error de información en el QR' }
+                            } else {
+                                let nit = await obtenerIDEstablecimientoXIDAdmin(id_user);
+                                
+                                if (nit != experiencia.id_establecimiento_experiencia) {
+                                    return { error: 'La experiencia no corresponde a este establecimiento' }
+                                }
+                                if (!experiencia.estado_experiencia) {
+                                    return { error: 'La experiencia no está activa' }
+                                } else {
+                                    return await Experiencia_Usada
+                                        .findOne({
+                                            where: {
+                                                experiencia_usada_id_experiencia: id_experiencia,
+                                                experiencia_usada_id_user: id_usuario,
+                                                renovado_experiencia_usada: false
+                                            }
+                                        })
+                                        .then((usada) => {
+                                            if (usada) {
+                                                return { error: 'La experiencia ya se ha sido usada por este usuario' }
+                                            }
+                                        })
+                                }
+                            }
+                        })
+                }
+            })
+
+        if (result != undefined) {
+            if (result.error) {
+                return result
+            }
+        }
+
+        let registro_uso = {
+            experiencia_usada_id_user: id_usuario,
+            experiencia_usada_id_experiencia: id_experiencia,
+            fecha_uso_experiencia_usada: new Date(),
+            valor_comision: await calcularValorComision(id_experiencia)
+        }
+
+        return await Experiencia_Usada.create(registro_uso)
+            .then(() => {
+                return { success: 'Experiencia procesada y registrada' }
+            })
+
+
+
+
+
+    }
+}
+
+
+
 module.exports = {
     async crearExperiencia(req, res) {
         let files = req.files;
@@ -409,93 +499,13 @@ module.exports = {
     },
     async procesaQR(req, res) {
         const QR = req.body.data.split(' ');
-
-        if (QR.length != 2) {
-            return res.json({ error: 'Se ha leído un QR no válido' })
-        } else {
-            let id_usuario = QR[0];
-            let id_experiencia = QR[1];
-
-            id_usuario = CryptoJS.AES.decrypt(id_usuario, process.env.KEY_AES);
-            id_usuario = id_usuario.toString(CryptoJS.enc.Utf8);
-
-            id_experiencia = CryptoJS.AES.decrypt(id_experiencia, process.env.KEY_AES);
-            id_experiencia = id_experiencia.toString(CryptoJS.enc.Utf8);
-
-            let result = await User.findOne({ where: { id_user: id_usuario } })
-                .then(async (user) => {
-                    if (!user) {
-                        return { error: 'Error de información en el QR' }
-                    } else {
-                        if (!user.estado_user) {
-                            return { error: 'Usuario no se encuentra activo' }
-                        } else {
-                            let fecha_vto_afiliacion = await Afiliacion
-                                .findOne({ where: { afiliacion_id_user: user.id_user } })
-                                .then((afiliacion) => {
-                                    return afiliacion.fecha_vencimiento
-                                })
-                            let fecha_actual = new Date();
-                            if (fecha_actual > fecha_vto_afiliacion) {
-                                return { error: 'La afiliación del usuario ha expirado' }
-                            }
-                        }
-                        return await Experiencia.findOne({ where: { id_experiencia: id_experiencia } })
-                            .then(async (experiencia) => {
-                                if (!experiencia) {
-                                    return { error: 'Error de información en el QR' }
-                                } else {
-                                    let nit = await obtenerIDEstablecimientoXIDAdmin(req.headers.id_user);
-                                    
-                                    if (nit != experiencia.id_establecimiento_experiencia) {
-                                        return { error: 'La experiencia no corresponde a este establecimiento' }
-                                    }
-                                    if (!experiencia.estado_experiencia) {
-                                        return { error: 'La experiencia no está activa' }
-                                    } else {
-                                        return await Experiencia_Usada
-                                            .findOne({
-                                                where: {
-                                                    experiencia_usada_id_experiencia: id_experiencia,
-                                                    experiencia_usada_id_user: id_usuario,
-                                                    renovado_experiencia_usada: false
-                                                }
-                                            })
-                                            .then((usada) => {
-                                                if (usada) {
-                                                    return { error: 'La experiencia ya se ha sido usada por este usuario' }
-                                                }
-                                            })
-                                    }
-                                }
-                            })
-                    }
-                })
-
-            if (result != undefined) {
-                if (result.error) {
-                    return res.json(result)
-                }
-            }
-
-            let registro_uso = {
-                experiencia_usada_id_user: id_usuario,
-                experiencia_usada_id_experiencia: id_experiencia,
-                fecha_uso_experiencia_usada: new Date(),
-                valor_comision: await calcularValorComision(id_experiencia)
-            }
-
-            console.log(registro_uso.valor_comision)
-
-            return await Experiencia_Usada.create(registro_uso)
-                .then((registro) => {
-                    return res.json({ success: 'Experiencia procesada y registrada' })
-                })
-
-
-
-
-
+        const id_user = req.headers.id_user;
+        
+        try {
+            let resultado = await procesaQR(QR,id_user)
+            return res.json(resultado)
+        } catch (error) {
+            return res.json({error:error.toString()})
         }
     },
     async obtenerInfoExperiencia(req, res) {

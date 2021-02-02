@@ -1,8 +1,35 @@
-const { Establecimiento, User, Ciudad, Historico_Establecimiento } = require('../db');
+const { Establecimiento, User, Ciudad, Experiencia_Usada, Experiencia, Factura,EstadoFactura } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
+
+async function obtenerIDEstablecimientoXFactura(id_factura){
+
+  return await Establecimiento.findOne({
+    attributes:['id_establecimiento'],
+    include:{
+      model:Experiencia,
+      attributes:[],
+      include:{
+        model:Experiencia_Usada,
+        attributes:[],
+        include:{
+          model:Factura,
+          where:{
+            id_factura
+          },
+          attributes:[]
+        }
+      }
+    }
+
+  })
+  .then(establecimiento=>{
+    return establecimiento.id_establecimiento
+  })
+    
+}
 
 // Permite validar los datos del establecimiento antes de agregarlo//
 async function validacionDatosEstablecimiento(establecimiento,files) {
@@ -122,6 +149,7 @@ function validacionHD(hd) {
 }
 // Permite añadir al establecimiento luego de las validaciones//
 async function añadirEstablecimiento(establecimiento, hd, admin,files) {
+
  await Establecimiento.create(Object.assign(establecimiento, hd)).
     then((newEstablecimiento) => {
 
@@ -136,10 +164,7 @@ async function añadirEstablecimiento(establecimiento, hd, admin,files) {
 
 
       añadirAdminEstablecimiento(admin, newEstablecimiento.id_establecimiento);
-      let historico_cero = {
-        id_establecimiento_historico: newEstablecimiento.id_establecimiento
-      }
-      Historico_Establecimiento.create(historico_cero);
+      
     })
 }
 // Permite añadir al administrador del establecimiento luego de las validaciones//
@@ -223,6 +248,7 @@ module.exports = {
     }
 
   },
+  
   async añadirLogo(req, res) {
     if (req.file == undefined) {
       res.json({ error: 'Error al subir imagen!' })
@@ -387,7 +413,6 @@ module.exports = {
   },
   async obtenerIDEstablecimientoXIDAdmin (id_usuario_admin){
     let id;
-    
     await User.findOne({ where: { id_user: id_usuario_admin } }).
       then(usuario => {
         if (usuario) {
@@ -397,5 +422,8 @@ module.exports = {
       })
       
     return id;
+  },
+  async obtenerIDEstablecimientoXFactura(id_factura){
+      return obtenerIDEstablecimientoXFactura(id_factura)
   }
 }

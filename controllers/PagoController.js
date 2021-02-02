@@ -1,6 +1,7 @@
-const {Experiencia_Usada,Establecimiento,Experiencia,FuentePago,Tarjeta,Sequelize,Pago,sequelize} = require('../db');
+const {Experiencia_Usada,Establecimiento,Experiencia,FuentePago,Tarjeta,Sequelize,Pago,Factura,sequelize, FacturaEstadoFactura,EstadoFactura, TipoFuentePago, PagoEstadoPago, EstadoPago} = require('../db');
 const {generarTransaccion,consultarTransaccion} = require('./PasarelaController')
-
+const {obtenerIDEstablecimientoXFactura} = require('./EstablecimientoController')
+const {obtenerFuentePagoXEstablecimieto} = require('./FuentePagoController')
 
 async function generarTotales(){
 
@@ -18,7 +19,9 @@ async function generarTotales(){
             include:{
                 model:Experiencia_Usada,
                 where:{
-                    cobrada_experiencia_usada:false
+                    experiencia_usada_id_factura:{
+                        [Sequelize.Op.eq]:null
+                    }
                 },attributes: [
                   ]
             }
@@ -59,90 +62,116 @@ async function marcarExperienciasCobrada(id_establecimiento){
 
 }
 
-async function generarPagoPorEstablecimiento(establecimiento){
+async function asociarExperienciasUsadasConIDFactura(id_establecimiento,id_factura){
 
-    let total_comision = parseFloat(establecimiento.total_comision).toFixed(2)
-    let id_fuentePago;
-        let email;
-        await FuentePago.findOne({
+    await Establecimiento.findAll({
+
+        raw:false,    
+        attributes: [
+          ],
+        include:{
+            model:Experiencia,
+            attributes: ['id_experiencia'
+              ],
             include:{
-                model:Tarjeta,
+                model:Experiencia_Usada,
                 where:{
-                    id_establecimiento_tarjeta:establecimiento.id_establecimiento,
-                    estado_tarjeta:true
-                }
+                    experiencia_usada_id_factura:{
+                        [Sequelize.Op.eq]:null
+                    }
+                },attributes: ['id_experiencia_usada' 
+                  ]
             }
-        })
-        .then(fuentePago=>{
-            id_fuentePago=fuentePago.id_fuente_pago
-            email=fuentePago.customer_email
-        })
-
-        
-        let pago ={
-            total_monto:total_comision,
-            id_establecimiento_pago:establecimiento.id_establecimiento,
-            fuente_pago_id_fuente_pago:id_fuentePago
+        },
+        where:{
+            id_establecimiento:id_establecimiento
         }
+    })
+    .then(establecimientos=>{
+        establecimientos.forEach(establecimiento => {
+            establecimiento.experiencia.forEach(experiencia => {
+                experiencia.experiencia_usadas.forEach(async experiencia_usada => {
+                    
+                    await Experiencia_Usada.update({
+                        experiencia_usada_id_factura:id_factura
+                    },{
+                        where:{
+                            id_experiencia_usada:experiencia_usada.id_experiencia_usada
+                        }
+                    })
+                });
+            });
+        });
+    })
 
-        
-        await Pago.create(pago)
-        .then(async pago=>{
-
-            let transaccion={
-                amount_in_cents:total_comision*100,
-                currency:'COP',
-                customer_email:email,
-                payment_method:{
-                    installments:1
-                },
-                reference:pago.id_pago.toString(),
-                payment_source_id:id_fuentePago
-            }
-
-            let procesoTransaccion = await generarTransaccion(transaccion);
-            let observacion_pago;
-            let id_transaction;
-            if(!procesoTransaccion.realizada){
-                observacion_pago=procesoTransaccion.error
-            }else{
-                id_transaction=procesoTransaccion.id_transaction
-                observacion_pago='ENVIADO A LA PASARELA DE PAGOS'
-            }
-
-            let updatePago={
-                pago_enviado:procesoTransaccion.realizada,
-                id_transaction:id_transaction,
-                observacion_pago:observacion_pago
-            }
-            
-            await Pago.update(updatePago,{
-                where:{
-                    id_pago:pago.id_pago
-                }
-            })
-
-
-
-        })
 }
 
-async function generarPagos(totales){
+async function nuevoEstadoFactura(id_estado,id_factura){
+
+    await FacturaEstadoFactura.update({
+        factura_estado_factura_actual:false
+    },{
+        where:{
+            factura_id_factura:id_factura
+        }
+    })
+
+    let nuevoEstado = {
+        factura_id_factura:id_factura,
+        estado_factura_id_estado_factura:id_estado,
+        factura_estado_factura_actual:true
+    }
+
+    await FacturaEstadoFactura.create(nuevoEstado)
+}
+
+async function generarFacturaPorEstablecimiento(establecimiento){
+    let total_comision = parseFloat(establecimiento.total_comision).toFixed(2)
+
+    let factura = {
+        total_monto:total_comision
+    }
+
+    let id_factura;
+    await Factura.create(factura)
+    .then(factura=>{
+        id_factura=factura.id_factura
+    })
+
+    await asociarExperienciasUsadasConIDFactura(establecimiento.id_establecimiento,id_factura)
+    await nuevoEstadoFactura(4,id_factura)
+      
+}
+
+
+async function nuevoEstadoPago(id_estado,id_pago){
+
+    await PagoEstadoPago.update({
+        pago_estado_pago_actual:false
+    },{
+        where:{
+            pago_id_pago:id_pago
+        }
+    })
+
+    let nuevoEstado = {
+        pago_id_pago:id_pago,
+        estado_pago_id_estado_pago:id_estado,
+        pago_estado_pago_actual:true
+    }
+
+    await PagoEstadoPago.create(nuevoEstado)
+
+}
+
+async function generarFacturas(totales){
 
     await totales.forEach(async establecimiento => {
         
         try {
-            await generarPagoPorEstablecimiento(establecimiento);
+            await generarFacturaPorEstablecimiento(establecimiento);
         } catch (error) {
-            let total_comision = parseFloat(establecimiento.total_comision).toFixed(2)
-            let pago ={
-                total_monto:total_comision,
-                id_establecimiento_pago:establecimiento.id_establecimiento,
-                pago_enviado:false,
-                observacion_pago:error.toString()
-
-            }
-            await Pago.create(pago)
+            console.log(error.toString())
         }
         
     });
@@ -211,16 +240,148 @@ async function validarPagos(){
     })
 }
 
+async function validaSiGeneraPagoNuevo(id_factura){
+
+    return await Factura.findOne({
+        where:{
+            id_factura
+        },
+        include:[{
+            model:FacturaEstadoFactura,
+            where:{
+                factura_estado_factura_actual:true
+            },
+            include:{
+                model:EstadoFactura,
+                where:{
+                    id_estado_factura:{
+                        [Sequelize.Op.in]:[1,3]
+                    }
+                }
+            }
+        },{
+            model:Pago,
+            where:{
+                actual:true
+            },
+            include:{
+                model:PagoEstadoPago,
+                where:{
+                    pago_estado_pago_actual:true
+                },
+                include:{
+                    model:EstadoPago,
+                    where:{
+                        id_estado_pago:{
+                            [Sequelize.Op.in]:[1,2]
+                        }
+                    }
+                }
+            }
+        }]
+    })
+    .then(pago=>{
+        console.log(pago);
+        if(pago)
+        return false;
+        else
+        return true;
+    })
+
+}
+
+async function generarPagoXEstablecimiento(pago_id_factura,id_tipo_fuente_pago){
+
+    let generaNuevoPago = await validaSiGeneraPagoNuevo(pago_id_factura);
+
+    if(generaNuevoPago){
+        let id_establecimiento = await obtenerIDEstablecimientoXFactura(pago_id_factura);
+        let pago_fuente_pago;
+        let actual = true;
+
+        try {
+            pago_fuente_pago = await obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuente_pago)
+        } catch (error) {
+            pago_fuente_pago=null
+        }
+
+        let pago = {
+            pago_fuente_pago,
+            pago_id_factura,
+            actual:true
+        }
+
+        await Pago.update({
+            actual:false
+        },{
+            where:{
+                pago_id_factura
+            }
+        })
+
+        await Pago.create(pago)
+        .then(async pago=>{
+            await nuevoEstadoPago(1,pago.id_pago)
+        })
+
+        await nuevoEstadoFactura(2,pago_id_factura)
+
+    }
+
+    
+    
+
+
+    
+    
+
+    
+    
+    
+
+}
+
+async function generarPagos(){
+
+    await Factura.findAll({
+        include:{
+            model:FacturaEstadoFactura,
+            where:{
+                factura_estado_factura_actual:true
+            },
+            include:{
+                model:EstadoFactura,
+                where:{
+                    id_estado_factura:4
+                }
+            }
+        }
+    })
+    .then(facturas=>{
+        console.log(facturas)
+        facturas.forEach(async factura => {
+            console.log(factura)
+            await generarPagoXEstablecimiento(factura.id_factura,1);
+        });
+    })
+    
+
+}
+
 
 module.exports={
     async realizarPagoManual(req,res){
+      /*  let totales = await generarTotales();
+        await generarFacturas(totales);
+        return res.json({success:'Se han realizado los cobros a los establecimientos'})*/
+
         let totales = await generarTotales();
-        await generarPagos(totales);
-        return res.json({success:'Se han realizado los cobros a los establecimientos'})
+        await generarFacturas(totales);
+        await generarPagos();
     },
     async realizarPagoJob(){
-        let totales = await generarTotales();
-        await generarPagos(totales);
+        
+
     },
     async validarPagoJob(){
 
