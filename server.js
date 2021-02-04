@@ -18,6 +18,7 @@ const ContactoRouter = require('./routes/datosContacto')
 const NoticiaRouter = require('./routes/noticias')
 const PagoRouter = require('./routes/pagos')
 const VersionRouter = require('./routes/versiones')
+const EventoRouter = require('./routes/eventos')
 
 //Middleware de autenticación//
 const authMiddleware = require('./middleware/auth')
@@ -61,7 +62,9 @@ app.use('/api/noticia',authMiddleware, NoticiaRouter)
 
 app.use('/api/pago',authMiddleware, PagoRouter)
 
-cron.schedule('52 * * * *', async () => {
+app.use('/api/eventos',EventoRouter)
+
+cron.schedule('49 * * * *', async () => {
     console.log('Ejecutando cobro a los establecimientos');
     await realizarPagoJob();
   });

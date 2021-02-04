@@ -65,10 +65,21 @@ async function obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuent
     
 
 }
+async function obtenerCuotas(id_fuente_pago){
+    let fuente_pago=await FuentePago.findOne({
+        attributes:['cuotas_pago'],
+        where:{
+            id_fuente_pago
+        }
+    })
+
+    return fuente_pago.cuotas_pago
+}
 
 module.exports={
     async obtenerIDTipoFuentePago(tipo_fuente_pago){
         return await obtenerIDTipoFuentePago(tipo_fuente_pago)
     },
     obtenerFuentePagoXEstablecimieto,
+    obtenerCuotas
 }

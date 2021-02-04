@@ -448,7 +448,7 @@ CREATE TABLE IF NOT EXISTS `cpg`.`factura_estado_factura` (
     REFERENCES `cpg`.`factura` (`id_factura`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_estado_factura_pago_estado_factura`
+  CONSTRAINT `fk_estado_factura_factura_estado_factura`
     FOREIGN KEY (`estado_factura_id_estado_factura`)
     REFERENCES `cpg`.`estado_factura` (`id_estado_factura`)
     ON DELETE NO ACTION
@@ -499,7 +499,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `cpg`;
-INSERT INTO `cpg`.`user` (`id_user`, `nombre_usuario`, `numero_identificacion`, `email`, `numero_celular`, `password`, `estado_user`, `rol_id_rol`, `id_establecimiento_user`, `user_direccion`, `user_id_ciudad`, `createdAt`, `updatedAt`) VALUES (1, 'Super Usuario', NULL, 'superusuario@gmail.com', NULL, '$10$SFn8J7UQu2jdXbE5/JNtkexY4BzpP6KI8UzXqwV91nRpT1Y78tYiS', 1, 1, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `cpg`.`user` (`id_user`, `nombre_usuario`, `numero_identificacion`, `email`, `numero_celular`, `password`, `estado_user`, `rol_id_rol`, `id_establecimiento_user`, `user_direccion`, `user_id_ciudad`, `createdAt`, `updatedAt`) VALUES (1, 'Super Usuario', NULL, 'superusuario@gmail.com', NULL, '$2a$10$SHk5r6DQs8v.3wkpPFqnyuo2vXHz1BnUTfrw3USMBj303Zf/E/w9C', 1, 1, NULL, NULL, NULL, NULL, NULL);
 
 COMMIT;
 
@@ -543,10 +543,12 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `cpg`;
-INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (1, 'APPROVED');
-INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (2, 'VOIDED');
-INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (3, 'DECLINED');
-INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (4, 'ERROR');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (1, 'GENERADO');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (2, 'PENDING');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (3, 'APPROVED');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (4, 'VOIDED');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (5, 'DECLINED');
+INSERT INTO `cpg`.`estado_pago` (`id_estado_pago`, `nombre_estado_pago`) VALUES (6, 'ERROR');
 
 COMMIT;
 
@@ -559,6 +561,7 @@ USE `cpg`;
 INSERT INTO `cpg`.`estado_factura` (`id_estado_factura`, `nombre_estado_factura`) VALUES (1, 'PAGADA');
 INSERT INTO `cpg`.`estado_factura` (`id_estado_factura`, `nombre_estado_factura`) VALUES (2, 'SIN PAGAR');
 INSERT INTO `cpg`.`estado_factura` (`id_estado_factura`, `nombre_estado_factura`) VALUES (3, 'ANULADA');
+INSERT INTO `cpg`.`estado_factura` (`id_estado_factura`, `nombre_estado_factura`) VALUES (4, 'CREADA');
 
 COMMIT;
 

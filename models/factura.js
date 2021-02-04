@@ -8,7 +8,6 @@ module.exports= (sequelize, type) => {
         total_monto: {
             type: type.DECIMAL(10,2)
         }
-        
     }
         , {
             tableName: 'factura',

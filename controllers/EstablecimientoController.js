@@ -196,6 +196,7 @@ async function validaNit(nitEstablecimiento) {
   return error
 }
 
+
 module.exports = {
   async creaEstablecimiento(req, res) {
 
@@ -281,135 +282,6 @@ module.exports = {
     } else {
       await registroTarjeta(req, res)
     }
-  },
-  async realizarPago(req, res) {
-    let nit_establecimiento = req.body.nit;
-    let errores = await validaNit(req.body.nit);
-
-    if (errores) {
-      res.json({ errores })
-    } else {
-
-
-
-      var payment_info = {
-        token_card: "token_id",
-        customer_id: "customer_id",
-        doc_type: "NIT",
-        doc_number: "1035851980",
-        name: "John",
-        last_name: "Doe",
-        email: "example@email.com",
-        bill: "OR-1234",
-        description: "Test Payment",
-        value: "116000",
-        tax: "16000",
-        tax_base: "100000",
-        currency: "COP",
-        dues: "12"
-      }
-      epayco.charge.create(payment_info)
-        .then(function (charge) {
-          console.log(charge);
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      await epayco.customers.get("ewmfsybmXuoq7ySCo")
-        .then(function (customer) {
-          /*console.log(customer)*/
-        })
-        .catch(function (err) {
-          console.log("err: " + err);
-        });
-    }
-    console.log(epayco.customers)
-    /*  epayco.customers.delete("ewmfsybmXuoq7ySCo")
-       .then(function(customer) {
-               console.log(customer);
-       })
-       .catch(function(err) {
-               console.log('err: ' + err);
-       })
-      /* let token_card_p;
-   
-       await epayco.customers.get("ewmfsybmXuoq7ySCo")
-         .then(function (customer) {
-           token_card_p = customer.data.cards[0].token;
-         })
-         .catch(function (err) {
-           console.log("err: " + err);
-         });
-   
-       console.log(token_card_p)
-       let payment_info = {
-         token_card: "GX2XusxefAX3juXZr",
-         customer_id: "EaA7Z5ZatzzuQ39dm",
-         doc_type: "CC",
-         doc_number: "1035851980",
-         name: "John",
-         last_name: "Doe",
-         email: "example@email.com",
-         bill: "OR-1234",
-         description: "Test Payment",
-         value: "456",
-         tax: "16000",
-         tax_base: "100000",
-         currency: "COP",
-         dues: "12",
-         ip: "190.000.000.000", /*This is the client's IP, it is required */
-    /* url_response: "https://ejemplo.com/respuesta.html",
-     url_confirmation: "https://ejemplo.com/confirmacion",
-     method_confirmation: "GET"
-   }
-   await epayco.charge.create(payment_info)
-     .then(function (charge) {
-       console.log(charge.data);
-     })
-     .catch(function (err) {
-
-       console.log(err.data.errors)
-     });*/
-
-  },
-  async pruebamercadopago(req, res) {
-
-    var customer_data = { "email": "test@test.com" }
-
-    mercadopago.customers.create(customer_data).then(function (customer) {
-
-      var card_data = {
-        "token": "9b2d63e00d66a8c721607214cedaecda",
-        "customer": customer.id
-      }
-
-      mercadopago.cards.create(card_data).then(function (card) {
-        console.log(card);
-      });
-
-    });
-
-
-
   },
   async obtenerIDEstablecimientoXIDAdmin (id_usuario_admin){
     let id;

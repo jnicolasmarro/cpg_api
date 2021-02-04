@@ -4,6 +4,7 @@ const { Tarjeta,Establecimiento,User, FuentePago} = require('../db');
 const {obtenerIDTipoFuentePago} = require('./FuentePagoController')
 const validator = require('validator');
 
+
 async function validarDatosTarjeta(id_establecimiento,tarjeta,cuotas){
     let error = [];
 
@@ -266,9 +267,9 @@ async function almacenarFuentePago(fuentePago){
 
 async function procesarTransaccion(transaccion){
 
-    let realizada;
+    let enviada;
     let error;
-    let id_transaction
+    let id_transaction;
 
     await fetch(`${process.env.URL_WOMPI}/transactions`, {
         method: 'post',
@@ -280,19 +281,17 @@ async function procesarTransaccion(transaccion){
     })
     .then(res=>res.json())
     .then(res=>{
-        console.log(res)
         if(res.data){
-            realizada=true;
+            enviada=true;
             id_transaction=res.data.id
         }
-
         if(res.error){
             error=res.error.type
-            realizada=false;
+            enviada=false;
         }
     })
 
-    return {realizada,error,id_transaction}
+    return {enviada,error,id_transaction}
 }
 
 async function RegistrarTarjeta(id_establecimiento,tarjeta,cuotas){
@@ -381,6 +380,7 @@ async function RegistrarTarjeta(id_establecimiento,tarjeta,cuotas){
 
 }
 
+
 module.exports={
 async RegistrarTarjeta(req, res) {
 
@@ -425,6 +425,7 @@ async consultarTransaccion(id_referencia){
     })
 
     return {status,statusMessage}
-}
+},
+
 
 }

@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 require('dotenv').config();
 const URL = process.env.URL_DB
-const sequelize = new Sequelize(URL,{timezone:'-05:00'});
+const sequelize = new Sequelize(URL,{timezone:'-05:00',logging:true});
 
 // Modelos de la base de datos
 const AfiliacionModel = require('./models/afiliacion')
@@ -27,7 +27,6 @@ const TarjetaModel = require('./models/tarjeta')
 const TipoFuentePagoModel = require('./models/tipo_fuente_pago')
 const UsuarioModel  = require('./models/user')
 const UtilModel = require('./models/util');
-const factura = require('./models/factura');
 
 // Objetos Sequelize
 const Afiliacion = AfiliacionModel(sequelize, Sequelize)
