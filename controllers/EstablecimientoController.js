@@ -1,4 +1,4 @@
-const { Establecimiento, User, Ciudad, Experiencia_Usada, Experiencia, Factura,EstadoFactura } = require('../db');
+const { Sequelize,Establecimiento, User, Ciudad, Experiencia_Usada, Experiencia, Factura,EstadoFactura, Rol } = require('../db');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
@@ -6,16 +6,20 @@ const fs = require('fs');
 
 async function obtenerIDEstablecimientoXFactura(id_factura){
 
+  console.log(id_factura)
   return await Establecimiento.findOne({
     attributes:['id_establecimiento'],
     include:{
       model:Experiencia,
+      required:true,
       attributes:[],
       include:{
         model:Experiencia_Usada,
+        required:true,
         attributes:[],
         include:{
           model:Factura,
+          required:true,
           where:{
             id_factura
           },
@@ -196,6 +200,47 @@ async function validaNit(nitEstablecimiento) {
   return error
 }
 
+async function obtenerCorreoAdminYEstablecimiento(id_establecimiento){
+
+  let correos=[]
+
+  let establecimiento = await Establecimiento.findOne({
+    where:{
+      id_establecimiento
+    },
+    attributes:['correo_establecimiento']
+  })
+
+  if(establecimiento){
+    correos.push(establecimiento.correo_establecimiento)
+  }
+
+  let admin = await User.findOne({
+    attributes:['email'],
+    include:[{
+      model:Establecimiento,
+      required:true,
+      where:{
+        id_establecimiento
+      },
+      attributes:[]
+    },{
+      model:Rol,
+      required:true,
+      where:{
+        nombre_rol:{
+          [Sequelize.Op.eq]:'Administrador Establecimiento'
+        }
+      },
+      attributes:[]
+    }]
+  })
+
+  if(admin){
+    correos.push(admin.email)
+  }
+  return correos
+}
 
 module.exports = {
   async creaEstablecimiento(req, res) {
@@ -249,6 +294,7 @@ module.exports = {
     }
 
   },
+  obtenerCorreoAdminYEstablecimiento,
   
   async añadirLogo(req, res) {
     if (req.file == undefined) {

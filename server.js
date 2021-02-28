@@ -64,7 +64,7 @@ app.use('/api/pago',authMiddleware, PagoRouter)
 
 app.use('/api/eventos',EventoRouter)
 
-cron.schedule('49 * * * *', async () => {
+cron.schedule('1 * * * * *', async () => {
     console.log('Ejecutando cobro a los establecimientos');
     await realizarPagoJob();
   });

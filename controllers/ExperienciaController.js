@@ -33,7 +33,7 @@ async function calcularValorComision(id_experiencia){
 
     valorComision = valorExperiencia*(porcentajeComision/100)
     
-    return valorComision.toFixed(2)
+    return Math.round(valorComision)
 }
 
 
@@ -362,25 +362,7 @@ module.exports = {
         }).
         then(experiencias => { res.json({ experiencias }) })
 
-/*
-        let usados = [];
-        await Experiencia_Usada.findAll({ raw: true, attributes: ['experiencia_usada_id_experiencia'], where: { experiencia_usada_id_user: id_user, renovado_experiencia_usada: 0 } }).
-            then(usado => {
-                usado.forEach(e => {
-                    usados.push(e.experiencia_id_experiencia_usada)
-                });
-            })
 
-        await Experiencia.findAll({
-            where: {
-                id_experiencia: {
-                    [Sequelize.Op.notIn]: usados
-                },
-                estado_experiencia: 1,
-                experiencia_tipo_id_tipo: 1
-            }
-        }).
-            then(experiencias => { res.json({ experiencias }) })*/
 
     },
     async obtenerSeleccion(req, res) {

@@ -1,12 +1,16 @@
-const {Experiencia_Usada,Establecimiento,Experiencia,FuentePago,Tarjeta,Sequelize,Pago,Factura,sequelize, FacturaEstadoFactura,EstadoFactura, TipoFuentePago, PagoEstadoPago, EstadoPago} = require('../db');
+const {Experiencia_Usada,Establecimiento,Experiencia,FuentePago,Tarjeta,Sequelize,Pago,Factura,sequelize, FacturaEstadoFactura,EstadoFactura, TipoFuentePago, PagoEstadoPago, EstadoPago, Util} = require('../db');
 const {generarTransaccion,consultarTransaccion} = require('./PasarelaController')
 const {obtenerIDEstablecimientoXFactura} = require('./EstablecimientoController')
 const {obtenerFuentePagoXEstablecimieto,obtenerCuotas} = require('./FuentePagoController')
+const fs = require('fs');
+const nodemailer = require("nodemailer");
+var handlebars = require('handlebars');
 
+
+// Funcion que permite generar los totales a cobrar por cada uno de los establecimientos
 async function generarTotales(){
     
     let totales=await Establecimiento.findAll({
-
         raw:true,    
         attributes: [
             'id_establecimiento',
@@ -14,16 +18,15 @@ async function generarTotales(){
           ],
         include:{
             model:Experiencia,
-            attributes: [
-              ],
+            attributes: [],
             include:{
                 model:Experiencia_Usada,
                 where:{
                     experiencia_usada_id_factura:{
                         [Sequelize.Op.eq]:null
                     }
-                },attributes: [
-                  ]
+                },
+                attributes: []
             }
         },
         group: ['id_establecimiento'],
@@ -36,49 +39,32 @@ async function generarTotales(){
     return totales;
 }
 
-async function marcarExperienciasCobrada(id_establecimiento){
-
-    await Experiencia_Usada.findAll({
-        raw:true,
-        include:{
-            model:Experiencia,
-            where:{
-                id_establecimiento_experiencia:id_establecimiento
-            }
-        }
-    })
-    .then(async experiencias=>{
-        experiencias.forEach(async experiencia => {
-            await Experiencia_Usada.update({cobrada_experiencia_usada:true},{
-                where:{
-                    id_experiencia_usada:experiencia.id_experiencia_usada
-                }
-            })
-        });
-    })
-
-}
-
+// Funcion que permite asociar experiencias usadas de un establecimiento a una factura
 async function asociarExperienciasUsadasConIDFactura(id_establecimiento,id_factura){
+    console.log(id_establecimiento)
     let experiencias = await Experiencia_Usada.findAll({
         where:{
             experiencia_usada_id_factura:{
                 [Sequelize.Op.eq]:null
-            }},attributes: ['id_experiencia_usada' 
-        ],
+            }},
+            attributes: ['id_experiencia_usada'],
         include:{
            model:Experiencia,
-           attributes:[],
+           attributes:['id_experiencia'],
            include:{
                model:Establecimiento,
-               attributes:[],
+               attributes:['id_establecimiento'],
                where:{
                 id_establecimiento
-            }
-           } 
+                },
+                required:true
+           },
+           required:true 
         }
     })
+    console.log(experiencias)
         for (const experiencia_usada of experiencias) {
+            console.log(experiencia_usada)
             await Experiencia_Usada.update({
                 experiencia_usada_id_factura:id_factura
             },{
@@ -89,6 +75,9 @@ async function asociarExperienciasUsadasConIDFactura(id_establecimiento,id_factu
         }
 }
 
+// Funcion que permite agregar un nuevo estado de una factura,
+// dejando estados anterior como no actuales y agregando
+// un nuevo estado como el estado actual y un estado de factura
 async function nuevoEstadoFactura(id_estado,id_factura){
     
         await FacturaEstadoFactura.update({
@@ -108,9 +97,11 @@ async function nuevoEstadoFactura(id_estado,id_factura){
         await FacturaEstadoFactura.create(nuevoEstado) 
 }
 
-async function guardaFactura(total_monto,id_establecimiento){
-    let factura = await Factura.create({total_monto});
+
+async function guardaFactura(total_monto,total_sin_iva,total_iva,porcentaje_iva,id_establecimiento){
+    let factura = await Factura.create({total_monto,total_sin_iva,total_iva,porcentaje_iva});
     await nuevoEstadoFactura(4,factura.id_factura);
+    console.log(id_establecimiento)
     await asociarExperienciasUsadasConIDFactura(id_establecimiento,factura.id_factura);
 }
 
@@ -133,21 +124,45 @@ async function nuevoEstadoPago(id_estado,id_pago){
         await PagoEstadoPago.create(nuevoEstado)
 }
 
+// Genera las facturas teniendo en cuenta los totales obtenidos por establecimientos
 async function generarFacturas(totales){
         for (const total of totales) {
-            await guardaFactura(total.total_comision,total.id_establecimiento);
+            let total_iva = 0;
+            let total_sin_iva = 0;
+            let porcentaje_iva = 0;
+            let generaIva = await Util.findOne({
+                where:{
+                    id_param:5
+                },
+                attributes:['valor_param']
+            });
+
+            if(generaIva.valor_param=='S'){
+                porcentaje_iva = await Util.findOne({
+                    where:{
+                        id_param:6
+                    },
+                    attributes:['valor_param']
+                });
+                porcentaje_iva = parseInt(porcentaje_iva.valor_param)
+                total_iva=total.total_comision*(porcentaje_iva/100)
+                
+            }
+            total_sin_iva=total.total_comision-total_iva
+            await guardaFactura(total.total_comision,total_sin_iva.toFixed(2),total_iva.toFixed(2),porcentaje_iva,total.id_establecimiento);
         }
 }
 
-
+// Funcion que permite validar si a una factura se le debe de generar un nuevo pago
 async function validaSiGeneraPagoNuevo(id_factura){
 
     return await Factura.findOne({
         where:{
             id_factura
         },
-        include:[{
-            model:FacturaEstadoFactura,
+        attributes:['id_factura'],
+        include:[
+            {model:FacturaEstadoFactura,
             where:{
                 factura_estado_factura_actual:true
             },
@@ -159,7 +174,8 @@ async function validaSiGeneraPagoNuevo(id_factura){
                     }
                 }
             }
-        },{
+            },
+            {
             model:Pago,
             where:{
                 actual:true
@@ -189,10 +205,12 @@ async function validaSiGeneraPagoNuevo(id_factura){
 
 }
 
+// Se genera un nuevo pago por establecimiento teniendo en cuenta la factura y el tipo de pago
 async function generarPagoXEstablecimiento(pago_id_factura,id_tipo_fuente_pago){
     let generaNuevoPago = await validaSiGeneraPagoNuevo(pago_id_factura);
     if(generaNuevoPago){
         let id_establecimiento = await obtenerIDEstablecimientoXFactura(pago_id_factura);
+        console.log(id_establecimiento)
         let pago_fuente_pago;
         try {
             pago_fuente_pago = await obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuente_pago)
@@ -204,6 +222,7 @@ async function generarPagoXEstablecimiento(pago_id_factura,id_tipo_fuente_pago){
             pago_id_factura,
             actual:true
         }
+
             await Pago.create(pago)
              .then(async pago=>{
             await nuevoEstadoPago(1,pago.id_pago)
@@ -214,8 +233,10 @@ async function generarPagoXEstablecimiento(pago_id_factura,id_tipo_fuente_pago){
 
 }
 
+// Genera pagos por todas las factura en estado CREADA
 async function generarPagos(){
     let facturas=await Factura.findAll({
+        attributes:['id_factura'],
         include:{
             model:FacturaEstadoFactura,
             where:{
@@ -231,12 +252,12 @@ async function generarPagos(){
     });
 
     for (const factura of facturas) {
+        console.log(factura)
         await generarPagoXEstablecimiento(factura.id_factura,1);
     };
-    
-
 }
 
+// Mediante un id de pago obtener el valor a pagar
 async function obtenerValorXPago(id_pago){
     let factura=await Factura.findOne({
         attributes:['total_monto'],
@@ -251,6 +272,7 @@ async function obtenerValorXPago(id_pago){
     return factura.total_monto
 }
 
+// Mediante un id de pago obtener el id de la factura
 async function obtenerFacturaXPago(id_pago){
     let factura=await Factura.findOne({
         attributes:['id_factura'],
@@ -265,6 +287,7 @@ async function obtenerFacturaXPago(id_pago){
     return factura.id_factura
 }
 
+//Mediante un id de pago obtener la fuente de pago
 async function obtenerFuentePagoXPago(id_pago){
     let pago = await Pago.findOne({
         attributes:['pago_fuente_pago'],
@@ -292,8 +315,6 @@ async function debitarPagoIndividual(id_pago){
         payment_source_id: fuente_pago
     }
 
-    console.log(transaccion)
-
     let transaccionGenerada = await generarTransaccion(transaccion)
 
     if(transaccionGenerada.enviada){
@@ -305,8 +326,9 @@ async function debitarPagoIndividual(id_pago){
         }})
     }else{
         await nuevoEstadoPago(5,id_pago);
+
         await PagoEstadoPago.update({
-            observacion:transaccionGenerada.error.toString()
+            observacion:transaccionGenerada.error
         },{
             where:{
                 pago_id_pago:id_pago,
@@ -326,12 +348,14 @@ async function debitarPagos(){
         },
         include:{
             model:PagoEstadoPago,
+            required:true,
             where:{
                 pago_estado_pago_actual:true
             },
             attributes:[],
             include:{
                 model:EstadoPago,
+                required:true,
                 where:{
                     nombre_estado_pago:{
                         [Sequelize.Op.eq]:['GENERADO']
@@ -394,9 +418,10 @@ async function insertarErrorEnPago(id_pago,id_factura,id_estado){
 }
 
 
+
 module.exports={
     async realizarPagoManual(){
-        
+        await notificarXCorreo();
 
     },
     async realizarPagoJob(){

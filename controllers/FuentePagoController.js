@@ -25,12 +25,14 @@ async function obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuent
             attributes:['id_fuente_pago'],
             include:[{
                 model:Tarjeta,
+                required:true,
                 where:{
                     estado_tarjeta:true
                 },
                 attributes:[],
                 include:{
                     model:Establecimiento,
+                    required:true,
                     where:{
                         id_establecimiento
                     },
@@ -38,6 +40,7 @@ async function obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuent
                 }
             },{
                 model:TipoFuentePago,
+                required:true,
                 attributes:[],
                 where:{
                     id_tipo_fuente_pago
@@ -45,6 +48,7 @@ async function obtenerFuentePagoXEstablecimieto(id_establecimiento,id_tipo_fuent
             }]
         })
         .then(fuente_pago=>{
+
             return fuente_pago.id_fuente_pago
         })
     }else if(id_tipo_fuente_pago==2){
@@ -73,7 +77,13 @@ async function obtenerCuotas(id_fuente_pago){
         }
     })
 
-    return fuente_pago.cuotas_pago
+    if(fuente_pago){
+        return fuente_pago.cuotas_pago
+    }else{
+        return null
+    }
+
+    
 }
 
 module.exports={

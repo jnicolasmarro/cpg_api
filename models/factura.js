@@ -7,6 +7,13 @@ module.exports= (sequelize, type) => {
         },
         total_monto: {
             type: type.DECIMAL(10,2)
+        },
+        total_iva: {
+            type: type.DECIMAL(10,2)
+        },total_sin_iva:{
+            type: type.DECIMAL(10,2)
+        },porcentaje_iva:{
+            type: type.INTEGER
         }
     }
         , {

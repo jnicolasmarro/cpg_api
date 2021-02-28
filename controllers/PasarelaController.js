@@ -265,10 +265,22 @@ async function almacenarFuentePago(fuentePago){
     return error
 }
 
+function concatenarError(propiedad,errores){
+
+    let errorConcat='';
+    
+    errores.forEach(error => {
+        
+        errorConcat = `${errorConcat}${error} ` ;
+    });
+    
+    return `${propiedad}: ${errorConcat}`
+}
+
 async function procesarTransaccion(transaccion){
 
     let enviada;
-    let error;
+    let error='';
     let id_transaction;
 
     await fetch(`${process.env.URL_WOMPI}/transactions`, {
@@ -281,14 +293,38 @@ async function procesarTransaccion(transaccion){
     })
     .then(res=>res.json())
     .then(res=>{
+
         if(res.data){
             enviada=true;
             id_transaction=res.data.id
         }
         if(res.error){
-            error=res.error.type
+            if(res.error.messages){
+                if(res.error.messages.amount_in_cents){
+                        error=`${error}${concatenarError('Monto',res.error.messages.amount_in_cents)}`
+                }
+                if(res.error.messages.is_amount_in_cents_valid_for_currency){
+                    error=`${error}${concatenarError('Monto válido para la moneda',res.error.messages.is_amount_in_cents_valid_for_currency)}`
+                }
+                if(res.error.messages.currency){
+                        error=`${error}${concatenarError('Moneda',res.error.messages.currency)}`
+                }
+                if(res.error.messages.customer_email){
+                    error=`${error}${concatenarError('Correo',res.error.messages.customer_email)}`
+                }
+                if(res.error.messages.payment_method){
+                    error=`${error}${concatenarError('Metodo de pago',res.error.messages.payment_method)}`
+                }
+                if(res.error.messages.reference){
+                    error=`${error}${concatenarError('Factura',res.error.messages.reference)}`
+                }
+                if(res.error.messages.payment_source_id){
+                    error=`${error}${concatenarError('Fuente de pago',res.error.messages.payment_source_id)}`
+                }
+            }
             enviada=false;
         }
+
     })
 
     return {enviada,error,id_transaction}

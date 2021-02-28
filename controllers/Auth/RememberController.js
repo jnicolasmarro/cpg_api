@@ -95,7 +95,8 @@ module.exports = async (req, res) => {
 
     // Se establece la plantilla a enviar
     let htmlToSend;
-    readHTMLFile(__dirname + '/index.html', async function (err, html) {
+    
+    readHTMLFile(  './views/index.html', async function (err, html) {
         let template = handlebars.compile(html);
         let replacements = {
             // Se genera link para enviar en la plantilla

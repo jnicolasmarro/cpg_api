@@ -235,84 +235,8 @@
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "logo_establecimiento",
-									"type": "file",
-									"src": "/C:/Users/NICOLAS_PC/Desktop/CPG/cpg-api/publico/establecimiento/2708101546.jpg"
-								},
-								{
-									"key": "cantidad_lote",
-									"value": "45",
-									"type": "text"
-								},
-								{
-									"key": "nombre_usuario",
-									"value": "prueb",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "eredheweer@gail.com",
-									"type": "text"
-								},
-								{
-									"key": "numero_celular",
-									"value": "3122045789",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "123456789",
-									"type": "text"
-								},
-								{
-									"key": "autorizacion_datos",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "autorizacion_debito",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "ciudad",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "nit",
-									"value": "1234562744",
-									"type": "text"
-								},
-								{
-									"key": "nombre_empresa",
-									"value": "pruebda l",
-									"type": "text"
-								},
-								{
-									"key": "establecimiento_comercial",
-									"value": "werwerew",
-									"type": "text"
-								},
-								{
-									"key": "correo_establecimiento",
-									"value": "corodwf2@dfsdf.com",
-									"type": "text"
-								},
-								{
-									"key": "celular_establecimiento",
-									"value": "3154614631",
-									"type": "text"
-								},
-								{
-									"key": "direccion_establecimiento",
-									"value": "cra sifgsdfihd",
-									"type": "text"
-								}
-							]
+							"mode": "urlencoded",
+							"urlencoded": []
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/establecimiento/creacion",
@@ -328,6 +252,78 @@
 							]
 						},
 						"description": "Petición POST para la creación de un cliente"
+					},
+					"response": []
+				},
+				{
+					"name": "registrarTarjeta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_establecimiento",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "number",
+									"value": "4242424242424242",
+									"type": "text"
+								},
+								{
+									"key": "cvc",
+									"value": "789",
+									"type": "text"
+								},
+								{
+									"key": "exp_month",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "exp_year",
+									"value": "29",
+									"type": "text"
+								},
+								{
+									"key": "card_holder",
+									"value": "Admin Prueba 1",
+									"type": "text"
+								},
+								{
+									"key": "cuotas",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/establecimiento/vincularTarjeta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"establecimiento",
+								"vincularTarjeta"
+							]
+						}
 					},
 					"response": []
 				},
@@ -384,57 +380,6 @@
 					"response": []
 				},
 				{
-					"name": "vincularTarjeta",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "nit",
-									"value": "1111111111",
-									"type": "text"
-								},
-								{
-									"key": "number",
-									"value": "4575623182290326",
-									"type": "text"
-								},
-								{
-									"key": "exp_year",
-									"value": "2025",
-									"type": "text"
-								},
-								{
-									"key": "exp_month",
-									"value": "12",
-									"type": "text"
-								},
-								{
-									"key": "cvc",
-									"value": "123",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "http://localhost:3000/api/establecimiento/vincularTarjeta",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"establecimiento",
-								"vincularTarjeta"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "realizarPago",
 					"request": {
 						"method": "POST",
@@ -481,7 +426,7 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "jnicolasmarro@gmail.com",
+									"value": "superusuario@gmail.com",
 									"description": "Email de ingreso",
 									"type": "text"
 								},
@@ -531,7 +476,7 @@
 								},
 								{
 									"key": "numero_celular",
-									"value": "3194874864",
+									"value": "3192522839",
 									"description": "Célular del usuario que se registra",
 									"type": "text"
 								},
@@ -543,7 +488,7 @@
 								},
 								{
 									"key": "codigo",
-									"value": "11119166",
+									"value": "11111111",
 									"description": "Código de la afiliación que el usuario adquiere",
 									"type": "text"
 								},
@@ -615,7 +560,8 @@
 							"variable": [
 								{
 									"key": "email",
-									"value": ""
+									"value": "",
+									"type": "string"
 								}
 							]
 						}
@@ -857,27 +803,27 @@
 							"formdata": [
 								{
 									"key": "titulo",
-									"value": "Prueba experiencia",
+									"value": "Prueba experiencia 1",
 									"type": "text"
 								},
 								{
 									"key": "descripcion",
-									"value": "prueba",
+									"value": "prueba ",
 									"type": "text"
 								},
 								{
 									"key": "precio_experiencia",
-									"value": "40000",
+									"value": "85000",
 									"type": "text"
 								},
 								{
 									"key": "precio_publico",
-									"value": "50000",
+									"value": "150000",
 									"type": "text"
 								},
 								{
 									"key": "comision",
-									"value": "3",
+									"value": "26.56",
 									"type": "text"
 								},
 								{
@@ -887,13 +833,13 @@
 								},
 								{
 									"key": "id_establecimiento",
-									"value": "4",
+									"value": "1",
 									"type": "text"
 								},
 								{
 									"key": "imagen_experiencia",
 									"type": "file",
-									"src": "/C:/Users/NICOLAS_PC/Desktop/CPG/cpg-api/publico/experiencias/2.jpg"
+									"src": "/C:/Users/NICOLAS_PC/Desktop/CPG/cpg-api/publico/experiencias/1.jpeg"
 								}
 							]
 						},
@@ -1034,7 +980,7 @@
 							"urlencoded": [
 								{
 									"key": "id_experiencia",
-									"value": "4",
+									"value": "1",
 									"type": "text"
 								}
 							]
@@ -1317,12 +1263,12 @@
 							"urlencoded": [
 								{
 									"key": "titulo_item",
-									"value": "Seleccion de producto",
+									"value": "Seleccion de producto 1",
 									"type": "text"
 								},
 								{
 									"key": "descripcion_item",
-									"value": "Descripcion",
+									"value": "Descripcion 1",
 									"type": "text"
 								},
 								{
@@ -1591,6 +1537,166 @@
 						"header": [],
 						"url": {
 							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "version",
+			"item": [
+				{
+					"name": "versionAppMovil",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/versiones/obtenerVersionAppMovil",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"versiones",
+								"obtenerVersionAppMovil"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "pagos",
+			"item": [
+				{
+					"name": "ejecutarPago",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/pago/ejecutarpago",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pago",
+								"ejecutarpago"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tokenizar",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "id_user",
+								"value": "{{id_user}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_establecimiento",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "number",
+									"value": "4242424242424241",
+									"type": "text"
+								},
+								{
+									"key": "cvc",
+									"value": "789",
+									"type": "text"
+								},
+								{
+									"key": "exp_month",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "exp_year",
+									"value": "29",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/pago/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pago",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "wompi",
+			"item": [
+				{
+					"name": "recibirEventos",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"event\": \"transaction.updated\",\r\n  \"data\": {\r\n    \"transaction\": {\r\n        \"id\": \"1234-1610641025-49201\",\r\n        \"amount_in_cents\": 4490000,\r\n        \"reference\": \"MZQ3X2DE2SMX\",\r\n        \"customer_email\": \"juan.perez@gmail.com\",\r\n        \"currency\": \"COP\",\r\n        \"payment_method_type\": \"NEQUI\",\r\n        \"redirect_url\": \"https://mitienda.com.co/pagos/redireccion\",\r\n        \"status\": \"APPROVED\",\r\n        \"shipping_address\": null,\r\n        \"payment_link_id\": null,\r\n        \"payment_source_id\": null\r\n      }\r\n  },\r\n  \"environment\": \"prod\",\r\n  \"signature\": {\r\n    \"properties\": [\r\n      \"transaction.id\",\r\n      \"transaction.status\",\r\n      \"transaction.amount_in_cents\"\r\n    ],\r\n    \"checksum\": \"3476DDA50F64CD7CBD160689640506FEBEA93239BC524FC0469B2C68A3CC8BD0\"\r\n  },\r\n  \"timestamp\": 1530291411,\r\n  \"sent_at\":  \"2018-07-20T16:45:05.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/eventos/recibireventos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"eventos",
+								"recibireventos"
+							]
 						}
 					},
 					"response": []

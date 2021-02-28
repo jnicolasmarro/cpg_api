@@ -143,7 +143,7 @@ module.exports = async (req, res) => {
         });
     } else {
 
-        // Si existen errores se retorna al cliente móvil
+        // Si existen errores se retorna al cliente móvil o web
         return res.json({ errores })
     }
 
