@@ -81,7 +81,9 @@ module.exports = async (req, res) => {
         numero_celular: req.body.numero_celular,
         password: req.body.password,
         codigo: req.body.codigo,
-        numero_identificacion: req.body.numero_identificacion
+        numero_identificacion: req.body.numero_identificacion,
+        ciudad:req.body.id_ciudad,
+        direccion:req.body.direccion
     }
     // Se realiza validación de los datos del usuario final y se guarda en la variable error el resultado
     let errores = await validacionNuevoUsuarioFinal(user_req);
@@ -101,7 +103,9 @@ module.exports = async (req, res) => {
             email: user_req.email,
             numero_celular: user_req.numero_celular,
             password: bcrypt.hashSync(user_req.password, bcrypt.genSaltSync(10)),
-            rol_id_rol:2
+            rol_id_rol:2,
+            user_id_ciudad:user_req.ciudad,
+            user_direccion:user_req.direccion
         }
 
          return await User.create(user)

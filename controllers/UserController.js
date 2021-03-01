@@ -1,6 +1,6 @@
 /*Controlador de Usuario*/
 const validator = require('validator');
-const { User, Afiliacion } = require('../db');
+const { User, Afiliacion, Ciudad } = require('../db');
 const bcrypt = require('bcryptjs');
 
 
@@ -179,11 +179,29 @@ module.exports = {
     // Permite obtener todos los usuarios finales 
     async obtenerUsuarios(req, res) {
         await User.findAll({ 
-            where: { rol_id_rol: 2 }, 
-            attributes: ['id_user', 'nombre_usuario','numero_identificacion','email','numero_celular','estado_user'] })
+            where: { rol_id_rol: 2 },
+            raw:true, 
+            include:{
+                model:Ciudad,
+                attributes:['nombre_ciudad'],
+                nested: false,
+                attributes: [],
+                required: true,
+            },
+            attributes: ['id_user', 'nombre_usuario','numero_identificacion','email','numero_celular','estado_user','ciudad.nombre_ciudad','user_direccion'] })
             .then(users => {
+
+                users.forEach(user => {
+                    if(user.estado_user){
+                        user.estado_user = 'ACTIVO'
+                    }else{
+                        user.estado_user = 'INACTIVO'
+                    }
+
+                });
                     res.json({users})
             })
+        
     },
     async inactivarUsuario(req, res) {
         let user = {
